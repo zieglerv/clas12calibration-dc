@@ -103,6 +103,7 @@ public class FitControlBinSelectionUI extends javax.swing.JFrame
 				new java.awt.Font("Lucida Grande", 0, 13), new java.awt.Color(0, 102, 0))); // NOI18N
 
 		jCheckBox1.setText("( "+(float)TableLoader.AlphaBounds[0][0]+","+(float)TableLoader.AlphaBounds[0][1]+")");
+                jCheckBox1.setSelected(true);
 		jCheckBox1.addActionListener(new java.awt.event.ActionListener()
 		{
 			public void actionPerformed(java.awt.event.ActionEvent evt)
@@ -112,6 +113,7 @@ public class FitControlBinSelectionUI extends javax.swing.JFrame
 		});
 
 		jCheckBox2.setText("( "+(float)TableLoader.AlphaBounds[1][0]+","+(float)TableLoader.AlphaBounds[1][1]+")");
+                jCheckBox2.setSelected(true);
 		jCheckBox2.addActionListener(new java.awt.event.ActionListener()
 		{
 			public void actionPerformed(java.awt.event.ActionEvent evt)
@@ -121,6 +123,7 @@ public class FitControlBinSelectionUI extends javax.swing.JFrame
 		});
 
 		jCheckBox3.setText("( "+(float)TableLoader.AlphaBounds[2][0]+","+(float)TableLoader.AlphaBounds[2][1]+")");
+                jCheckBox3.setSelected(true);
 		jCheckBox3.addActionListener(new java.awt.event.ActionListener()
 		{
 			public void actionPerformed(java.awt.event.ActionEvent evt)
@@ -130,6 +133,7 @@ public class FitControlBinSelectionUI extends javax.swing.JFrame
 		});
 
 		jCheckBox4.setText("( "+(float)TableLoader.AlphaBounds[3][0]+","+(float)TableLoader.AlphaBounds[3][1]+")");
+                jCheckBox4.setSelected(true);
 		jCheckBox4.addActionListener(new java.awt.event.ActionListener()
 		{
 			public void actionPerformed(java.awt.event.ActionEvent evt)
@@ -139,6 +143,7 @@ public class FitControlBinSelectionUI extends javax.swing.JFrame
 		});
 
 		jCheckBox5.setText("( "+(float)TableLoader.AlphaBounds[4][0]+","+(float)TableLoader.AlphaBounds[4][1]+")");
+                jCheckBox5.setSelected(true);
 		jCheckBox5.addActionListener(new java.awt.event.ActionListener()
 		{
 			public void actionPerformed(java.awt.event.ActionEvent evt)
@@ -148,6 +153,7 @@ public class FitControlBinSelectionUI extends javax.swing.JFrame
 		});
 
 		jCheckBox6.setText("( "+(float)TableLoader.AlphaBounds[5][0]+","+(float)TableLoader.AlphaBounds[5][1]+")");
+                jCheckBox6.setSelected(true);
 		jCheckBox6.addActionListener(new java.awt.event.ActionListener()
 		{
 			public void actionPerformed(java.awt.event.ActionEvent evt)
