@@ -54,7 +54,7 @@ import org.jlab.groot.graphics.EmbeddedCanvas;
 import org.jlab.groot.math.F1D;
 import org.jlab.io.base.DataEvent;
 import org.jlab.io.base.DataBank;
-import org.jlab.io.evio.EvioDataChain;
+//import org.jlab.io.evio.EvioDataChain;
 import org.jlab.io.hipo.HipoDataSource;
 import org.jlab.rec.dc.timetodistance.TableLoader;
 import static org.jlab.rec.dc.timetodistance.TableLoader.AlphaBounds;
@@ -118,7 +118,7 @@ public class TimeToDistanceFitter implements ActionListener, Runnable
 	private boolean isPolynomialFit;
 
 	private ArrayList<String> fileArray;
-	private EvioDataChain reader;
+	//private EvioDataChain reader;
 	private HipoDataSource readerH;
 	private OrderOfAction OAInstance;
 	private DCTabbedPane dcTabbedPane;
@@ -134,7 +134,7 @@ public class TimeToDistanceFitter implements ActionListener, Runnable
 	{
                 
 		this.fileArray = files;
-		this.reader = new EvioDataChain();
+		//this.reader = new EvioDataChain();
 		this.readerH = new HipoDataSource();
 		this.dcTabbedPane = new DCTabbedPane("DC Calibration");
 		this.isPolynomialFit = isPolynFit;
@@ -152,7 +152,7 @@ public class TimeToDistanceFitter implements ActionListener, Runnable
                 
 		this.fileArray = files;
 		this.OAInstance = OAInstance;
-		this.reader = new EvioDataChain();
+		//this.reader = new EvioDataChain();
 		this.readerH = new HipoDataSource();
 		this.dcTabbedPane = new DCTabbedPane("DC Calibration");
 		this.tupleVars = new double[5];
@@ -443,13 +443,15 @@ public class TimeToDistanceFitter implements ActionListener, Runnable
 		{
 			// Reading multiple hipo files.
 			System.out.println("Ready to Open & read " + str);
+                        
+                        readerH= new HipoDataSource();
 			readerH.open(str);
 
 			while (readerH.hasEvent())
 			{
 				icounter++;
 
-				if (icounter % 2000 == 0)
+				if (icounter % 1000 == 0)
 				{
 					System.out.println("Processed " + icounter + " events.");
 				}
@@ -535,7 +537,8 @@ public class TimeToDistanceFitter implements ActionListener, Runnable
                         double alpha = bnkHits.getFloat("Alpha", j);
                         int region = (int) (bnkHits.getInt("superlayer", j) + 1) / 2;
                         //cut on region close to 0 and 30 deg.
-                        if(Math.abs(alpha-30)>2 || Math.abs(alpha)>2)
+                        
+                        if(Math.abs(alpha-30)<2 || Math.abs(alpha)<2)
                             continue;
                         
                         boolean passHit = false;
@@ -554,6 +557,7 @@ public class TimeToDistanceFitter implements ActionListener, Runnable
                         double calibTime = (double) (bnkHits.getInt("TDC", j) - bnkHits.getFloat("TProp", j)
 					- bnkHits.getFloat("TFlight", j) - bnkHits.getFloat("TStart", j) 
                                         - bnkHits.getFloat("T0", j) -bnkHits.getFloat("tBeta", j));
+                        
                         /*double calibTime = DCTimeFunction.computeCalibTime(bnkHits.getInt("sector", j),
                                 superlayer, 
                                 bnkHits.getFloat("doca", j),
@@ -786,28 +790,30 @@ public class TimeToDistanceFitter implements ActionListener, Runnable
 			// parSteps[p], pLow[iSL][p], pHigh[iSL][p]);
 			if (fixIt[p] == true)
 			{
-				mapOfFitParameters.get(new Coordinate(iSec, iSL)).fix(p);
+                            System.out.println("parameter["+p+"] is fixed");
+                            mapOfFitParameters.get(new Coordinate(iSec, iSL)).fix(p);
 			}
 		}
 
 		// Following is to ensure that initial values are written as output if all parameters are
 		// fixed i.e. when checkBoxFixAll == true;
-		for (int p = 0; p < nFreePars; p++)
-		{ // Don't delete
-			fPars[p] = pInit[iSL][p];
-		}
+		//for (int p = 0; p < nFreePars; p++)
+		//{ // Don't delete
+		//	fPars[p] = pInit[iSL][p];
+                //        System.out.println(" free parameter [ "+p+" ] = "+fPars[p]);
+		//}
 
 		// If all the parameters are fixed, don't run Minuit
 		if (checkBoxFixAll == false)
 		{
 			MnMigrad migrad = new MnMigrad(mapOfFitFunctions.get(new Coordinate(iSec, iSL)),
 					mapOfFitParameters.get(new Coordinate(iSec, iSL)));
-                        
+                        migrad.useAnalyticalDerivaties();
                         FunctionMinimum min = migrad.minimize();
-                        for (int p = 0; p < nFreePars; p++) {
-                            migrad.removeLimits(p);
-                        }
-                        migrad.minimize();
+                        //for (int p = 0; p < nFreePars; p++) {
+                        //    migrad.removeLimits(p);
+                        //}
+                        //migrad.minimize();
 			
 			// ---------------- step# fit result : Collect the fit results ------------------------------------
 			mapTmpUserFitParameters.put(new Coordinate(iSec, iSL), min.userParameters());
@@ -957,30 +963,44 @@ public class TimeToDistanceFitter implements ActionListener, Runnable
 
 			if (iSL == 2 || iSL == 3)
 			{   
+                            if(h2timeVtrkDoca.get(new Coordinate(iSec, iSL, k, 0))!=null) {
                                 profHist = h2timeVtrkDoca.get(new Coordinate(iSec, iSL, k, 0)).getProfileX();  // Minimum B-field
 				profHist.getAttributes().setLineColor(1);
 				profHist.getAttributes().setMarkerColor(1);
-				canvas2.draw(profHist); 
-                            for(int b = 1; b< BMax; b++) {
-				profHist = h2timeVtrkDoca.get(new Coordinate(iSec, iSL, k, b)).getProfileX();  // Minimum B-field
-				profHist.getAttributes().setLineColor(1);
-				profHist.getAttributes().setMarkerColor(1);
-				canvas2.draw(profHist, "same"); 
+                                if(profHist!=null)
+                                    canvas2.draw(profHist); 
                             }
-				
+                            for(int b = 1; b< BMax; b++) {
+                                if(h2timeVtrkDoca.get(new Coordinate(iSec, iSL, k, b))!=null) {    
+                                    profHist = h2timeVtrkDoca.get(new Coordinate(iSec, iSL, k, b)).getProfileX();  // Minimum B-field
+                                    profHist.getAttributes().setLineColor(b+1);
+                                    profHist.getAttributes().setMarkerColor(b+1);
+                                    if(profHist!=null)
+                                        canvas2.draw(profHist, "same"); 
+                                }
+                            }
 			}
 			else
-				canvas2.draw(h2timeVtrkDoca.get(new Coordinate(iSec, iSL, k)).getProfileX());
-
+                            if(h2timeVtrkDoca.get(new Coordinate(iSec, iSL, k))!=null) {
+                                if(h2timeVtrkDoca.get(new Coordinate(iSec, iSL, k)).getProfileX()!=null)
+                                    canvas2.draw(h2timeVtrkDoca.get(new Coordinate(iSec, iSL, k)).getProfileX());
+                            }
 			if (iSL == 2 || iSL == 3)
 			{
                             for(int b =0; b<BMax; b++) {
-				canvas2.draw(mapOfFitLinesX.get(new Coordinate(iSec, iSL, k, b)), "same");
+                                if(h2timeVtrkDoca.get(new Coordinate(iSec, iSL, k, b))!=null) {
+                                    mapOfFitLinesX.get(new Coordinate(iSec, iSL, k, b)).setLineColor(b+1);
+                                    if(mapOfFitLinesX.get(new Coordinate(iSec, iSL, k, b))!=null) 
+                                        canvas2.draw(mapOfFitLinesX.get(new Coordinate(iSec, iSL, k, b)), "same");
+                                }
                                 //mapOfFitLinesX.get(new Coordinate(iSec, iSL, k, b)).getAttributes().setLineColor(1+b);
                             }
 			}
 			else
-				canvas2.draw(mapOfFitLinesX.get(new Coordinate(iSec, iSL, k)), "same");
+                            if(h2timeVtrkDoca.get(new Coordinate(iSec, iSL, k))!=null) {
+                                if(mapOfFitLinesX.get(new Coordinate(iSec, iSL, k))!=null)
+                                    canvas2.draw(mapOfFitLinesX.get(new Coordinate(iSec, iSL, k)), "same");
+                            }
 			canvas2.getPad(k - nSkippedThBins).setTitle(Title);
 			canvas2.setPadTitlesX("trkDoca");
 			canvas2.setPadTitlesY("time (ns)");

@@ -649,6 +649,7 @@ public class FitControlUI extends javax.swing.JFrame
 		});
 
 		jCheckBox1.setText("Fix me");
+                jCheckBox1.setSelected(true);
 		jCheckBox1.addActionListener(new java.awt.event.ActionListener()
 		{
 			public void actionPerformed(java.awt.event.ActionEvent evt)
@@ -658,6 +659,7 @@ public class FitControlUI extends javax.swing.JFrame
 		});
 
 		jCheckBox2.setText("Fix me");
+                jCheckBox2.setSelected(true);
 		jCheckBox2.addActionListener(new java.awt.event.ActionListener()
 		{
 			public void actionPerformed(java.awt.event.ActionEvent evt)
@@ -676,6 +678,7 @@ public class FitControlUI extends javax.swing.JFrame
 		});
 
 		jCheckBox4.setText("Fix me");
+                jCheckBox4.setSelected(true);
 		jCheckBox4.addActionListener(new java.awt.event.ActionListener()
 		{
 			public void actionPerformed(java.awt.event.ActionEvent evt)
@@ -685,6 +688,7 @@ public class FitControlUI extends javax.swing.JFrame
 		});
 
 		jCheckBox5.setText("Fix me");
+                jCheckBox5.setSelected(true);
 		jCheckBox5.addActionListener(new java.awt.event.ActionListener()
 		{
 			public void actionPerformed(java.awt.event.ActionEvent evt)
@@ -694,6 +698,7 @@ public class FitControlUI extends javax.swing.JFrame
 		});
 
 		jCheckBox6.setText("Fix me");
+                jCheckBox6.setSelected(true);
 		jCheckBox6.addActionListener(new java.awt.event.ActionListener()
 		{
 			public void actionPerformed(java.awt.event.ActionEvent evt)
@@ -703,6 +708,7 @@ public class FitControlUI extends javax.swing.JFrame
 		});
 
 		jCheckBox7.setText("Fix me");
+                jCheckBox7.setSelected(true);
 		jCheckBox7.addActionListener(new java.awt.event.ActionListener()
 		{
 			public void actionPerformed(java.awt.event.ActionEvent evt)
@@ -712,6 +718,7 @@ public class FitControlUI extends javax.swing.JFrame
 		});
 
 		jCheckBox8.setText("Fix me");
+                jCheckBox8.setSelected(true);
 		jCheckBox8.addActionListener(new java.awt.event.ActionListener()
 		{
 			public void actionPerformed(java.awt.event.ActionEvent evt)
@@ -721,6 +728,7 @@ public class FitControlUI extends javax.swing.JFrame
 		});
 
 		jCheckBox9.setText("Fix me");
+                jCheckBox9.setSelected(true);
 		jCheckBox9.addActionListener(new java.awt.event.ActionListener()
 		{
 			public void actionPerformed(java.awt.event.ActionEvent evt)
@@ -842,6 +850,7 @@ public class FitControlUI extends javax.swing.JFrame
 		resetParHighTextField9.setText("jTextField32");
 
 		jCheckBox10.setText("Fix me");
+                jCheckBox10.setSelected(true);
 		jCheckBox10.addActionListener(new java.awt.event.ActionListener()
 		{
 			public void actionPerformed(java.awt.event.ActionEvent evt)
