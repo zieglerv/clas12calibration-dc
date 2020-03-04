@@ -1,17 +1,6 @@
-/*  +__^_________,_________,_____,________^-.-------------------,
- *  | |||||||||   `--------'     |          |                   O
- *  `+-------------USMC----------^----------|___________________|
- *    `\_,---------,---------,--------------'
- *      / X MK X /'|       /'
- *     / X MK X /  `\    /'
- *    / X MK X /`-------'
- *   / X MK X /
- *  / X MK X /
- * (________(                @author m.c.kunkel
- *  `------'
-*/
-package org.clas.detector.clas12calibration.dc.init;
+package org.clas.detector.clas12calibration.dc.analysis;
 
+//  @author m.c.kunkel
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -21,27 +10,23 @@ import org.jlab.groot.math.F1D;
 import org.jlab.groot.math.RandomFunc;
 import org.jlab.groot.ui.TCanvas;
 
-public class Coordinate
-{
-	private Integer[] array;
+public class Coordinate {
+	private Integer[] size;
 
-	public Coordinate(Integer... size)
-	{
-		this.array = size;
+	public Coordinate(Integer... size) {
+		this.size = size;
 	}
 
 	@Override
-	public int hashCode()
-	{
+	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + Arrays.hashCode(array);
+		result = prime * result + Arrays.hashCode(size);
 		return result;
 	}
 
 	@Override
-	public boolean equals(Object obj)
-	{
+	public boolean equals(Object obj) {
 		if (this == obj)
 			return true;
 		if (obj == null)
@@ -49,13 +34,12 @@ public class Coordinate
 		if (getClass() != obj.getClass())
 			return false;
 		Coordinate other = (Coordinate) obj;
-		if (!Arrays.equals(array, other.array))
+		if (!Arrays.equals(size, other.size))
 			return false;
 		return true;
 	}
 
-	public static void main(String[] args)
-	{
+	public static void main(String[] args) {
 		Map<Coordinate, H1F> trial = new HashMap<Coordinate, H1F>();
 
 		trial.put(new Coordinate(1, 1), new H1F("h" + 1, "", 50, 0, 2.0 * Math.PI));
@@ -79,8 +63,7 @@ public class Coordinate
 		RandomFunc randfunc3 = new RandomFunc(func3);
 		RandomFunc randfunc4 = new RandomFunc(func4);
 
-		for (int i = 0; i < 1800; i++)
-		{
+		for (int i = 0; i < 1800; i++) {
 			trial.get(new Coordinate(1, 1)).fill(randfunc.random());
 			trial.get(new Coordinate(2, 1)).fill(randfunc2.random());
 			trial.get(new Coordinate(1, 1, 1, 1, 1, 1)).fill(randfunc3.random());
@@ -90,7 +73,7 @@ public class Coordinate
 		trial.get(new Coordinate(1, 1)).setTitleX("First");
 		trial.get(new Coordinate(2, 1)).setTitleX("Second");
 		trial.get(new Coordinate(1, 1, 1, 1, 1, 1)).setTitleX("Third");
-		trial.get(new Coordinate(1, 1, 1)).setTitleX("Fourth");
+                trial.get(new Coordinate(1, 1, 1)).setTitleX("Fourth");
 
 		TCanvas c1 = new TCanvas("c1", 800, 800);
 		c1.divide(2, 2);
