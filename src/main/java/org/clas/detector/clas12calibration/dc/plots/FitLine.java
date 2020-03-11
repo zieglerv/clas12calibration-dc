@@ -8,8 +8,6 @@ package org.clas.detector.clas12calibration.dc.plots;
 import org.freehep.math.minuit.MnUserParameters;
 import org.jlab.groot.math.Func1D;
 import org.jlab.rec.dc.Constants;
-import org.jlab.rec.dc.timetodistance.T2DFunctions;
-
 /**
  *
  * @author ziegler
@@ -67,7 +65,7 @@ public class FitLine extends Func1D{
         double deltatime_beta = (Math.sqrt(x * x + (distbeta * fc._beta * fc._beta) 
                 * (distbeta* fc._beta * fc._beta)) - x) / Constants.V0AVERAGED;
 
-        calcTime = T2DFunctions.polyFcnMac(x,  ralpha,  B,  v_0,  vm,  R, 
+        calcTime = fc.polyFcnMac(x,  ralpha,  B,  v_0,  vm,  R, 
             tmax,  dmax,  delBf,  Bb1,  Bb2,  Bb3,  Bb4, i+1) + deltatime_beta ;
         
         //System.out.println("ijk "+i+""+j+""+k+" b "+(float)PlotMaker.BfieldValues[k]+" ralpha "+(float)ralpha+" x "+x+" time "+(float)calcTime);

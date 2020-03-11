@@ -1,6 +1,5 @@
 package org.clas.detector.clas12calibration.dc.analysis;
 
-//  @author m.c.kunkel
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -9,7 +8,10 @@ import org.jlab.groot.data.H1F;
 import org.jlab.groot.math.F1D;
 import org.jlab.groot.math.RandomFunc;
 import org.jlab.groot.ui.TCanvas;
-
+/**
+ * 
+ * @author mkunkle
+ */
 public class Coordinate {
 	private Integer[] size;
 

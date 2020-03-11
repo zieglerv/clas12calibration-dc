@@ -63,7 +63,7 @@ import org.jlab.rec.dc.timetodistance.TableLoader;
 
 /**
  *
- * @author ziegler
+ * @author ziegler, devita
  */
 
     
@@ -132,6 +132,8 @@ public class Viewer implements IDataEventListener, DetectorListener, ActionListe
         menuItem.getAccessibleContext().setAccessibleDescription("Set GUI update interval");
         menuItem.addActionListener(this);
         settings.add(menuItem);
+        
+        
         menuItem = new JMenuItem("Set Style to default");
         menuItem.getAccessibleContext().setAccessibleDescription("Set GROOT style to default");
         menuItem.addActionListener(this);
@@ -142,6 +144,13 @@ public class Viewer implements IDataEventListener, DetectorListener, ActionListe
         settings.add(menuItem);
         menuBar.add(settings);
         
+        JMenu fits = new JMenu("Fits");
+        fits.getAccessibleContext().setAccessibleDescription("Choose parameters");
+        menuItem = new JMenuItem("Refit");
+        menuItem.getAccessibleContext().setAccessibleDescription("...");
+        menuItem.addActionListener(this);
+        fits.add(menuItem);
+        menuBar.add(fits);
            
         // create main panel
         mainPanel = new JPanel();	
@@ -219,6 +228,9 @@ public class Viewer implements IDataEventListener, DetectorListener, ActionListe
         }        
         if(e.getActionCommand()=="Print histograms to file...") {
             this.printHistosToFile();
+        }
+        if(e.getActionCommand()=="Refit") {
+            
         }
         if(e.getActionCommand()=="Save histograms to file...") {
             DateFormat df = new SimpleDateFormat("MM-dd-yyyy_hh.mm.ss_aa");

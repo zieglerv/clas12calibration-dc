@@ -10,7 +10,6 @@ import org.clas.detector.clas12calibration.dc.analysis.Coordinate;
 import org.freehep.math.minuit.FCNBase;
 import org.jlab.groot.data.GraphErrors;
 import org.jlab.rec.dc.Constants;
-import org.jlab.rec.dc.timetodistance.T2DFunctions;
 
 /**
  *
@@ -47,7 +46,7 @@ public class FitFunction implements FCNBase{
         double deltatime_beta = (Math.sqrt(x * x + (distbeta * _beta * _beta) 
                 * (distbeta* _beta * _beta)) - x) / Constants.V0AVERAGED;
 
-        double calcTime = T2DFunctions.polyFcnMac(x,  ralpha,  B,  v_0,  vm,  R, 
+        double calcTime = this.polyFcnMac(x,  ralpha,  B,  v_0,  vm,  R, 
             tmax,  dmax,  delBf,  Bb1,  Bb2,  Bb3,  Bb4, i+1) + deltatime_beta ;
         
         return calcTime;

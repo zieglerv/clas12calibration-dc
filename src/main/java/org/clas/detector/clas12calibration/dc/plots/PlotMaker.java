@@ -4,15 +4,22 @@
  * and open the template in the editor.
  */
 package org.clas.detector.clas12calibration.dc.plots;
-
+import org.clas.detector.clas12calibration.dc.t2d.TableLoader;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.clas.detector.clas12calibration.dc.analysis.Coordinate;
+import org.clas.detector.clas12calibration.dc.analysis.FitPanel;
+import org.clas.detector.clas12calibration.dc.t2d.TimeToDistanceEstimator;
 import org.clas.detector.clas12calibration.viewer.AnalysisMonitor;
 import org.clas.detector.clas12calibration.viewer.Viewer;
 import org.freehep.math.minuit.FCNBase;
@@ -37,7 +44,6 @@ import org.jlab.io.hipo.HipoDataSync;
 import org.jlab.jnp.hipo4.data.SchemaFactory;
 import org.jlab.rec.dc.Constants;
 import org.jlab.rec.dc.hit.FittedHit;
-import org.jlab.rec.dc.timetodistance.TimeToDistanceEstimator;
 import org.jlab.utils.groups.IndexedList;
 import org.jlab.utils.system.ClasUtilsFile;
 /**
@@ -48,12 +54,16 @@ public class PlotMaker extends AnalysisMonitor{
     public HipoDataSync writer = null;
     private HipoDataEvent hipoEvent = null;
     private SchemaFactory schemaFactory = new SchemaFactory();
+    FitPanel fp;
     PrintWriter pw = null;
+    File outfile = null;
+    
     public PlotMaker(String name, ConstantsManager ccdb) throws FileNotFoundException {
         super(name, ccdb);
         this.setAnalysisTabNames("TrackDoca vs T","TrackDoca vs T Graphs","CalcDoca vs T","Time Residuals","Parameters");
         this.init(false, "v0:vmid:R:tmax:distbeta:delBf:b1:b2:b3:b4");
-        pw = new PrintWriter(new File("ccdbConstants.txt"));
+        outfile = new File("ccdbConstants.txt");
+        pw = new PrintWriter(outfile);
         pw.printf("#& sector superlayer component v0 deltanm tmax distbeta delta_bfield_coefficient b1 b2 b3 b4 delta_T0 c1 c2 c3\n");
         
         String dir = ClasUtilsFile.getResourceDir("CLAS12DIR", "etc/bankdefs/hipo4");
@@ -78,6 +88,7 @@ public class PlotMaker extends AnalysisMonitor{
                 }
             }
         }
+        
     }
     private Map<Coordinate, H2F> Tvstrkdocas                = new HashMap<Coordinate, H2F>();
     private Map<Coordinate, H2F> Tvscalcdocas               = new HashMap<Coordinate, H2F>();
@@ -231,104 +242,108 @@ public class PlotMaker extends AnalysisMonitor{
             for (int j = 0; j < this.alphaBins; j++) {
                 this.filltrkDocavsTGraphs(i,j);
             }
-            
-            runFit(i); 
-            
+            //runFit(i); 
         }
-        pw.close();
-        
-        int ij =0;
-        int ip =0;
-        for (int i = 0; i < this.nsl; i++) {
-            //Plot pars
-            for(int p = 0; p<6; p++) {
+        //fp.refit();
+        //pw.close();
+        fp.updateFitButton();
+    }
+    public void plotFits() {
+        if(fp.fitted==true) {
+            pw.close();
+            File file2 = new File("");
+            file2 = outfile;
+            file2.renameTo(new File("ccdb"+new Timestamp(new Date().getTime()).toString()));
+            int ij =0;
+            int ip =0;
+            for (int i = 0; i < this.nsl; i++) {
+                //Plot pars
+                for(int p = 0; p<6; p++) {
 
-                ParsVsIter.get(new Coordinate(i,p)).setOptStat(0);
-                this.getAnalysisCanvas().getCanvas("Parameters").cd(ip);
-                GraphErrors gr = new GraphErrors();
-                double min = ParsVsIter.get(new Coordinate(i,p)).getMin();
-                double max = ParsVsIter.get(new Coordinate(i,p)).getMax();
-                if(Math.abs(min)<1.e-06 && Math.abs(max)<1.e-06) {
-                    min = -0.1;
-                    max = 0.1;
-                }
-                
-                gr= ParsVsIter.get(new Coordinate(i,p)).getGraph();
-                gr.addPoint(-1, min-0.1, 0, 0);
-                this.getAnalysisCanvas().getCanvas("Parameters").
-                        draw(gr);
-                
-                this.getAnalysisCanvas().getCanvas("Parameters").getPad(ip).getAxisX().setRange(0.5, 11.5);
-                ip++;
-            }
-        }
-        
-        for (int i = 0; i < this.nsl; i++) {
-            
-            for (int j = 0; j < this.alphaBins; j++) {
-                
-                if(i<2 || i>3) {
-                    if(TvstrkdocasProf.get(new Coordinate(i, j, BBins)).getVectorX().size()>0) {
-
-                        this.updateTable(i,j);
-                        TvstrkdocasFits.put(new Coordinate(i,j,BBins), new FitLine("f"+""+i+""+j+"0", i, j, BBins, 
-                        TvstrkdocasFitPars.get(new Coordinate(i))));
-                        TvstrkdocasFits.get(new Coordinate(i, j, BBins)).setLineStyle(4);
-                        TvstrkdocasFits.get(new Coordinate(i, j, BBins)).setLineWidth(5);
-                        TvstrkdocasFits.get(new Coordinate(i, j, BBins)).setLineColor(8);
+                    ParsVsIter.get(new Coordinate(i,p)).setOptStat(0);
+                    this.getAnalysisCanvas().getCanvas("Parameters").cd(ip);
+                    GraphErrors gr = new GraphErrors();
+                    double min = ParsVsIter.get(new Coordinate(i,p)).getMin()-2*ParsVsIter.get(new Coordinate(i,p)).getBinError(1);
+                    double max = ParsVsIter.get(new Coordinate(i,p)).getMax()+2*ParsVsIter.get(new Coordinate(i,p)).getBinError(1);
+                    if(Math.abs(min)<1.e-06 && Math.abs(max)<1.e-06) {
+                        min = -0.1;
+                        max = 0.1;
                     }
-                     
-                } else {
-                    for(int k = 0; k < this.BBins; k++) {
-                        if(TvstrkdocasProf.get(new Coordinate(i, j, k)).getVectorX().size()>0){
+                    
+                    this.getAnalysisCanvas().getCanvas("Parameters").
+                            draw(ParsVsIter.get(new Coordinate(i,p)));
+
+                    //this.getAnalysisCanvas().getCanvas("Parameters").getPad(ip).getAxisX().setRange(0.5, 11.5);
+                    //this.getAnalysisCanvas().getCanvas("Parameters").getPad(ip).getAxisY().setRange(min, max);
+                    ip++;
+                }
+            }
+
+            for (int i = 0; i < this.nsl; i++) {
+
+                for (int j = 0; j < this.alphaBins; j++) {
+
+                    if(i<2 || i>3) {
+                        if(TvstrkdocasProf.get(new Coordinate(i, j, BBins)).getVectorX().size()>0) {
+
                             this.updateTable(i,j);
-                            TvstrkdocasFits.put(new Coordinate(i,j,k), new FitLine("f"+""+i+""+j+""+k, i, j, k, 
+                            TvstrkdocasFits.put(new Coordinate(i,j,BBins), new FitLine("f"+""+i+""+j+"0", i, j, BBins, 
                             TvstrkdocasFitPars.get(new Coordinate(i))));
-                            TvstrkdocasFits.get(new Coordinate(i, j, k)).setLineStyle(4);
-                            TvstrkdocasFits.get(new Coordinate(i, j, k)).setLineWidth(5);
-                            TvstrkdocasFits.get(new Coordinate(i, j, k)).setLineColor(k+1);
+                            TvstrkdocasFits.get(new Coordinate(i, j, BBins)).setLineStyle(4);
+                            TvstrkdocasFits.get(new Coordinate(i, j, BBins)).setLineWidth(5);
+                            TvstrkdocasFits.get(new Coordinate(i, j, BBins)).setLineColor(8);
+                        }
+
+                    } else {
+                        for(int k = 0; k < this.BBins; k++) {
+                            if(TvstrkdocasProf.get(new Coordinate(i, j, k)).getVectorX().size()>0){
+                                this.updateTable(i,j);
+                                TvstrkdocasFits.put(new Coordinate(i,j,k), new FitLine("f"+""+i+""+j+""+k, i, j, k, 
+                                TvstrkdocasFitPars.get(new Coordinate(i))));
+                                TvstrkdocasFits.get(new Coordinate(i, j, k)).setLineStyle(4);
+                                TvstrkdocasFits.get(new Coordinate(i, j, k)).setLineWidth(5);
+                                TvstrkdocasFits.get(new Coordinate(i, j, k)).setLineColor(k+1);
+                            }
                         }
                     }
+                    ij++;
                 }
-                ij++;
-                
             }
-             
+            this.getCalib().fireTableDataChanged();    
+            //this.reProcess();
         }
-        this.getCalib().fireTableDataChanged();    
-        this.reProcess();
-        this.getCalib().fireTableDataChanged();     
     }
     private int maxIter = 10;
-    public void runFit(int i) {
+    double[][] fixPars = new double[6][10];
+    
+    private MnScan  scanner = null;
+    private MnMigrad migrad = null;
+    public void runFit(int i, boolean fixFit[][]) {
         // i = superlayer - 1;
-        
+        System.out.println(" **************** ");
+        System.out.println(" RUNNING THE FITS ");
+        System.out.println(" **************** ");
         TvstrkdocasFit.put(new Coordinate(i), 
                 new FitFunction(i, (Map<Coordinate, GraphErrors>) TvstrkdocasProf));
         
-        MnScan  scanner = new MnScan((FCNBase) TvstrkdocasFit.get(new Coordinate(i)), 
+        scanner = new MnScan((FCNBase) TvstrkdocasFit.get(new Coordinate(i)), 
                 TvstrkdocasFitPars.get(new Coordinate(i)),2);
 	
         for(int p = 0; p<10; p++) {
                 ParsVsIter.get(new Coordinate(i,p)).setBinContent(0, TvstrkdocasFitPars.get(new Coordinate(i)).value(p));
                 ParsVsIter.get(new Coordinate(i,p)).setBinError(0, TvstrkdocasFitPars.get(new Coordinate(i)).error(p));
+        }
+        scanner.fix(10);
+        for (int p = 0; p < 10; p++) {
+            if(fixFit[p][i]==true) {
+                scanner.fix(p); 
             }
-        
-        for(int p = 5; p<11; p++) {
-            scanner.fix(p);
         }
-        if(i<2) {
-            TvstrkdocasFitPars.get(new Coordinate(i)).setValue(0, 0.0045);
-            scanner.fix(2);
-            //scanner.fix(2);
-        }
-        if(i>1 && i<4)
-            scanner.fix(3);
         FunctionMinimum scanmin = scanner.minimize();
         if(scanmin.isValid())
             TvstrkdocasFitPars.put(new Coordinate(i),scanmin.userParameters());
         
-        MnMigrad migrad = new MnMigrad((FCNBase) TvstrkdocasFit.get(new Coordinate(i)), 
+        migrad = new MnMigrad((FCNBase) TvstrkdocasFit.get(new Coordinate(i)), 
                 TvstrkdocasFitPars.get(new Coordinate(i)),1);
         migrad.setCheckAnalyticalDerivatives(true);
         
@@ -346,19 +361,17 @@ public class PlotMaker extends AnalysisMonitor{
             System.err.println("****************************************************");  
             for(int pi = 0; pi<6; pi++) 
                 System.out.println("par["+pi+"]="+(TvstrkdocasFitPars.get(new Coordinate(i)).value(pi)-min.userParameters().value(pi)));
-            if(it==2 && (i>1 && i<4))
-                migrad.release(5);
-            if(it==5 && (i>1 && i<4))
-                migrad.release(3);
+            
             if(min.isValid()) {
                 TvstrkdocasFitPars.put(new Coordinate(i),min.userParameters());  
             }
             
            
             System.err.println(min);
+            
         }
         
-        //Dump results to file
+        
         for(int isec = 0; isec < 6; isec++) {
            
             pw.printf("%d\t %d\t %d\t %.6f\t %d\t %.6f\t %.6f\t %.6f\t %.6f\t %.6f\t %.6f\t %.6f\t %d\t %.6f\t %.6f\t %d\n",
@@ -378,27 +391,105 @@ public class PlotMaker extends AnalysisMonitor{
                 0);
         }
         
+        //release all so they can be fixed again
+        TvstrkdocasFitPars.get(new Coordinate(i)).release(10);
+        for (int p = 0; p < 10; p++) {
+            if(fixFit[p][i]==true) {
+                TvstrkdocasFitPars.get(new Coordinate(i)).release(p);
+            }
+        }
     }
+    private SimpleDateFormat sdf = new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss");
     int counter = 0;
     public  HipoDataSource reader = new HipoDataSource();
-    public void reProcess() {
-        
+    
+    public void reCook() {
+        for (int i = 0; i < nsl; i++) {
+            for (int j = 0; j < alphaBins; j++) {
+                for (int k = 0; k < BBins+1; k++) {
+                    Tvstrkdocas.get(new Coordinate(i,j,k)).reset();
+                    Tvscalcdocas.get(new Coordinate(i,j,k)).reset();
+                    //TvstrkdocasProf.get(new Coordinate(i,j,k)).reset();
+                }
+            }
+        }
+        reLoadFitPars();
+        reader = new HipoDataSource();
         reader.open("TestOutPut.hipo");
-        
-        while (reader.hasEvent()) {
+        while (reader.hasEvent()) { 
             hits.clear();
             DataEvent event = reader.getNextEvent();
             if(event.hasBank("TimeBasedTrkg::TBHits")) {
                 DataBank bnkHits = event.getBank("TimeBasedTrkg::TBHits");
-
+                
                 for (int i = 0; i < bnkHits.rows(); i++) {
                     if(this.getHit(bnkHits, i)!=null)
                         hits.add(this.getHit(bnkHits, i));
                 }
-                // fill uncalibrated plot
                 for(FittedHit hit : hits) {
-                    fitResi.get(new Coordinate(hit.get_Superlayer()-1)).fill(hit.get_Residual());
+                    hit.set_TimeResidual(-999);
+                    updateHit(hit);
                 }
+                //refit with new constants
+                Refit rf = new Refit(hits);
+                rf.reFit();    
+                for(FittedHit hit : hits) {
+                    int alphaBin = this.getAlphaBin(hit.getAlpha());
+                    double bFieldVal = (double) hit.getB();
+                        if(alphaBin!=-1) {
+                        Tvstrkdocas.get(new Coordinate(hit.get_Superlayer() - 1, alphaBin, this.BBins))
+                                        .fill(hit.get_ClusFitDoca(), hit.get_Time());
+                        Tvscalcdocas.get(new Coordinate(hit.get_Superlayer() - 1, alphaBin, this.BBins))
+                                        .fill(hit.get_Doca(), hit.get_Time());
+                        //Fill region 2 for different b-field values
+                        if(hit.get_Superlayer() >2 && hit.get_Superlayer() <5) { 
+                            int bBin = this.getBBin(bFieldVal);
+                            Tvstrkdocas.get(new Coordinate(hit.get_Superlayer() - 1, alphaBin, bBin))
+                                        .fill(hit.get_ClusFitDoca(), hit.get_Time());
+                            Tvscalcdocas.get(new Coordinate(hit.get_Superlayer() - 1, alphaBin, bBin))
+                                        .fill(hit.get_Doca(), hit.get_Time());
+
+                        }
+                    }
+                }
+            }
+        }
+        for (int i = 0; i < this.nsl; i++) {
+            for (int j = 0; j < this.alphaBins; j++) {
+                this.filltrkDocavsTGraphs(i,j);
+            }
+        }
+        reader.close();
+        fp.updateFitButton();
+    }
+    public void reProcess() {
+        //reset histos to refill
+        for (int i = 0; i < this.nsl; i++) {
+            for (int j = 0; j < this.alphaBins; j++) {
+                //for (int k = 0; k < this.BBins; k++) {
+                //    timeResi.get(new Coordinate(i,j,k)).reset();
+                //    timeResiNew.get(new Coordinate(i,j,k)).reset();
+                //}
+            }
+        }
+        
+        reader = new HipoDataSource();
+        reader.open("TestOutPut.hipo");
+        while (reader.hasEvent()) { 
+            hits.clear();
+            DataEvent event = reader.getNextEvent();
+            if(event.hasBank("TimeBasedTrkg::TBHits")) {
+                DataBank bnkHits = event.getBank("TimeBasedTrkg::TBHits");
+                
+                for (int i = 0; i < bnkHits.rows(); i++) {
+                    if(this.getHit(bnkHits, i)!=null)
+                        hits.add(this.getHit(bnkHits, i));
+                }
+//                // fill uncalibrated plot
+//                for(FittedHit hit : hits) {
+//                    fitResi.get(new Coordinate(hit.get_Superlayer()-1)).fill(hit.get_Residual());
+//                    System.out.println("====================== filling the residuals");
+//                }
                 for(FittedHit hit : hits) {
                     hit.set_TimeResidual(-999);
                     updateHit(hit);
@@ -411,25 +502,26 @@ public class PlotMaker extends AnalysisMonitor{
                     timeResi.get(new Coordinate(hit.get_Superlayer()-1)).fill(hit.get_TimeResidual());
                 }
 
-            }
+            } 
         }
+        
         //--------------------------------------------
-        System.out.println("reloading Fit Parameters");
+        System.out.println("************ reloading Fit Parameters");
         reLoadFitPars();
         //--------------------------------------------
-        
-        //reset histos to refill
-        for (int i = 0; i < this.nsl; i++) {
-            for (int j = 0; j < this.alphaBins; j++) {
-                for (int k = 0; k < this.BBins; k++) {
-                    //TvstrkdocasProf.get(new Coordinate(i,j,k)).reset();
-                    Tvstrkdocas.get(new Coordinate(i,j,k)).reset();
-                    Tvscalcdocas.get(new Coordinate(i,j,k)).reset();
-                }
-            }
-        }
-        
         reader.gotoEvent(0);
+        
+//        //reset histos to refill
+//        for (int i = 0; i < this.nsl; i++) {
+//            for (int j = 0; j < this.alphaBins; j++) {
+//                for (int k = 0; k < this.BBins; k++) {
+//                    //TvstrkdocasProf.get(new Coordinate(i,j,k)).reset();
+//                    Tvstrkdocas.get(new Coordinate(i,j,k)).reset();
+//                    Tvscalcdocas.get(new Coordinate(i,j,k)).reset();
+//                }
+//            }
+//        }
+//        
         hits.clear();
         while (reader.hasEvent()) {
             DataEvent event = reader.getNextEvent();
@@ -473,7 +565,8 @@ public class PlotMaker extends AnalysisMonitor{
         //    this.getAnalysisCanvas().getCanvas("Fit Residuals").cd(i);
         //    this.getAnalysisCanvas().getCanvas("Fit Residuals").draw(fitResi.get(new Coordinate(i)));
         //}
-        
+        reader.close();
+        this.getCalib().fireTableDataChanged();  
     }
     private void fitTimeResPlot(H1F h1, EmbeddedCanvas canvasRes) {
         F1D gausFunc = new F1D("gausFunc", "[amp]*gaus(x,[mean],[sigma])+[amp2]*gaus(x,[mean],[sigma2])", -0.5, 0.5);
@@ -488,7 +581,7 @@ public class PlotMaker extends AnalysisMonitor{
         gausFunc.setOptStat(1110);
         h1.setOptStat(0);
         DataFitter.fit(gausFunc, h1, "Q");
-        gausFunc.setOptStat(00001111110);
+        gausFunc.setOptStat(101100);
         canvasRes.draw(h1, "same");
     }
     private int getAlphaBin(double alpha) {
@@ -600,8 +693,11 @@ public class PlotMaker extends AnalysisMonitor{
                 int superlayer = bnkHits.getInt("superlayer", i);
                 
                 //int region = (int) (superlayer + 1) / 2;
-                double alpha = bnkHits.getFloat("Alpha", i);
-                int alphaBin = this.getAlphaBin(alpha);
+                // alpha in the bank is corrected for B field.  To fill the alpha bin use the uncorrected value
+                double theta0 = Math.toDegrees(Math.acos(1-0.02*bFieldVal));
+                double alphaRadUncor = bnkHits.getFloat("Alpha", i)+(double)PlotMaker.polarity*theta0;
+                
+                int alphaBin = this.getAlphaBin(alphaRadUncor);
                 boolean passHit = false;
 
 //                    if( ( ( region ==1 && alpha> -20.0 && alpha< -5.0)
@@ -714,6 +810,9 @@ public class PlotMaker extends AnalysisMonitor{
             TvstrkdocasFitPars.get(new Coordinate(i)).add(parNames[10], pars[10], errs[10]);
             
         }   
+        // Fit panel
+        fp = new FitPanel(this);
+        fp.openFitPanel("fit panel", TvstrkdocasFitPars);
     }
     private void reLoadFitPars() {
         for (int s =0; s < 6; s++) {
@@ -899,7 +998,7 @@ public class PlotMaker extends AnalysisMonitor{
         return bank;
 
     }
-    private void updateHit(FittedHit hit) {
+    private void updateHit(FittedHit hit) { 
         double distbeta = TvstrkdocasFitPars.get(new Coordinate(hit.get_Superlayer()-1)).value(4);
         double deltatime_beta = (Math.sqrt(hit.get_ClusFitDoca() * hit.get_ClusFitDoca() 
                 + (distbeta * hit.get_Beta() * hit.get_Beta()) 
@@ -907,8 +1006,10 @@ public class PlotMaker extends AnalysisMonitor{
         hit.set_DeltaTimeBeta(deltatime_beta);
         hit.set_Doca(this.timeToDistance(hit.get_Sector(), hit.get_Superlayer(), 
                 hit.getAlpha(), hit.get_Beta(), hit.getB(), hit.get_ClusFitDoca(), hit.get_Time(), distbeta));
-        double x = hit.get_XWire();
-        double cosTkAng = Math.cos(Math.toRadians(hit.getAlpha()));
+        double x = hit.get_XWire(); 
+        double alphaRadUncor = Math.toRadians(hit.getAlpha());
+        double trkAngle = Math.tan(alphaRadUncor);
+        double cosTkAng = 1./Math.sqrt(trkAngle*trkAngle + 1.);
         hit.set_X(x + hit.get_LeftRightAmb() * (hit.get_Doca() / cosTkAng) );
         
     }
@@ -917,12 +1018,10 @@ public class PlotMaker extends AnalysisMonitor{
     private double timeToDistance(int sector, int superlayer, double alpha, double beta, double B, double x, double time,
                                 double distbeta) {
         double distance = 0;
-        //local angle correction
-        double theta0 = Math.toDegrees(Math.acos(1-0.02*B));
-        alpha-=(double)PlotMaker.polarity*theta0;
+        
         //reduce the corrected angle
         double ralpha = (double) TvstrkdocasFit.get(new Coordinate(0)).getReducedAngle(alpha);
-            
+         
         if(beta>1.0)
             beta = 1.0;
         double deltatime_beta = (Math.sqrt(x * x + (distbeta * beta * beta) 
@@ -932,7 +1031,7 @@ public class PlotMaker extends AnalysisMonitor{
             correctedTime=0.01; // fixes edge effects ... to be improved
         distance = tde.interpolateOnGrid(B, ralpha, 
                         correctedTime, 
-                        sector-1, superlayer-1) ;
+                        sector-1, superlayer-1) ; 
         return distance;
     }
 
@@ -943,7 +1042,7 @@ public class PlotMaker extends AnalysisMonitor{
                     BfieldValuesUpd[i][j][k] = BfieldValues[k];
                     if(B.get(new Coordinate(i,j,k)).getBinContent(B.get(new Coordinate(i,j,k)).getMaximumBin())>10)
                         BfieldValuesUpd[i][j][k] = B.get(new Coordinate(i,j,k)).getMean();
-                    System.out.println("ijk" +i+" "+j+" "+k+" BBin UPdated "+BfieldValues[k]+" --> "+BfieldValuesUpd[i][j][k] );
+                    //System.out.println("ijk" +i+" "+j+" "+k+" BBin UPdated "+BfieldValues[k]+" --> "+BfieldValuesUpd[i][j][k] );
                 }
             }
         }

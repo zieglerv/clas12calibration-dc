@@ -74,7 +74,17 @@ public class Refit {
             cf.Fit(clus, true);
             cf.SetResidualDerivedParams(clus, true, false, Viewer.dcDetector); //calcTimeResidual=false, resetLRAmbig=false 
             
+            double trkAngle = clus.get_clusterLineFitSlope();
+            //local angle correction
+            double alpha = Math.toDegrees(Math.atan(trkAngle));
+            for(FittedHit h : clus) {
+                
+                h.setAlpha(alpha);
+            }
         }
         clusters.clear();
     }
+    
+    
+    
 }

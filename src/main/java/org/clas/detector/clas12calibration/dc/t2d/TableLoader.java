@@ -1,4 +1,4 @@
-package org.clas.detector.clas12calibration.dc.plots;
+package org.clas.detector.clas12calibration.dc.t2d;
 
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
