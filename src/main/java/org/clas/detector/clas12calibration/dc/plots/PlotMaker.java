@@ -436,6 +436,7 @@ public class PlotMaker extends AnalysisMonitor{
                 for(FittedHit hit : hits) {
                     int alphaBin = this.getAlphaBin(hit.getAlpha());
                     double bFieldVal = (double) hit.getB();
+                         
                         if(alphaBin!=-1) {
                         Tvstrkdocas.get(new Coordinate(hit.get_Superlayer() - 1, alphaBin, this.BBins))
                                         .fill(hit.get_ClusFitDoca(), hit.get_Time());
@@ -465,12 +466,9 @@ public class PlotMaker extends AnalysisMonitor{
     public void reProcess() {
         //reset histos to refill
         for (int i = 0; i < this.nsl; i++) {
-            for (int j = 0; j < this.alphaBins; j++) {
-                //for (int k = 0; k < this.BBins; k++) {
-                //    timeResi.get(new Coordinate(i,j,k)).reset();
-                //    timeResiNew.get(new Coordinate(i,j,k)).reset();
-                //}
-            }
+               timeResi.get(new Coordinate(i)).reset();
+               timeResiNew.get(new Coordinate(i)).reset();
+                
         }
         
         reader = new HipoDataSource();
@@ -677,7 +675,7 @@ public class PlotMaker extends AnalysisMonitor{
             Constants.Load();
             TableLoader.FillT0Tables(newRun, "default");
             TableLoader.Fill(Viewer.ccdb.getConstants(newRun, Constants.TIME2DIST));  
-            this.loadFitPars();
+            this.loadFitPars(); 
             polarity = (int)Math.signum(event.getBank("RUN::config").getFloat("torus",0));
        
        }
@@ -808,7 +806,6 @@ public class PlotMaker extends AnalysisMonitor{
                 ParsVsIter.put(new Coordinate(i,p), new H1F("h"+p, "superlayer "+(i+1)+" par "+p,this.maxIter+1, 0.5,this.maxIter+1.5));
             }
             TvstrkdocasFitPars.get(new Coordinate(i)).add(parNames[10], pars[10], errs[10]);
-            
         }   
         // Fit panel
         fp = new FitPanel(this);
@@ -922,7 +919,13 @@ public class PlotMaker extends AnalysisMonitor{
         double tBeta = bnkHits.getFloat("tBeta", i);
         double resiTime = bnkHits.getFloat("timeResidual", i);
         double resiFit = bnkHits.getFloat("fitResidual", i);
-         
+        
+        double bFieldVal = (double) bnkHits.getFloat("B", i);
+        //int region = (int) (superlayer + 1) / 2;
+        // alpha in the bank is corrected for B field.  To fill the alpha bin use the uncorrected value
+        double theta0 = Math.toDegrees(Math.acos(1-0.02*bFieldVal));
+        double alphaRadUncor = bnkHits.getFloat("Alpha", i)+(double)PlotMaker.polarity*theta0;
+
         hit = new FittedHit(sector, superlayer, layer, wire, TDC, id);
         hit.set_Id(id); // use event number as id to recompose the clusters
         hit.setB(B);
@@ -942,14 +945,18 @@ public class PlotMaker extends AnalysisMonitor{
         hit.set_DeltaTimeBeta(tBeta);
         hit.set_Doca(doca);
         hit.set_Time(time);
-        hit.setAlpha(Alpha);
+        hit.setAlpha(alphaRadUncor);
         hit.set_DocaErr(docaError);
         hit.set_AssociatedClusterID(clusterID);
         hit.set_AssociatedHBTrackID(trkID); 
         hit.set_TimeResidual(resiTime);
         hit.set_Residual(resiFit);
         
-        return hit;
+        if (bnkHits.getByte("trkID", i) >0 && bnkHits.getFloat("beta", i)>0.9 && bnkHits.getFloat("TFlight", i)>0 && Math.abs(bnkHits.getFloat("fitResidual", i))<0.075) {            
+            return hit;
+        } else {
+            return null;
+        }
     }
     private DataBank fillTBHitsBank(DataEvent event, List<FittedHit> hitlist) {
         //if(event.hasBank("TimeBasedTrkg::TBHits")) { // for second pass tracking

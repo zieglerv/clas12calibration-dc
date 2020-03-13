@@ -178,22 +178,40 @@ public class TableLoader {
         T2DLOADED = true;
      }
     
-    public static synchronized void ReFill() {
-        DISTFROMTIME = new double[6][6][maxBinIdxB+1][maxBinIdxAlpha+1][nBinsT]; // sector slyr alpha Bfield time bins [s][r][ibfield][icosalpha][tbin]
+    private static void test() {
+        for(int r = 2; r<3; r++ ){ //loop over slys
+            for(int ibfield =0; ibfield<4; ibfield++) {
+                for(int icosalpha =0; icosalpha<maxBinIdxAlpha+1; icosalpha++) {
+                    double cos30minusalpha = Math.cos(Math.toRadians(30.)) + (double) (icosalpha)*(1. - Math.cos(Math.toRadians(30.)))/5.;
+                    double alpha = -(Math.toDegrees(Math.acos(cos30minusalpha)) - 30);
+                    int nxmax = (int) (2.*Constants.wpdist[r]*cos30minusalpha/0.0010); 
+
+                    System.out.println("superlayer "+(r+1)+" B bin "+ibfield+" alpha bin "+icosalpha+
+                            "B "+(float)+ Math.sqrt(BfieldValues[ibfield])+" nteps "+nxmax
+                            +" value "+DISTFROMTIME[0][r][ibfield][icosalpha][20]);
+                }
+            }
+        }
+    }
     
+    public static synchronized void ReFill() {
+        //reset
+        DISTFROMTIME = new double[6][6][maxBinIdxB+1][maxBinIdxAlpha+1][nBinsT]; // sector slyr alpha Bfield time bins [s][r][ibfield][icosalpha][tbin]
+        minBinIdxT  = 0;
+        maxBinIdxT  = new int[6][6][8][6];
+        maxTBin = -1;
         double stepSize = 0.0010;
         DecimalFormat df = new DecimalFormat("#");
         df.setRoundingMode(RoundingMode.CEILING);
         
         for(int s = 0; s<6; s++ ){ // loop over sectors
                 for(int r = 0; r<6; r++ ){ //loop over slys
-                    
                     // end fill constants
                     //System.out.println(v0[s][r]+" "+vmid[s][r]+" "+FracDmaxAtMinVel[s][r]);
                     double dmax = 2.*Constants.wpdist[r]; 
                     //double tmax = CCDBConstants.getTMAXSUPERLAYER()[s][r];
                     for(int ibfield =0; ibfield<maxBinIdxB+1; ibfield++) {
-                        double bfield = Math.sqrt(BfieldValues[ibfield]);
+                        double bfield = BfieldValues[ibfield];
 
                         for(int icosalpha =0; icosalpha<maxBinIdxAlpha+1; icosalpha++) {
 
