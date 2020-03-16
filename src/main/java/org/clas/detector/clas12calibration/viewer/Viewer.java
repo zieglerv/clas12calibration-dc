@@ -9,6 +9,7 @@ import java.awt.BorderLayout;
 import java.awt.Dialog;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.GridLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -59,8 +60,6 @@ import org.jlab.io.base.DataEventType;
 import org.jlab.io.task.DataSourceProcessorPane;
 import org.jlab.io.task.IDataEventListener;
 import org.jlab.rec.dc.Constants;
-import org.jlab.rec.dc.timetodistance.TableLoader;
-
 /**
  *
  * @author ziegler, devita
@@ -93,17 +92,12 @@ public class Viewer implements IDataEventListener, DetectorListener, ActionListe
     private String Dir = "/Users/ziegler";
     
     
-    private JTextField[] v0 = {new JTextField(6),new JTextField(6),new JTextField(6),new JTextField(6),new JTextField(6),new JTextField(6)};
-    private JTextField[] vmid = {new JTextField(6),new JTextField(6),new JTextField(6),new JTextField(6),new JTextField(6),new JTextField(6)};
-    private JTextField[] R = {new JTextField(6),new JTextField(6),new JTextField(6),new JTextField(6),new JTextField(6),new JTextField(6)};
-    private JTextField[] tmax = {new JTextField(6),new JTextField(6),new JTextField(6),new JTextField(6),new JTextField(6),new JTextField(6)};
-    private JTextField[] distbeta = {new JTextField(6),new JTextField(6),new JTextField(6),new JTextField(6),new JTextField(6),new JTextField(6)};
-    private JTextField[] delBf = {new JTextField(6),new JTextField(6),new JTextField(6),new JTextField(6),new JTextField(6),new JTextField(6)};
-    private JTextField[] b1 = {new JTextField(6),new JTextField(6),new JTextField(6),new JTextField(6),new JTextField(6),new JTextField(6)};
-    private JTextField[] b2 = {new JTextField(6),new JTextField(6),new JTextField(6),new JTextField(6),new JTextField(6),new JTextField(6)};
-    private JTextField[] b3 = {new JTextField(6),new JTextField(6),new JTextField(6),new JTextField(6),new JTextField(6),new JTextField(6)};
-    private JTextField[] b4 = {new JTextField(6),new JTextField(6),new JTextField(6),new JTextField(6),new JTextField(6),new JTextField(6)};
-    // detector monitors
+    private JLabel[] superlayer = {new JLabel("", JLabel.CENTER),new JLabel("", JLabel.CENTER),new JLabel("", JLabel.CENTER),new JLabel("", JLabel.CENTER),new JLabel("", JLabel.CENTER),new JLabel("", JLabel.CENTER)};
+    public static JTextField[] alphaCuts1 = {new JTextField(7),new JTextField(7),new JTextField(7),new JTextField(7),new JTextField(7),new JTextField(7)};
+    public static JTextField[] alphaCuts2 = {new JTextField(7),new JTextField(7),new JTextField(7),new JTextField(7),new JTextField(7),new JTextField(7)};
+   
+    public static JTextField betaCut = new JTextField(3);
+     // detector monitors
     AnalysisMonitor[] monitors ; 
         
     public Viewer() throws FileNotFoundException {    	
@@ -117,7 +111,7 @@ public class Viewer implements IDataEventListener, DetectorListener, ActionListe
         menuItem.getAccessibleContext().setAccessibleDescription("Open histograms file");
         menuItem.addActionListener(this);
         file.add(menuItem);
-         menuItem = new JMenuItem("Print histograms to file...");
+        menuItem = new JMenuItem("Print histograms to file...");
         menuItem.getAccessibleContext().setAccessibleDescription("Print histograms to file");
         menuItem.addActionListener(this);
         file.add(menuItem);
@@ -218,7 +212,7 @@ public class Viewer implements IDataEventListener, DetectorListener, ActionListe
             String fileName = null;
             JFileChooser fc = new JFileChooser();
             fc.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
-            File workingDirectory = new File(this.Dir + "/kpp-histos");
+            File workingDirectory = new File(this.Dir + "/cal-histos");
             fc.setCurrentDirectory(workingDirectory);
             int option = fc.showOpenDialog(null);
             if (option == JFileChooser.APPROVE_OPTION) {
@@ -470,7 +464,7 @@ public class Viewer implements IDataEventListener, DetectorListener, ActionListe
         confOuterPanel.add(confPanel, BorderLayout.NORTH);
         confOuterPanel.add(butPage2, BorderLayout.SOUTH);
 
-        configPane.add("Previous calibration values", confOuterPanel);
+        //configPane.add("Previous calibration values", confOuterPanel);
 
         int y=0;
         // Tracking options
@@ -484,39 +478,78 @@ public class Viewer implements IDataEventListener, DetectorListener, ActionListe
         // Target GMEAN channel
         c.gridx = 0;
         c.gridy = y;
-        trPanel.add(new JLabel("Fit Parameters:"),c);
+        trPanel.add(new JLabel(""),c);
         c.gridx = 1;
         c.gridy = y;
         JPanel tgmPanel = new JPanel();
         for(int i = 0; i < 6; i++) {
-            v0[i].addActionListener(this);
-            vmid[i].addActionListener(this);
-            R[i].addActionListener(this);
-            tmax[i].addActionListener(this);
-            distbeta[i].addActionListener(this);
-            delBf[i].addActionListener(this);
-            b1[i].addActionListener(this);
-            b2[i].addActionListener(this);
-            b3[i].addActionListener(this);
-            b4[i].addActionListener(this);
-        }
-        //put guess values for parameters that we want to fix
-        v0[0].setText("650");
-        v0[1].setText("1000");
-        for(int i = 0; i < 6; i++) {
-            tgmPanel.add(v0[i]);
+            superlayer[i].setText("Superlayer "+(i+1)+"    ");
+            tgmPanel.add(superlayer[i]);
         }
         trPanel.add(tgmPanel,c);
         c.gridx = 2;
         c.gridy = y;
         trPanel.add(new JLabel(""),c);
-
-       
-
+        y++;
+        c.gridx = 0;
+        c.gridy = y;
+        tgmPanel = new JPanel();
+        trPanel.add(new JLabel("alpha>"),c);
+        for(int i = 0; i < 6; i++) {
+            alphaCuts1[i].setText("-30");
+            alphaCuts1[i].addActionListener(this);
+            tgmPanel.add(alphaCuts1[i]);
+        }
+        c.gridx = 1;
+	c.gridy = y;
+        trPanel.add(tgmPanel,c);
+        c.gridx = 2;
+        c.gridy = y;
+        
+        //trPanel.add(new JLabel(""),c);
+        y++;
+        c.gridx = 0;
+        c.gridy = y;
+        tgmPanel = new JPanel();
+        trPanel.add(new JLabel("alpha<"),c);
+        for(int i = 0; i < 6; i++) {
+            alphaCuts2[i].setText("30");
+            alphaCuts2[i].addActionListener(this);
+            tgmPanel.add(alphaCuts2[i]);
+        }
+        c.gridx = 1;
+	c.gridy = y;
+        trPanel.add(tgmPanel,c);
+        c.gridx = 2;
+        c.gridy = y;
+        trPanel.add(new JLabel(""),c);
+        //
+        y++;
+        c.gridx = 2;
+        c.gridy = y;
+        tgmPanel = new JPanel();
+        trPanel.add(new JLabel("beta>", JLabel.LEADING),c);
+        //c.gridx = 2;
+        //c.gridy = y;
+        //trPanel.add(new JLabel(""),c);
+        //y++;
+        //c.gridx = 0;
+        //c.gridy = y;
+        //tgmPanel = new JPanel();
+        betaCut.setText("0.9");
+        betaCut.addActionListener(this);
+        tgmPanel.add(betaCut);
+        c.gridx = 3;
+	c.gridy = y;
+        trPanel.add(tgmPanel,c);
+        c.gridx = 2;
+        c.gridy = y;
+        trPanel.add(new JLabel(""),c);
+        
         JPanel butPage3 = new configButtonPanel(this, true, "Finish");
         trOuterPanel.add(butPage3, BorderLayout.SOUTH);
 
-        configPane.add("Fit Parameters Control", trOuterPanel);
+        configPane.add("Cuts", trOuterPanel);
 
         configFrame.add(configPane);
         configFrame.setVisible(true);

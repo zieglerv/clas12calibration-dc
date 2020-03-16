@@ -703,7 +703,8 @@ public class PlotMaker extends AnalysisMonitor{
 //                    || (region ==3 && alpha> -28.0 && alpha< 2.0) )) {
 //                        passHit = true;
 //                    }
-            if (bnkHits.getByte("trkID", i) >0 && bnkHits.getFloat("beta", i)>0.9 && bnkHits.getFloat("TFlight", i)>0 && Math.abs(bnkHits.getFloat("fitResidual", i))<0.075)
+            if (bnkHits.getByte("trkID", i) >0 
+                    && bnkHits.getFloat("beta", i)> Double.parseDouble(Viewer.betaCut.getText()) && bnkHits.getFloat("TFlight", i)>0 && Math.abs(bnkHits.getFloat("fitResidual", i))<0.075)
             {
                 
                 hitlist.add(this.getHit(bnkHits, i));
@@ -952,7 +953,8 @@ public class PlotMaker extends AnalysisMonitor{
         hit.set_TimeResidual(resiTime);
         hit.set_Residual(resiFit);
         
-        if (bnkHits.getByte("trkID", i) >0 && bnkHits.getFloat("beta", i)>0.9 && bnkHits.getFloat("TFlight", i)>0 && Math.abs(bnkHits.getFloat("fitResidual", i))<0.075) {            
+        if (bnkHits.getByte("trkID", i) >0 && bnkHits.getFloat("beta", i)> Double.parseDouble(Viewer.betaCut.getText())
+                && bnkHits.getFloat("TFlight", i)>0 && Math.abs(bnkHits.getFloat("fitResidual", i))<0.075) {            
             return hit;
         } else {
             return null;
