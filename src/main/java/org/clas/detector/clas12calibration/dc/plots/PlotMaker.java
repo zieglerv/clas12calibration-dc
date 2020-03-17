@@ -704,7 +704,9 @@ public class PlotMaker extends AnalysisMonitor{
 //                        passHit = true;
 //                    }
             if (bnkHits.getByte("trkID", i) >0 
-                    && bnkHits.getFloat("beta", i)> Double.parseDouble(Viewer.betaCut.getText()) && bnkHits.getFloat("TFlight", i)>0 && Math.abs(bnkHits.getFloat("fitResidual", i))<0.075)
+                    && bnkHits.getFloat("beta", i)> Double.parseDouble(Viewer.betaCut.getText()) 
+                    && this.selectOnAlpha(superlayer, alphaRadUncor)==true
+                    && bnkHits.getFloat("TFlight", i)>0 && Math.abs(bnkHits.getFloat("fitResidual", i))<0.075)
             {
                 
                 hitlist.add(this.getHit(bnkHits, i));
@@ -954,6 +956,7 @@ public class PlotMaker extends AnalysisMonitor{
         hit.set_Residual(resiFit);
         
         if (bnkHits.getByte("trkID", i) >0 && bnkHits.getFloat("beta", i)> Double.parseDouble(Viewer.betaCut.getText())
+                && this.selectOnAlpha(superlayer, alphaRadUncor)==true
                 && bnkHits.getFloat("TFlight", i)>0 && Math.abs(bnkHits.getFloat("fitResidual", i))<0.075) {            
             return hit;
         } else {
@@ -1055,6 +1058,16 @@ public class PlotMaker extends AnalysisMonitor{
                 }
             }
         }
+    }
+
+    private boolean selectOnAlpha(int superlayer, double alphaRadUncor) {
+        boolean pass = false;
+        int i = superlayer - 1;
+        if(alphaRadUncor>Double.parseDouble(Viewer.alphaCuts1[i].getText()) &&
+                alphaRadUncor<Double.parseDouble(Viewer.alphaCuts2[i].getText())) {
+            pass = true;
+        }
+        return pass;        
     }
     
 }
