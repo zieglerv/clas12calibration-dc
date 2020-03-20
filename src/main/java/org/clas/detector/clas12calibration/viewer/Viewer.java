@@ -76,8 +76,8 @@ public class Viewer implements IDataEventListener, DetectorListener, ActionListe
     JMenuBar menuBar                            = null;
     DataSourceProcessorPane processorPane 	= null;
     EmbeddedCanvasTabbed CLAS12Canvas           = null;
-    JFrame  innerConfigFrame = new JFrame("Configure FTOF calibration settings");
-    JDialog configFrame = new JDialog(innerConfigFrame, "Configure FTOF calibration settings");
+    JFrame  innerConfigFrame = new JFrame("Configure calibration settings");
+    JDialog configFrame = new JDialog(innerConfigFrame, "Configure calibration settings");
     JTabbedPane configPane = new JTabbedPane();
     
     CodaEventDecoder               decoder = new CodaEventDecoder();

@@ -107,11 +107,16 @@ public class FitPanel {
         fitted = true;
         this._pM.plotFits();
     }
+    
+    
     public void plotResiduals() {
         this._pM.reProcess();
     }
     public void reCook() {
         this._pM.reCook();
+    }
+    public void reset() {
+        this._pM.resetPars();
     }
     private final class CustomPanel2 extends JPanel {
         JLabel label;
@@ -122,6 +127,7 @@ public class FitPanel {
         JCheckBox[][]    fixFit ;
         
         JButton   fitButton = null;
+        JButton   resetButton = null;
         JButton   resButton = null;
         JButton   reCookButton = null;
         
@@ -131,16 +137,6 @@ public class FitPanel {
         public CustomPanel2(Map<Coordinate, MnUserParameters> TvstrkdocasFitPars) {        
             super(new BorderLayout());
             for(int i = 0; i < 6; i++) {
-                //pars[0][i] = TableLoader.v0[0][i];
-                //pars[1][i] = TableLoader.vmid[0][i];
-                //pars[2][i] = TableLoader.FracDmaxAtMinVel[0][i];
-                //pars[3][i] = TableLoader.Tmax[0][i];
-                //pars[4][i] = TableLoader.distbeta[0][i];
-                //pars[5][i] = TableLoader.delta_bfield_coefficient[0][i];
-                //pars[6][i] = TableLoader.b1[0][i];
-                //pars[7][i] = TableLoader.b2[0][i];
-                //pars[8][i] = TableLoader.b3[0][i];
-                //pars[9][i] = TableLoader.b4[0][i];
                 for(int p = 0; p<10; p++) {
                     pars[p][i] = TvstrkdocasFitPars.get(new Coordinate(i)).value(p);
                 }
@@ -175,6 +171,20 @@ public class FitPanel {
             panel.add(new JLabel("    Fit range max"));
             maxRange.setText(Double.toString(2.0));
             panel.add(maxRange);
+            
+            resetButton = new JButton("RESET");
+            resetButton.setUI(new MetalButtonUI());
+            resetButton.setBackground(Color.CYAN);
+            resetButton.setContentAreaFilled(false);
+            resetButton.setOpaque(true);
+            resetButton.setFont(bBold);
+            resetButton.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    reset();
+                    return;
+                }
+            });
+            panel.add(resetButton);
             
             resButton = new JButton("Residuals");
             resButton.setUI(new MetalButtonUI());
@@ -228,6 +238,7 @@ public class FitPanel {
             
             this.add(panel, BorderLayout.CENTER);
             this.add(fitButton, BorderLayout.PAGE_END);
+            
             
             label = new JLabel("Click the \"Show it!\" button"
                            + " to bring up the selected dialog.",

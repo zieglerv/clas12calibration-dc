@@ -9,6 +9,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.sql.Timestamp;
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -57,6 +58,7 @@ public class PlotMaker extends AnalysisMonitor{
     FitPanel fp;
     PrintWriter pw = null;
     File outfile = null;
+    private int runNumber;
     
     public PlotMaker(String name, ConstantsManager ccdb) throws FileNotFoundException {
         super(name, ccdb);
@@ -253,7 +255,10 @@ public class PlotMaker extends AnalysisMonitor{
             pw.close();
             File file2 = new File("");
             file2 = outfile;
-            file2.renameTo(new File("ccdb"+new Timestamp(new Date().getTime()).toString()));
+            DateFormat df = new SimpleDateFormat("MM-dd-yyyy_hh.mm.ss_aa");
+            String fileName = "cccdb_run" + this.runNumber + "time_" 
+                    + df.format(new Date())+ "iteration_"+this.iterationNum  + ".txt";
+            file2.renameTo(new File(fileName));
             int ij =0;
             int ip =0;
             for (int i = 0; i < this.nsl; i++) {
@@ -399,11 +404,13 @@ public class PlotMaker extends AnalysisMonitor{
             }
         }
     }
-    private SimpleDateFormat sdf = new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss");
+    
     int counter = 0;
+    private int iterationNum = 1;
     public  HipoDataSource reader = new HipoDataSource();
     
     public void reCook() {
+        iterationNum++;
         for (int i = 0; i < nsl; i++) {
             for (int j = 0; j < alphaBins; j++) {
                 for (int k = 0; k < BBins+1; k++) {
@@ -665,20 +672,20 @@ public class PlotMaker extends AnalysisMonitor{
         
         DataBank bank = event.getBank("RUN::config");
         int newRun = bank.getInt("run", 0);
-       if (newRun == 0) {
+        if (newRun == 0) {
            return ;
-       } else {
+        } else {
            count++;
-       }
+        }
        
-       if(count==1) {
+        if(count==1) {
             Constants.Load();
             TableLoader.FillT0Tables(newRun, "default");
             TableLoader.Fill(Viewer.ccdb.getConstants(newRun, Constants.TIME2DIST));  
             this.loadFitPars(); 
             polarity = (int)Math.signum(event.getBank("RUN::config").getFloat("torus",0));
-       
-       }
+            runNumber = newRun;
+        }
         if(!event.hasBank("TimeBasedTrkg::TBHits")) {
             return;
         } 
@@ -783,9 +790,24 @@ public class PlotMaker extends AnalysisMonitor{
         //writer.writeEvent(hipoEvent);
         
     }
+    public double[][] resetPars = new double[6][11];
     private String[] parNames = {"v0", "vmid", "R", "tmax", "distbeta", "delBf", 
         "b1", "b2", "b3", "b4", "dmax"};
     private double[] errs = {0.001,0.001,0.01,1.0,0.01,0.001,0.001,0.001,0.001,0.001,0.00001};
+    
+    public void resetPars() {
+        for (int i = 0; i < this.nsl; i++) {
+            double[] pars = resetPars[i];
+            TvstrkdocasFitPars.put(new Coordinate(i), new MnUserParameters());
+            for(int p = 0; p < 10; p++) {
+                TvstrkdocasFitPars.get(new Coordinate(i)).add(parNames[p], pars[p], errs[p]);
+                //create graphs of parameters for various iterations
+                ParsVsIter.put(new Coordinate(i,p), new H1F("h"+p, "superlayer "+(i+1)+" par "+p,this.maxIter+1, 0.5,this.maxIter+1.5));
+            }
+            TvstrkdocasFitPars.get(new Coordinate(i)).add(parNames[10], pars[10], errs[10]);
+        }
+        fp.openFitPanel("fit panel", TvstrkdocasFitPars);
+    }
     public void loadFitPars() {
         for (int i = 0; i < this.nsl; i++) {
             double[] pars = new double[11];
@@ -802,6 +824,7 @@ public class PlotMaker extends AnalysisMonitor{
             pars[8] = TableLoader.b3[0][i];
             pars[9] = TableLoader.b4[0][i];
             pars[10] = 2.*Constants.wpdist[i];//fix dmax
+            resetPars[i] = pars;
             TvstrkdocasFitPars.put(new Coordinate(i), new MnUserParameters());
             for(int p = 0; p < 10; p++) {
                 TvstrkdocasFitPars.get(new Coordinate(i)).add(parNames[p], pars[p], errs[p]);
