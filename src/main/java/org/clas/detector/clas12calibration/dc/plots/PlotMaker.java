@@ -261,10 +261,12 @@ public class PlotMaker extends AnalysisMonitor{
             file2.renameTo(new File(fileName));
             int ij =0;
             int ip =0;
+            NbRunFit++;
             for (int i = 0; i < this.nsl; i++) {
-                //Plot pars
+               
                 for(int p = 0; p<6; p++) {
-
+                    ParsVsIter.get(new Coordinate(i,p)).setBinContent(NbRunFit, TvstrkdocasFitPars.get(new Coordinate(i)).value(p));
+                    ParsVsIter.get(new Coordinate(i,p)).setBinError(NbRunFit, TvstrkdocasFitPars.get(new Coordinate(i)).error(p));
                     ParsVsIter.get(new Coordinate(i,p)).setOptStat(0);
                     this.getAnalysisCanvas().getCanvas("Parameters").cd(ip);
                     GraphErrors gr = new GraphErrors();
@@ -323,6 +325,8 @@ public class PlotMaker extends AnalysisMonitor{
     
     private MnScan  scanner = null;
     private MnMigrad migrad = null;
+    
+    public int NbRunFit = 0;
     public void runFit(int i, boolean fixFit[][]) {
         // i = superlayer - 1;
         System.out.println(" **************** ");
@@ -334,10 +338,6 @@ public class PlotMaker extends AnalysisMonitor{
         scanner = new MnScan((FCNBase) TvstrkdocasFit.get(new Coordinate(i)), 
                 TvstrkdocasFitPars.get(new Coordinate(i)),2);
 	
-        for(int p = 0; p<10; p++) {
-                ParsVsIter.get(new Coordinate(i,p)).setBinContent(0, TvstrkdocasFitPars.get(new Coordinate(i)).value(p));
-                ParsVsIter.get(new Coordinate(i,p)).setBinError(0, TvstrkdocasFitPars.get(new Coordinate(i)).error(p));
-        }
         scanner.fix(10);
         for (int p = 0; p < 10; p++) {
             if(fixFit[p][i]==true) {
@@ -356,10 +356,7 @@ public class PlotMaker extends AnalysisMonitor{
         
         
         for(int it = 0; it<maxIter; it++) {
-            for(int p = 0; p<10; p++) {
-                ParsVsIter.get(new Coordinate(i,p)).setBinContent(it+1, TvstrkdocasFitPars.get(new Coordinate(i)).value(p));
-                ParsVsIter.get(new Coordinate(i,p)).setBinError(it+1, TvstrkdocasFitPars.get(new Coordinate(i)).error(p));
-            }
+            
             min = migrad.minimize();
             System.err.println("****************************************************");
             System.err.println("*   FIT RESULTS  FOR SUPERLAYER  "+(i+1)+" at iteration "+(it+1)+"  *");
@@ -371,11 +368,10 @@ public class PlotMaker extends AnalysisMonitor{
                 TvstrkdocasFitPars.put(new Coordinate(i),min.userParameters());  
             }
             
-           
+            
             System.err.println(min);
             
         }
-        
         
         for(int isec = 0; isec < 6; isec++) {
            
@@ -802,7 +798,7 @@ public class PlotMaker extends AnalysisMonitor{
             for(int p = 0; p < 10; p++) {
                 TvstrkdocasFitPars.get(new Coordinate(i)).add(parNames[p], pars[p], errs[p]);
                 //create graphs of parameters for various iterations
-                ParsVsIter.put(new Coordinate(i,p), new H1F("h"+p, "superlayer "+(i+1)+" par "+p,this.maxIter+1, 0.5,this.maxIter+1.5));
+               ParsVsIter.put(new Coordinate(i,p), new H1F("h"+p+": " +parNames[p]+", superlayer "+(i+1),this.maxIter+1, 0.5,this.maxIter+1.5));
             }
             TvstrkdocasFitPars.get(new Coordinate(i)).add(parNames[10], pars[10], errs[10]);
         }
@@ -852,6 +848,12 @@ public class PlotMaker extends AnalysisMonitor{
                 TableLoader.b2[s][i] = TvstrkdocasFitPars.get(new Coordinate(i)).value(7);
                 TableLoader.b3[s][i] = TvstrkdocasFitPars.get(new Coordinate(i)).value(8);
                 TableLoader.b4[s][i] = TvstrkdocasFitPars.get(new Coordinate(i)).value(9);
+            }
+        }
+        for (int i = 0; i < this.nsl; i++) {
+            for(int p = 0; p<6; p++) {
+                ParsVsIter.get(new Coordinate(i,p)).setBinContent(0, TvstrkdocasFitPars.get(new Coordinate(i)).value(p));
+                ParsVsIter.get(new Coordinate(i,p)).setBinError(0, TvstrkdocasFitPars.get(new Coordinate(i)).error(p));
             }
         }
         TableLoader.ReFill();
