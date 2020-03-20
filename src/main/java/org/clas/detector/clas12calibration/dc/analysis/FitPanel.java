@@ -22,7 +22,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.plaf.metal.MetalButtonUI;
-import org.clas.detector.clas12calibration.dc.plots.PlotMaker;
+import org.clas.detector.clas12calibration.dc.plots.T2DCalib;
 import org.clas.detector.clas12calibration.dc.t2d.TableLoader;
 import org.freehep.math.minuit.MnUserParameters;
 
@@ -34,9 +34,9 @@ public class FitPanel {
     private double[]          range    = new double[2];
     private JFrame            frame    = new JFrame();
     private CustomPanel2      panel    = null;
-    private PlotMaker _pM;
+    private T2DCalib _pM;
 
-    public FitPanel(PlotMaker pM) {
+    public FitPanel(T2DCalib pM) {
         this._pM = pM;
         //init pars container
         for(int j = 0; j<6; j++) {

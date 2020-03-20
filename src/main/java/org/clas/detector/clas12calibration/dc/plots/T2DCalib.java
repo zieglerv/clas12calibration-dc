@@ -51,7 +51,7 @@ import org.jlab.utils.system.ClasUtilsFile;
  *
  * @author ziegler
  */
-public class PlotMaker extends AnalysisMonitor{
+public class T2DCalib extends AnalysisMonitor{
     public HipoDataSync writer = null;
     private HipoDataEvent hipoEvent = null;
     private SchemaFactory schemaFactory = new SchemaFactory();
@@ -60,7 +60,7 @@ public class PlotMaker extends AnalysisMonitor{
     File outfile = null;
     private int runNumber;
     
-    public PlotMaker(String name, ConstantsManager ccdb) throws FileNotFoundException {
+    public T2DCalib(String name, ConstantsManager ccdb) throws FileNotFoundException {
         super(name, ccdb);
         this.setAnalysisTabNames("TrackDoca vs T","TrackDoca vs T Graphs","CalcDoca vs T","Time Residuals","Parameters");
         this.init(false, "v0:vmid:R:tmax:distbeta:delBf:b1:b2:b3:b4");
@@ -696,7 +696,7 @@ public class PlotMaker extends AnalysisMonitor{
                 //int region = (int) (superlayer + 1) / 2;
                 // alpha in the bank is corrected for B field.  To fill the alpha bin use the uncorrected value
                 double theta0 = Math.toDegrees(Math.acos(1-0.02*bFieldVal));
-                double alphaRadUncor = bnkHits.getFloat("Alpha", i)+(double)PlotMaker.polarity*theta0;
+                double alphaRadUncor = bnkHits.getFloat("Alpha", i)+(double)T2DCalib.polarity*theta0;
                 
                 int alphaBin = this.getAlphaBin(alphaRadUncor);
                 boolean passHit = false;
@@ -952,7 +952,7 @@ public class PlotMaker extends AnalysisMonitor{
         //int region = (int) (superlayer + 1) / 2;
         // alpha in the bank is corrected for B field.  To fill the alpha bin use the uncorrected value
         double theta0 = Math.toDegrees(Math.acos(1-0.02*bFieldVal));
-        double alphaRadUncor = bnkHits.getFloat("Alpha", i)+(double)PlotMaker.polarity*theta0;
+        double alphaRadUncor = bnkHits.getFloat("Alpha", i)+(double)T2DCalib.polarity*theta0;
 
         hit = new FittedHit(sector, superlayer, layer, wire, TDC, id);
         hit.set_Id(id); // use event number as id to recompose the clusters

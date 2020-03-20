@@ -91,15 +91,15 @@ public class FitFunction implements FCNBase{
     public double valueOf(double[] par) {
         double chisq = 0;
         double delta = 0;
-        for (int j = 0; j < PlotMaker.alphaBins; j++) {
+        for (int j = 0; j < T2DCalib.alphaBins; j++) {
             if(this.i>1 && this.i<4) {
-                for(int k = 0; k < PlotMaker.BBins; k++) {
+                for(int k = 0; k < T2DCalib.BBins; k++) {
                     if(_tvstrkdocasProf.get(new Coordinate(this.i, j, k)).getVectorX().size()>0){ 
                         //local angle correction
-                        double theta0 = Math.toDegrees(Math.acos(1-0.02*PlotMaker.BfieldValuesUpd[i-2][j][k]));
-                        double alpha = PlotMaker.AlphaValues[j];
+                        double theta0 = Math.toDegrees(Math.acos(1-0.02*T2DCalib.BfieldValuesUpd[i-2][j][k]));
+                        double alpha = T2DCalib.AlphaValues[j];
                         // correct alpha with theta0, the angle corresponding to the isochrone lines twist due to the electric field
-                        alpha-=(double)PlotMaker.polarity*theta0;
+                        alpha-=(double)T2DCalib.polarity*theta0;
                         //reduce the corrected angle
                         double ralpha = (double) this.getReducedAngle(alpha);
                         GraphErrors gr = _tvstrkdocasProf.get(new Coordinate(this.i, j, k));
@@ -109,7 +109,7 @@ public class FitFunction implements FCNBase{
                             double time = gr.getDataY(ix);
                             double err = gr.getDataEY(ix);
                             if(err>0) {
-                                double calcTime = this.eval(x, ralpha, PlotMaker.BfieldValuesUpd[i-2][j][k], par);
+                                double calcTime = this.eval(x, ralpha, T2DCalib.BfieldValuesUpd[i-2][j][k], par);
                                 delta = (time - calcTime) / err; 
                                 chisq += delta * delta;
                             }
@@ -117,12 +117,12 @@ public class FitFunction implements FCNBase{
                     }
                 }
             } else {
-                if(_tvstrkdocasProf.get(new Coordinate(this.i, j, PlotMaker.BBins)).getVectorX().size()>0){ 
+                if(_tvstrkdocasProf.get(new Coordinate(this.i, j, T2DCalib.BBins)).getVectorX().size()>0){ 
                     //local angle correction
-                    double alpha = PlotMaker.AlphaValues[j];
+                    double alpha = T2DCalib.AlphaValues[j];
                     //reduce the corrected angle
                     double ralpha = (double) this.getReducedAngle(alpha);
-                    GraphErrors gr = _tvstrkdocasProf.get(new Coordinate(this.i, j, PlotMaker.BBins));
+                    GraphErrors gr = _tvstrkdocasProf.get(new Coordinate(this.i, j, T2DCalib.BBins));
 
                     for (int ix =0; ix< gr.getDataSize(0); ix++) {
                         double x = gr.getDataX(ix);
