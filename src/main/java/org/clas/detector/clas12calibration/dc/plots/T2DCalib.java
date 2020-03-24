@@ -64,7 +64,7 @@ public class T2DCalib extends AnalysisMonitor{
         super(name, ccdb);
         this.setAnalysisTabNames("TrackDoca vs T","TrackDoca vs T Graphs","CalcDoca vs T","Time Residuals","Parameters");
         this.init(false, "v0:vmid:R:tmax:distbeta:delBf:b1:b2:b3:b4");
-        outfile = new File("ccdbConstants.txt");
+        outfile = new File("Files/ccdbConstants.txt");
         pw = new PrintWriter(outfile);
         pw.printf("#& sector superlayer component v0 deltanm tmax distbeta delta_bfield_coefficient b1 b2 b3 b4 delta_T0 c1 c2 c3\n");
         
@@ -256,7 +256,7 @@ public class T2DCalib extends AnalysisMonitor{
             File file2 = new File("");
             file2 = outfile;
             DateFormat df = new SimpleDateFormat("MM-dd-yyyy_hh.mm.ss_aa");
-            String fileName = "cccdb_run" + this.runNumber + "time_" 
+            String fileName = "Files/ccdb_run" + this.runNumber + "time_" 
                     + df.format(new Date())+ "iteration_"+this.iterationNum  + ".txt";
             file2.renameTo(new File(fileName));
             int ij =0;

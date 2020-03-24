@@ -39,7 +39,9 @@ import javax.swing.JTextField;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import org.clas.detector.clas12calibration.dc.analysis.configButtonPanel;
+import org.clas.detector.clas12calibration.dc.plots.T0Calib;
 import org.clas.detector.clas12calibration.dc.plots.T2DCalib;
+import org.clas.detector.clas12calibration.dc.plots.TDCCuts;
 import org.jlab.detector.base.DetectorType;
 import org.jlab.detector.base.GeometryFactory;
 import org.jlab.detector.calib.utils.ConstantsManager;
@@ -101,7 +103,9 @@ public class Viewer implements IDataEventListener, DetectorListener, ActionListe
     AnalysisMonitor[] monitors ; 
         
     public Viewer() throws FileNotFoundException {    	
-        this.monitors = new AnalysisMonitor[]{new T2DCalib("Time to Distance",ccdb)};		
+        this.monitors = new AnalysisMonitor[]{new T2DCalib("Time to Distance",ccdb),
+                                                new T0Calib("T0",ccdb),
+                                                new TDCCuts("TDC Cuts",ccdb)};		
 	// create menu bar
         menuBar = new JMenuBar();
         JMenuItem menuItem;
