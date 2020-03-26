@@ -99,13 +99,16 @@ public class Viewer implements IDataEventListener, DetectorListener, ActionListe
     public static JTextField[] alphaCuts2 = {new JTextField(7),new JTextField(7),new JTextField(7),new JTextField(7),new JTextField(7),new JTextField(7)};
    
     public static JTextField betaCut = new JTextField(3);
+    public static JTextField npassWires = new JTextField(3);
+    public static JTextField nWires = new JTextField(3);
+    public static JTextField deltaWire = new JTextField(3);
+    
+    
      // detector monitors
     AnalysisMonitor[] monitors ; 
         
     public Viewer() throws FileNotFoundException {    	
-        this.monitors = new AnalysisMonitor[]{new T2DCalib("Time to Distance",ccdb),
-                                                new T0Calib("T0",ccdb),
-                                                new TDCCuts("TDC Cuts",ccdb)};		
+        this.monitors = new AnalysisMonitor[]{new T2DCalib("Time to Distance",ccdb)};		
 	// create menu bar
         menuBar = new JMenuBar();
         JMenuItem menuItem;
@@ -533,16 +536,61 @@ public class Viewer implements IDataEventListener, DetectorListener, ActionListe
         c.gridy = y;
         tgmPanel = new JPanel();
         trPanel.add(new JLabel("beta>", JLabel.LEADING),c);
-        //c.gridx = 2;
-        //c.gridy = y;
-        //trPanel.add(new JLabel(""),c);
-        //y++;
-        //c.gridx = 0;
-        //c.gridy = y;
-        //tgmPanel = new JPanel();
+        
         betaCut.setText("0.9");
         betaCut.addActionListener(this);
         tgmPanel.add(betaCut);
+        c.gridx = 3;
+	c.gridy = y;
+        trPanel.add(tgmPanel,c);
+        c.gridx = 2;
+        c.gridy = y;
+        trPanel.add(new JLabel(""),c);
+        
+        //npassWires ,nWires ,deltaWire
+        y++;
+        c.gridx = 2;
+        c.gridy = y;
+        tgmPanel = new JPanel();
+        trPanel.add(new JLabel("nhits>", JLabel.LEADING),c);
+        
+        nWires.setText("4");
+        nWires.addActionListener(this);
+        tgmPanel.add(nWires);
+        c.gridx = 3;
+	c.gridy = y;
+        trPanel.add(tgmPanel,c);
+        c.gridx = 2;
+        c.gridy = y;
+        trPanel.add(new JLabel(""),c);
+        
+        //
+        y++;
+        c.gridx = 2;
+        c.gridy = y;
+        tgmPanel = new JPanel();
+        trPanel.add(new JLabel("nwires_wi_ave<=", JLabel.LEADING),c);
+        
+        npassWires.setText("9");
+        npassWires.addActionListener(this);
+        tgmPanel.add(npassWires);
+        c.gridx = 3;
+	c.gridy = y;
+        trPanel.add(tgmPanel,c);
+        c.gridx = 2;
+        c.gridy = y;
+        trPanel.add(new JLabel(""),c);
+        
+        //
+        y++;
+        c.gridx = 2;
+        c.gridy = y;
+        tgmPanel = new JPanel();
+        trPanel.add(new JLabel("deltaWire=", JLabel.LEADING),c);
+        
+        deltaWire.setText("3");
+        deltaWire.addActionListener(this);
+        tgmPanel.add(deltaWire);
         c.gridx = 3;
 	c.gridy = y;
         trPanel.add(tgmPanel,c);
@@ -562,10 +610,10 @@ public class Viewer implements IDataEventListener, DetectorListener, ActionListe
     
     
     public static void main(String[] args) throws FileNotFoundException {
+        
         JFrame frame = new JFrame("DC Calibration");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         Viewer viewer = new Viewer();
-        //frame.add(viewer.getPanel());
         frame.add(viewer.mainPanel);
         frame.setJMenuBar(viewer.menuBar);
         frame.setSize(1400, 800);

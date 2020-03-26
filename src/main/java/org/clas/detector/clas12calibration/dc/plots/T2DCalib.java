@@ -14,6 +14,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
@@ -658,10 +659,12 @@ public class T2DCalib extends AnalysisMonitor{
     int count = 0;
     public static int polarity =-1;
     public List<FittedHit> hits = new ArrayList<>();
-    
+    Map<Integer, ArrayList<Integer>> segMapTBHits = new HashMap<Integer, ArrayList<Integer>>();
+    Map<Integer, SegmentProperty> segPropMap = new HashMap<Integer, SegmentProperty>();
     List<FittedHit> hitlist = new ArrayList<>();
     @Override
     public void processEvent(DataEvent event) {
+        
         if (!event.hasBank("RUN::config")) {
             return ;
         }
@@ -685,46 +688,33 @@ public class T2DCalib extends AnalysisMonitor{
         if(!event.hasBank("TimeBasedTrkg::TBHits")) {
             return;
         } 
+        // get segment property
         
         DataBank bnkHits = event.getBank("TimeBasedTrkg::TBHits");
+        this.getSegProperty(bnkHits);
+        
         for (int i = 0; i < bnkHits.rows(); i++) {
-            
-
                 double bFieldVal = (double) bnkHits.getFloat("B", i);
                 int superlayer = bnkHits.getInt("superlayer", i);
-                
-                //int region = (int) (superlayer + 1) / 2;
                 // alpha in the bank is corrected for B field.  To fill the alpha bin use the uncorrected value
                 double theta0 = Math.toDegrees(Math.acos(1-0.02*bFieldVal));
                 double alphaRadUncor = bnkHits.getFloat("Alpha", i)+(double)T2DCalib.polarity*theta0;
                 
                 int alphaBin = this.getAlphaBin(alphaRadUncor);
-                boolean passHit = false;
-
-//                    if( ( ( region ==1 && alpha> -20.0 && alpha< -5.0)
-//                    || (region ==2 && alpha> -20.0 && alpha< 0.0)
-//                    || (region ==3 && alpha> -28.0 && alpha< 2.0) )) {
-//                        passHit = true;
-//                    }
             if (bnkHits.getByte("trkID", i) >0 
                     && bnkHits.getFloat("beta", i)> Double.parseDouble(Viewer.betaCut.getText()) 
                     && this.selectOnAlpha(superlayer, alphaRadUncor)==true
-                    && bnkHits.getFloat("TFlight", i)>0 && Math.abs(bnkHits.getFloat("fitResidual", i))<0.075)
+                    && bnkHits.getFloat("TFlight", i)>0 
+                    && segPropMap.get(bnkHits.getInt("clusterID", i)).getNumWireWithinDW()<=Integer.parseInt(Viewer.npassWires.getText())
+                    && segPropMap.get(bnkHits.getInt("clusterID", i)).getSize()>Integer.parseInt(Viewer.nWires.getText())
+                    && Math.abs(bnkHits.getFloat("fitResidual", i))<0.075)
             {
                 
                 hitlist.add(this.getHit(bnkHits, i));
                 double calibTime = (double) (bnkHits.getInt("TDC", i) - bnkHits.getFloat("TProp", i)
                                         - bnkHits.getFloat("TFlight", i) - bnkHits.getFloat("TStart", i) 
                                         - bnkHits.getFloat("T0", i) -0*bnkHits.getFloat("tBeta", i));
-                
-//                    double calibTime = this.computeCalibTime(bnkHits.getInt("sector", i), 
-//                            bnkHits.getInt("superlayer", i), 
-//                            bnkHits.getFloat("trkDoca", i), 
-//                            bnkHits.getInt("TDC", i), 
-//                            bnkHits.getFloat("TProp", i),
-//                            bnkHits.getFloat("TFlight", i), 
-//                            bnkHits.getFloat("TStart", i),bnkHits.getFloat("T0", i), bnkHits.getFloat("tBeta", i));
-                //fill all B bins (index = 7)
+
                 Tvstrkdocas.get(new Coordinate(bnkHits.getInt("superlayer", i) - 1, alphaBin, this.BBins))
                                 .fill(bnkHits.getFloat("trkDoca", i), calibTime);
                 Tvscalcdocas.get(new Coordinate(bnkHits.getInt("superlayer", i) - 1, alphaBin, this.BBins))
@@ -750,42 +740,7 @@ public class T2DCalib extends AnalysisMonitor{
         writer.writeEvent(hipoEvent);
         hitlist.clear();
     }
-    public void processEventIterate(DataBank bnkHits) {
-        
-        for (int i = 0; i < bnkHits.rows(); i++) {
-            if (bnkHits.getByte("trkID", i) >= 1 
-                    ) {
-
-                double bFieldVal = (double) bnkHits.getFloat("B", i);
-                int superlayer = bnkHits.getInt("superlayer", i);
-                
-                double alpha = bnkHits.getFloat("Alpha", i);
-                int alphaBin = this.getAlphaBin(alpha);
-               
-                double calibTime = (double) (bnkHits.getInt("TDC", i) - bnkHits.getFloat("TProp", i)
-                                        - bnkHits.getFloat("TFlight", i) - bnkHits.getFloat("TStart", i) 
-                                        - bnkHits.getFloat("T0", i) -0*bnkHits.getFloat("tBeta", i));
-                //fill all B bins (index = 7)
-                Tvstrkdocas.get(new Coordinate(bnkHits.getInt("superlayer", i) - 1, alphaBin, this.BBins))
-                                .fill(bnkHits.getFloat("trkDoca", i), calibTime);
-                Tvscalcdocas.get(new Coordinate(bnkHits.getInt("superlayer", i) - 1, alphaBin, this.BBins))
-                                .fill(bnkHits.getFloat("doca", i), calibTime);
-                
-                if(superlayer<3 || superlayer>4) {
-                    int bBin = this.getBBin(bFieldVal);
-                    Tvstrkdocas.get(new Coordinate(bnkHits.getInt("superlayer", i) - 1, alphaBin, bBin))
-                                .fill(bnkHits.getFloat("trkDoca", i), calibTime);
-                    Tvscalcdocas.get(new Coordinate(bnkHits.getInt("superlayer", i) - 1, alphaBin, bBin))
-                                .fill(bnkHits.getFloat("doca", i), calibTime);
-                }
-
-            }
-        }
-        //hipoEvent = (HipoDataEvent) writer.createEvent();
-        //hipoEvent.appendBank(bnkHits);
-        //writer.writeEvent(hipoEvent);
-        
-    }
+    
     public double[][] resetPars = new double[6][11];
     private String[] parNames = {"v0", "vmid", "R", "tmax", "distbeta", "delBf", 
         "b1", "b2", "b3", "b4", "dmax"};
@@ -979,10 +934,14 @@ public class T2DCalib extends AnalysisMonitor{
         hit.set_AssociatedHBTrackID(trkID); 
         hit.set_TimeResidual(resiTime);
         hit.set_Residual(resiFit);
+        this.getSegProperty(bnkHits);
         
         if (bnkHits.getByte("trkID", i) >0 && bnkHits.getFloat("beta", i)> Double.parseDouble(Viewer.betaCut.getText())
                 && this.selectOnAlpha(superlayer, alphaRadUncor)==true
-                && bnkHits.getFloat("TFlight", i)>0 && Math.abs(bnkHits.getFloat("fitResidual", i))<0.075) {            
+                && bnkHits.getFloat("TFlight", i)>0 
+                && segPropMap.get(clusterID).getNumWireWithinDW()<=Integer.parseInt(Viewer.npassWires.getText())
+                && segPropMap.get(clusterID).getSize()>Integer.parseInt(Viewer.nWires.getText())    
+                && Math.abs(bnkHits.getFloat("fitResidual", i))<0.075) {            
             return hit;
         } else {
             return null;
@@ -1093,6 +1052,31 @@ public class T2DCalib extends AnalysisMonitor{
             pass = true;
         }
         return pass;        
+    }
+
+    private void getSegProperty(DataBank bnkHits) {
+        
+        segMapTBHits.clear();
+        segPropMap.clear();
+               
+        for (int j = 0; j < bnkHits.rows(); j++){
+            Integer cID = bnkHits.getInt("clusterID", j);
+            if(segMapTBHits.containsKey(cID)==false) {
+                segMapTBHits.put(cID, new ArrayList<Integer>());
+            }
+            
+            segMapTBHits.get(cID).add((int)bnkHits.getShort("wire", j));
+            
+        }
+        
+        Iterator<Map.Entry<Integer, ArrayList<Integer>>> itr = segMapTBHits.entrySet().iterator(); 
+          
+        while(itr.hasNext()) { 
+            Map.Entry<Integer, ArrayList<Integer>> entry = itr.next(); 
+            segPropMap.put(entry.getKey() , 
+                    new SegmentProperty(entry.getKey(),entry.getValue(),Integer.parseInt(Viewer.deltaWire.getText())));
+        } 
+
     }
     
 }

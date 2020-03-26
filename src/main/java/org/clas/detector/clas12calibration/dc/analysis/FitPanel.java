@@ -23,7 +23,6 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.plaf.metal.MetalButtonUI;
 import org.clas.detector.clas12calibration.dc.plots.T2DCalib;
-import org.clas.detector.clas12calibration.dc.t2d.TableLoader;
 import org.freehep.math.minuit.MnUserParameters;
 
 
@@ -244,7 +243,7 @@ public class FitPanel {
                            + " to bring up the selected dialog.",
                            JLabel.CENTER);
         }
-        private Font bBold = new Font("Arial", Font.BOLD, 16);;
+        private Font bBold = new Font("Arial", Font.BOLD, 16);
         void setLabel(String newText) {
             label.setText(newText);
         }
