@@ -38,26 +38,25 @@ public class FitFunction implements FCNBase{
         H1F gr = _tdc;
         
         int maxbin = gr.getMaximumBin();
-        int minbin = maxbin;
-        for (int ix =0; ix< maxbin; ix++) {
-            if(gr.getBinContent(ix)>0)
-                minbin = ix;
-            break;
-        }
+        int halfmaxbin = 0;
+        double halfmax = gr.getBinContent(maxbin)/2;
+        
         for (int ix =0; ix< maxbin; ix++) {
             double y = gr.getBinContent(ix);
             double err = gr.getBinError(ix);
             
             if(err>0 && y>0) {
-                double slope=(gr.getBinContent(ix+1)-gr.getBinContent(ix))/
-                        (gr.getDataX(ix+1))-gr.getDataX(ix);
-                System.out.println("ix "+ix+" slope "+slope);
-                
+                if(y>halfmax) {
+                    
+                    halfmaxbin = ix-1;
+                    break;
+                }
+                    
             }
         }
-        int rangemax  = minbin +(int)(maxbin - minbin)/2;
-       
-        for (int ix =0; ix< rangemax; ix++) {
+        int delBin = (maxbin - halfmaxbin)/2;
+        System.out.println("delBin "+delBin);
+        for (int ix =halfmaxbin-delBin; ix< halfmaxbin+delBin; ix++) {
             double x = gr.getDataX(ix);
             double y = gr.getBinContent(ix);
             double err = gr.getBinError(ix);
