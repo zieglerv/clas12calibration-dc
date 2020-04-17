@@ -9,7 +9,6 @@ import java.awt.BorderLayout;
 import java.awt.Dialog;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.GridLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -39,9 +38,7 @@ import javax.swing.JTextField;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import org.clas.detector.clas12calibration.dc.analysis.configButtonPanel;
-import org.clas.detector.clas12calibration.dc.plots.T0Calib;
-import org.clas.detector.clas12calibration.dc.plots.T2DCalib;
-import org.clas.detector.clas12calibration.dc.plots.TDCCuts;
+import org.clas.detector.clas12calibration.dc.calt2d.T2DCalib;
 import org.jlab.detector.base.DetectorType;
 import org.jlab.detector.base.GeometryFactory;
 import org.jlab.detector.calib.utils.ConstantsManager;
@@ -69,7 +66,7 @@ import org.jlab.rec.dc.Constants;
 
     
 
-public class Viewer implements IDataEventListener, DetectorListener, ActionListener, ChangeListener {
+public class T2DViewer implements IDataEventListener, DetectorListener, ActionListener, ChangeListener {
     
     List<DetectorPane2D> AnalysisPanels 	= new ArrayList<DetectorPane2D>();
     JTabbedPane tabbedpane           		= null;
@@ -107,7 +104,7 @@ public class Viewer implements IDataEventListener, DetectorListener, ActionListe
      // detector monitors
     AnalysisMonitor[] monitors ; 
         
-    public Viewer() throws FileNotFoundException {    	
+    public T2DViewer() throws FileNotFoundException {    	
         this.monitors = new AnalysisMonitor[]{new T2DCalib("Time to Distance",ccdb)};		
 	// create menu bar
         menuBar = new JMenuBar();
@@ -613,7 +610,7 @@ public class Viewer implements IDataEventListener, DetectorListener, ActionListe
         
         JFrame frame = new JFrame("DC Calibration");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        Viewer viewer = new Viewer();
+        T2DViewer viewer = new T2DViewer();
         frame.add(viewer.mainPanel);
         frame.setJMenuBar(viewer.menuBar);
         frame.setSize(1400, 800);

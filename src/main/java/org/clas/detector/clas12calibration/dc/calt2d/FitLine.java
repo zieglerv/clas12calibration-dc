@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.clas.detector.clas12calibration.dc.plots;
+package org.clas.detector.clas12calibration.dc.calt2d;
 
 import org.freehep.math.minuit.MnUserParameters;
 import org.jlab.groot.math.Func1D;

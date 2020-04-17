@@ -3,14 +3,14 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.clas.detector.clas12calibration.dc.plots;
+package org.clas.detector.clas12calibration.dc.calt2d;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import org.clas.detector.clas12calibration.viewer.Viewer;
+import org.clas.detector.clas12calibration.viewer.T2DViewer;
 import org.jlab.rec.dc.cluster.Cluster;
 import org.jlab.rec.dc.cluster.ClusterFitter;
 import org.jlab.rec.dc.cluster.FittedCluster;
@@ -72,7 +72,7 @@ public class Refit {
         for(FittedCluster clus : clusters) {
             cf.SetFitArray(clus, "TSC");
             cf.Fit(clus, true);
-            cf.SetResidualDerivedParams(clus, true, false, Viewer.dcDetector); //calcTimeResidual=false, resetLRAmbig=false 
+            cf.SetResidualDerivedParams(clus, true, false, T2DViewer.dcDetector); //calcTimeResidual=false, resetLRAmbig=false 
             
             double trkAngle = clus.get_clusterLineFitSlope();
             //local angle updated

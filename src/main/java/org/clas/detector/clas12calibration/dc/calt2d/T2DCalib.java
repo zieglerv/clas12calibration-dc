@@ -3,12 +3,11 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.clas.detector.clas12calibration.dc.plots;
+package org.clas.detector.clas12calibration.dc.calt2d;
 import org.clas.detector.clas12calibration.dc.t2d.TableLoader;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
-import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -17,13 +16,11 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.clas.detector.clas12calibration.dc.analysis.Coordinate;
 import org.clas.detector.clas12calibration.dc.analysis.FitPanel;
 import org.clas.detector.clas12calibration.dc.t2d.TimeToDistanceEstimator;
 import org.clas.detector.clas12calibration.viewer.AnalysisMonitor;
-import org.clas.detector.clas12calibration.viewer.Viewer;
+import org.clas.detector.clas12calibration.viewer.T2DViewer;
 import org.freehep.math.minuit.FCNBase;
 import org.freehep.math.minuit.FunctionMinimum;
 import org.freehep.math.minuit.MnMigrad;
@@ -680,7 +677,7 @@ public class T2DCalib extends AnalysisMonitor{
         if(count==1) {
             Constants.Load();
             TableLoader.FillT0Tables(newRun, "default");
-            TableLoader.Fill(Viewer.ccdb.getConstants(newRun, Constants.TIME2DIST));  
+            TableLoader.Fill(T2DViewer.ccdb.getConstants(newRun, Constants.TIME2DIST));  
             this.loadFitPars(); 
             polarity = (int)Math.signum(event.getBank("RUN::config").getFloat("torus",0));
             runNumber = newRun;
@@ -702,11 +699,11 @@ public class T2DCalib extends AnalysisMonitor{
                 
                 int alphaBin = this.getAlphaBin(alphaRadUncor);
             if (bnkHits.getByte("trkID", i) >0 
-                    && bnkHits.getFloat("beta", i)> Double.parseDouble(Viewer.betaCut.getText()) 
+                    && bnkHits.getFloat("beta", i)> Double.parseDouble(T2DViewer.betaCut.getText()) 
                     && this.selectOnAlpha(superlayer, alphaRadUncor)==true
                     && bnkHits.getFloat("TFlight", i)>0 
-                    && segPropMap.get(bnkHits.getInt("clusterID", i)).getNumWireWithinDW()<=Integer.parseInt(Viewer.npassWires.getText())
-                    && segPropMap.get(bnkHits.getInt("clusterID", i)).getSize()>Integer.parseInt(Viewer.nWires.getText())
+                    && segPropMap.get(bnkHits.getInt("clusterID", i)).getNumWireWithinDW()<=Integer.parseInt(T2DViewer.npassWires.getText())
+                    && segPropMap.get(bnkHits.getInt("clusterID", i)).getSize()>Integer.parseInt(T2DViewer.nWires.getText())
                     && Math.abs(bnkHits.getFloat("fitResidual", i))<0.075)
             {
                 
@@ -920,10 +917,10 @@ public class T2DCalib extends AnalysisMonitor{
         double T0Sub = (TDC - TProp - TFlight - T0);
         hit.set_Time(T0Sub-TStart);
         hit.set_LeftRightAmb(LR);
-        hit.calc_CellSize(Viewer.dcDetector);
+        hit.calc_CellSize(T2DViewer.dcDetector);
         hit.set_X(X);
         hit.set_Z(Z);
-        hit.calc_GeomCorr(Viewer.dcDetector, 0);
+        hit.calc_GeomCorr(T2DViewer.dcDetector, 0);
         hit.set_ClusFitDoca(trkDoca);
         hit.set_DeltaTimeBeta(tBeta);
         hit.set_Doca(doca);
@@ -936,11 +933,11 @@ public class T2DCalib extends AnalysisMonitor{
         hit.set_Residual(resiFit);
         this.getSegProperty(bnkHits);
         
-        if (bnkHits.getByte("trkID", i) >0 && bnkHits.getFloat("beta", i)> Double.parseDouble(Viewer.betaCut.getText())
+        if (bnkHits.getByte("trkID", i) >0 && bnkHits.getFloat("beta", i)> Double.parseDouble(T2DViewer.betaCut.getText())
                 && this.selectOnAlpha(superlayer, alphaRadUncor)==true
                 && bnkHits.getFloat("TFlight", i)>0 
-                && segPropMap.get(clusterID).getNumWireWithinDW()<=Integer.parseInt(Viewer.npassWires.getText())
-                && segPropMap.get(clusterID).getSize()>Integer.parseInt(Viewer.nWires.getText())    
+                && segPropMap.get(clusterID).getNumWireWithinDW()<=Integer.parseInt(T2DViewer.npassWires.getText())
+                && segPropMap.get(clusterID).getSize()>Integer.parseInt(T2DViewer.nWires.getText())    
                 && Math.abs(bnkHits.getFloat("fitResidual", i))<0.075) {            
             return hit;
         } else {
@@ -1047,8 +1044,8 @@ public class T2DCalib extends AnalysisMonitor{
     private boolean selectOnAlpha(int superlayer, double alphaRadUncor) {
         boolean pass = false;
         int i = superlayer - 1;
-        if(alphaRadUncor>Double.parseDouble(Viewer.alphaCuts1[i].getText()) &&
-                alphaRadUncor<Double.parseDouble(Viewer.alphaCuts2[i].getText())) {
+        if(alphaRadUncor>Double.parseDouble(T2DViewer.alphaCuts1[i].getText()) &&
+                alphaRadUncor<Double.parseDouble(T2DViewer.alphaCuts2[i].getText())) {
             pass = true;
         }
         return pass;        
@@ -1074,7 +1071,7 @@ public class T2DCalib extends AnalysisMonitor{
         while(itr.hasNext()) { 
             Map.Entry<Integer, ArrayList<Integer>> entry = itr.next(); 
             segPropMap.put(entry.getKey() , 
-                    new SegmentProperty(entry.getKey(),entry.getValue(),Integer.parseInt(Viewer.deltaWire.getText())));
+                    new SegmentProperty(entry.getKey(),entry.getValue(),Integer.parseInt(T2DViewer.deltaWire.getText())));
         } 
 
     }

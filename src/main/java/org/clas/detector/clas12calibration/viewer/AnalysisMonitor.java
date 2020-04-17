@@ -27,7 +27,7 @@ public class AnalysisMonitor extends CalibrationEngine implements IDataEventList
         CalibrationConstantsListener{    
     
     private final String           analysisName;
-    private ArrayList<String>      analysisTabNames  = new ArrayList();
+    public ArrayList<String>      analysisTabNames  = new ArrayList();
     private IndexedList<DataGroup> analysisData    = new IndexedList<DataGroup>(3);
     private DataGroup              analysisSummary = null;
     private JPanel                 analysisPanel   = null;
@@ -55,8 +55,6 @@ public class AnalysisMonitor extends CalibrationEngine implements IDataEventList
     
     public AnalysisMonitor(String name, ConstantsManager ccdb){
         this.setStyle(0);
-//        GStyle.getH1FAttributes().setOptStat("11111111");
-
                                
         this.analysisName = name;
         this.analysisPanel  = new JPanel();

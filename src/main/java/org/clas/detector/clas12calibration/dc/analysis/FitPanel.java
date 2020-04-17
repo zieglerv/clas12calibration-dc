@@ -22,7 +22,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.plaf.metal.MetalButtonUI;
-import org.clas.detector.clas12calibration.dc.plots.T2DCalib;
+import org.clas.detector.clas12calibration.dc.calt2d.T2DCalib;
 import org.freehep.math.minuit.MnUserParameters;
 
 
