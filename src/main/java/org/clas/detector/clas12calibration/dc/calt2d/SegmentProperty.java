@@ -6,7 +6,6 @@
 package org.clas.detector.clas12calibration.dc.calt2d;
 
 import java.util.ArrayList;
-import java.util.List;
 
 
 /**
