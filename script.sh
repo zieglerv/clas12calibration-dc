@@ -6,4 +6,4 @@ OS=$(uname)
 classPath="$PWD/target/*:$PWD/target/classes/*"
 
 # run 
-java -Xmx1536m -Xms1024m -cp $classPath org.clas.detector.clas12calibration.viewer.Viewer
+java -Xmx1536m -Xms1024m -cp $classPath org.clas.detector.clas12calibration.viewer.Driver
