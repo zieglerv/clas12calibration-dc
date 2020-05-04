@@ -461,6 +461,7 @@ public class T2DCalib extends AnalysisMonitor{
                 this.filltrkDocavsTGraphs(i,j);
             }
         }
+        System.out.println("RECOOKING DONE!");
         reader.close();
         fp.updateFitButton();
     }
@@ -564,11 +565,13 @@ public class T2DCalib extends AnalysisMonitor{
         //    this.getAnalysisCanvas().getCanvas("Fit Residuals").cd(i);
         //    this.getAnalysisCanvas().getCanvas("Fit Residuals").draw(fitResi.get(new Coordinate(i)));
         //}
+        System.out.println("REPROCESSING DONE!");
         reader.close();
         this.getCalib().fireTableDataChanged();  
     }
+    
+    F1D gausFunc = new F1D("gausFunc", "[amp]*gaus(x,[mean],[sigma])+[amp2]*gaus(x,[mean],[sigma2])", -0.5, 0.5);      
     private void fitTimeResPlot(H1F h1, EmbeddedCanvas canvasRes) {
-        F1D gausFunc = new F1D("gausFunc", "[amp]*gaus(x,[mean],[sigma])+[amp2]*gaus(x,[mean],[sigma2])", -0.5, 0.5);
         gausFunc.setLineColor(4);
         gausFunc.setLineStyle(1);
         gausFunc.setLineWidth(2);
@@ -579,8 +582,11 @@ public class T2DCalib extends AnalysisMonitor{
         gausFunc.setParameter(4, 0.5);
         gausFunc.setOptStat(1110);
         h1.setOptStat(0);
+        canvasRes.clear();
+        
         DataFitter.fit(gausFunc, h1, "Q");
         gausFunc.setOptStat(101100);
+        
         canvasRes.draw(h1, "same");
     }
     private int getAlphaBin(double alpha) {
