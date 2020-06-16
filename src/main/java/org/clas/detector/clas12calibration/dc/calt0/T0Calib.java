@@ -95,8 +95,9 @@ public class T0Calib extends AnalysisMonitor{
 
 
     //H1F[][][][] h = new H1F[6][6][nSlots7][nCables6];
-    private Map<Coordinate, H1F> TDCHis                     = new HashMap<Coordinate, H1F>();    
-    public  Map<Coordinate, FitLine> TDCFits                = new HashMap<Coordinate, FitLine>();
+    private Map<Coordinate, H1F> TDCHis        = new HashMap<Coordinate, H1F>();    
+    public  Map<Coordinate, FitLine> TDCFits   = new HashMap<Coordinate, FitLine>();
+    public  Map<Coordinate, Double> T0s        = new HashMap<Coordinate, Double>();
     
     @Override
     public void createHistos() {
@@ -125,6 +126,8 @@ public class T0Calib extends AnalysisMonitor{
                         TDCHis.get(new Coordinate(i,j,k, l)).setLineColor(1);
                         TDCFits.put(new Coordinate(i,j,k, l), new FitLine());
                         hgrps.addDataSet(TDCHis.get(new Coordinate(i, j, k, l)), 0);
+                        
+                        T0s.put(new Coordinate(i,j,k, l), 0.0);
                         
                         Fitted[i][j][k][l] = false;
                     }
@@ -179,7 +182,7 @@ public class T0Calib extends AnalysisMonitor{
                 for (int k = 0; k < nSlots7; k++)
                 {
                     for (int l = 0; l < nCables6; l++)
-                    { System.out.println("**************************"+i+""+j+""+k+""+l);
+                    { 
                         if(this.fitThisHisto(this.TDCHis.get(new Coordinate(i,j,k,l)))==true) {
                             this.runFit(i, j, k, l);
                             int binmax = this.TDCHis.get(new Coordinate(i,j,k,l)).getMaximumBin();
@@ -217,6 +220,9 @@ public class T0Calib extends AnalysisMonitor{
         Fitted[i][j][k][l] = true;
         System.out.println(" FITTED ? "+Fitted[i][j][k][l]);
     }
+     private void updateTable(int i, int j,  int k, double t0) {
+       this.getCalib().setDoubleValue(t0, "T0", i+1, j+1, k+1);
+     }
     
     int counter = 0;
     public  HipoDataSource reader = new HipoDataSource();
@@ -405,8 +411,11 @@ public class T0Calib extends AnalysisMonitor{
         double T0Err = this.calcError(n, en, d, ed);
         T0val[1] =T0Err;
         T0val[0] = T0;
-        
-        
+        h.setOptStat(0);
+        String t = "T0 = "+(float)T0;
+        h.setTitle(t);
+        T0s.put(new Coordinate(i,j,k, l), T0);
+        this.updateTable(i, j, k, t0);
         TDCFits.put(new Coordinate(i,j,k,l), 
                 new FitLine("f"+""+i+""+j+""+k+""+l, i, j, k, l, 
                 h.getDataX(t0idx), h.getDataX(t0midx+1)) );
@@ -415,7 +424,6 @@ public class T0Calib extends AnalysisMonitor{
         TDCFits.get(new Coordinate(i,j,k,l)).setLineColor(8);
         TDCFits.get(new Coordinate(i,j,k,l)).setParameters(new double[] {f1.getParameter(0), f1.getParameter(1)});
         
-        System.out.println(" TO "+T0);
         return T0val;
     }
 
