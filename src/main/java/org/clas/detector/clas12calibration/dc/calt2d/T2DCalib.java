@@ -644,7 +644,7 @@ public class T2DCalib extends AnalysisMonitor{
                     double y = hslice.get(si).getMean();
                     double sigma = hslice.get(si).getRMS();
                    
-                    if(x/(2.*Constants.wpdist[i])>0.9) {
+                    if(x/(2.*Constants.wpdist[i])>0.9) { // for large docas (90% of dmax take fit with a double gauss and take the peak of the one at smaller distance as y
                         f2.setParameter(0, amp);
                         f2.setParameter(1, mean);
                         f2.setParameter(4, y+10);
