@@ -16,10 +16,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.clas.detector.clas12calibration.dc.analysis.Coordinate;
-import org.clas.detector.clas12calibration.dc.calt0.FitLine;
 import org.clas.detector.clas12calibration.dc.calt2d.SegmentProperty;
 import org.clas.detector.clas12calibration.viewer.AnalysisMonitor;
-import org.freehep.math.minuit.MnUserParameters;
 import org.jlab.detector.calib.utils.CalibrationConstants;
 import org.jlab.groot.data.H1F;
 import org.jlab.groot.group.DataGroup;
@@ -48,7 +46,7 @@ public class T0Calib extends AnalysisMonitor{
     private String analTabs = "Corrected TDC";;
     public T0Calib(String name, ConstantsManager ccdb) throws FileNotFoundException {
         super(name, ccdb);
-         this.setAnalysisTabNames(analTabs);
+        this.setAnalysisTabNames(analTabs);
         this.init(false, "T0");
         File outfile = new File("Files/ccdbConstantst0.txt");
         pw = new PrintWriter(outfile);
@@ -385,7 +383,6 @@ public class T0Calib extends AnalysisMonitor{
         
         DataFitter.fit(gausFunc, h, "Q"); 
         
-        System.out.println(" FIT GAUS");
         double tmidY = gausFunc.getParameter(0)/2;
         double tminY = gausFunc.getParameter(3);
         double del_min_halfmaxY = tmidY-tminY;

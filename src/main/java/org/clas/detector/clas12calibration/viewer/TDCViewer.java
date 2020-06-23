@@ -38,7 +38,7 @@ import javax.swing.JTextField;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import org.clas.detector.clas12calibration.dc.analysis.configButtonPanel;
-import org.clas.detector.clas12calibration.dc.calt2d.T2DCalib;
+import org.clas.detector.clas12calibration.dc.caltdccuts.TDCCuts;
 import org.jlab.detector.base.DetectorType;
 import org.jlab.detector.base.GeometryFactory;
 import org.jlab.detector.calib.utils.ConstantsManager;
@@ -61,7 +61,7 @@ import org.jlab.io.task.IDataEventListener;
 import org.jlab.rec.dc.Constants;
 /**
  *
- * @author ziegler, devita
+ * @author ziegler
  */
 
     
@@ -92,9 +92,7 @@ public class TDCViewer implements IDataEventListener, DetectorListener, ActionLi
     
     
     private JLabel[] superlayer = {new JLabel("", JLabel.CENTER),new JLabel("", JLabel.CENTER),new JLabel("", JLabel.CENTER),new JLabel("", JLabel.CENTER),new JLabel("", JLabel.CENTER),new JLabel("", JLabel.CENTER)};
-    public static JTextField[] alphaCuts1 = {new JTextField(7),new JTextField(7),new JTextField(7),new JTextField(7),new JTextField(7),new JTextField(7)};
-    public static JTextField[] alphaCuts2 = {new JTextField(7),new JTextField(7),new JTextField(7),new JTextField(7),new JTextField(7),new JTextField(7)};
-   
+    
     public static JTextField betaCut = new JTextField(3);
     public static JTextField npassWires = new JTextField(3);
     public static JTextField nWires = new JTextField(3);
@@ -105,7 +103,7 @@ public class TDCViewer implements IDataEventListener, DetectorListener, ActionLi
     AnalysisMonitor[] monitors ; 
         
     public TDCViewer() throws FileNotFoundException {    	
-        this.monitors = new AnalysisMonitor[]{new T2DCalib("Time to Distance",ccdb)};		
+        this.monitors = new AnalysisMonitor[]{new TDCCuts("TDC Cuts",ccdb)};		
 	// create menu bar
         menuBar = new JMenuBar();
         JMenuItem menuItem;
@@ -315,9 +313,6 @@ public class TDCViewer implements IDataEventListener, DetectorListener, ActionLi
     @Override
     public void dataEventAction(DataEvent event) {
     	
-       // EvioDataEvent decodedEvent = deco.DecodeEvent(event, decoder, table);
-        //decodedEvent.show();
-        		
 	if(event!=null ){
 //            event.show();
             if (event.getType() == DataEventType.EVENT_START) {
@@ -443,16 +438,6 @@ public class TDCViewer implements IDataEventListener, DetectorListener, ActionLi
         JPanel stepPanel = new JPanel(new GridBagLayout());
         stepOuterPanel.add(stepPanel, BorderLayout.NORTH);
         GridBagConstraints c = new GridBagConstraints();
-
-//        for (int i=0; i< engines.length; i++) {
-//                c.gridx = 0; c.gridy = i;
-//                c.anchor = c.WEST;
-//                stepChecks[i].setName(engines[i].stepName);
-//                stepChecks[i].setText(engines[i].stepName);
-//                stepChecks[i].setSelected(true);
-//                stepChecks[i].addActionListener(this);
-//                stepPanel.add(stepChecks[i],c);
-//        }
         JPanel butPage1 = new configButtonPanel(this, false, "Next");
         stepOuterPanel.add(butPage1, BorderLayout.SOUTH);
 
@@ -470,145 +455,13 @@ public class TDCViewer implements IDataEventListener, DetectorListener, ActionLi
 
         //configPane.add("Previous calibration values", confOuterPanel);
 
-        int y=0;
-        // Tracking options
-        JPanel trOuterPanel = new JPanel(new BorderLayout());
-        JPanel trPanel = new JPanel(new GridBagLayout());
-        trOuterPanel.add(trPanel, BorderLayout.NORTH);
-        c.weighty = 1;
-        c.anchor = c.NORTHWEST;
-        c.insets = new Insets(3,3,3,3);
-
-        // Target GMEAN channel
-        c.gridx = 0;
-        c.gridy = y;
-        trPanel.add(new JLabel(""),c);
-        c.gridx = 1;
-        c.gridy = y;
-        JPanel tgmPanel = new JPanel();
-        for(int i = 0; i < 6; i++) {
-            superlayer[i].setText("Superlayer "+(i+1)+"    ");
-            tgmPanel.add(superlayer[i]);
-        }
-        trPanel.add(tgmPanel,c);
-        c.gridx = 2;
-        c.gridy = y;
-        trPanel.add(new JLabel(""),c);
-        y++;
-        c.gridx = 0;
-        c.gridy = y;
-        tgmPanel = new JPanel();
-        trPanel.add(new JLabel("alpha>"),c);
-        for(int i = 0; i < 6; i++) {
-            alphaCuts1[i].setText("-30");
-            alphaCuts1[i].addActionListener(this);
-            tgmPanel.add(alphaCuts1[i]);
-        }
-        c.gridx = 1;
-	c.gridy = y;
-        trPanel.add(tgmPanel,c);
-        c.gridx = 2;
-        c.gridy = y;
-        
-        //trPanel.add(new JLabel(""),c);
-        y++;
-        c.gridx = 0;
-        c.gridy = y;
-        tgmPanel = new JPanel();
-        trPanel.add(new JLabel("alpha<"),c);
-        for(int i = 0; i < 6; i++) {
-            alphaCuts2[i].setText("30");
-            alphaCuts2[i].addActionListener(this);
-            tgmPanel.add(alphaCuts2[i]);
-        }
-        c.gridx = 1;
-	c.gridy = y;
-        trPanel.add(tgmPanel,c);
-        c.gridx = 2;
-        c.gridy = y;
-        trPanel.add(new JLabel(""),c);
-        //
-        y++;
-        c.gridx = 2;
-        c.gridy = y;
-        tgmPanel = new JPanel();
-        trPanel.add(new JLabel("beta>", JLabel.LEADING),c);
-        
-        betaCut.setText("0.9");
-        betaCut.addActionListener(this);
-        tgmPanel.add(betaCut);
-        c.gridx = 3;
-	c.gridy = y;
-        trPanel.add(tgmPanel,c);
-        c.gridx = 2;
-        c.gridy = y;
-        trPanel.add(new JLabel(""),c);
-        
-        //npassWires ,nWires ,deltaWire
-        y++;
-        c.gridx = 2;
-        c.gridy = y;
-        tgmPanel = new JPanel();
-        trPanel.add(new JLabel("nhits>", JLabel.LEADING),c);
-        
-        nWires.setText("4");
-        nWires.addActionListener(this);
-        tgmPanel.add(nWires);
-        c.gridx = 3;
-	c.gridy = y;
-        trPanel.add(tgmPanel,c);
-        c.gridx = 2;
-        c.gridy = y;
-        trPanel.add(new JLabel(""),c);
-        
-        //
-        y++;
-        c.gridx = 2;
-        c.gridy = y;
-        tgmPanel = new JPanel();
-        trPanel.add(new JLabel("nwires_wi_ave<=", JLabel.LEADING),c);
-        
-        npassWires.setText("9");
-        npassWires.addActionListener(this);
-        tgmPanel.add(npassWires);
-        c.gridx = 3;
-	c.gridy = y;
-        trPanel.add(tgmPanel,c);
-        c.gridx = 2;
-        c.gridy = y;
-        trPanel.add(new JLabel(""),c);
-        
-        //
-        y++;
-        c.gridx = 2;
-        c.gridy = y;
-        tgmPanel = new JPanel();
-        trPanel.add(new JLabel("deltaWire=", JLabel.LEADING),c);
-        
-        deltaWire.setText("3");
-        deltaWire.addActionListener(this);
-        tgmPanel.add(deltaWire);
-        c.gridx = 3;
-	c.gridy = y;
-        trPanel.add(tgmPanel,c);
-        c.gridx = 2;
-        c.gridy = y;
-        trPanel.add(new JLabel(""),c);
-        
-        JPanel butPage3 = new configButtonPanel(this, true, "Finish");
-        trOuterPanel.add(butPage3, BorderLayout.SOUTH);
-
-        configPane.add("Cuts", trOuterPanel);
-
-        configFrame.add(configPane);
-        configFrame.setVisible(true);
 
 	}
     
     
     public static void main(String[] args) throws FileNotFoundException {
         
-        JFrame frame = new JFrame("DC Calibration");
+        JFrame frame = new JFrame("TDC Cuts");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         TDCViewer viewer = new TDCViewer();
         frame.add(viewer.mainPanel);
