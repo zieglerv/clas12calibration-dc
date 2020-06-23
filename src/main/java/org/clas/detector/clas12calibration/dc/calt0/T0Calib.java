@@ -368,10 +368,36 @@ public class T0Calib extends AnalysisMonitor{
         return f0.getParameter(0);
     }
     private double[] getT0(int i, int j, int k, int l) {
+        System.out.println("Getting t0 for i,j,k,l = "+i+" "+j+" "+k+" "+l );
         H1F h = this.TDCHis.get(new Coordinate(i,j,k,l));
-        double thres = this.getThreshold(h);
+        
+        double thres = 0;//this.getThreshold(h);
         double [] T0val = new double[2];
-        F1D f1 = new F1D("f1","[a]*x+[b]", h.getDataX(0), h.getDataX(1));
+        F1D f1 = new F1D("f1","[a]*x+[b]", h.getDataX(0), h.getDataX(20));
+        
+        F1D gausFunc = new F1D("gausFunc", "[amp]*gaus(x,[mean],[sigma])+[p0]", 
+                h.getDataX(0), h.getDataX(h.getMaximumBin())); 
+        
+        gausFunc.setParameter(0, h.getMax());
+        gausFunc.setParameter(1, -0.0);
+        gausFunc.setParameter(2, 0.05);
+        gausFunc.setParameter(3, 0);
+        
+        DataFitter.fit(gausFunc, h, "Q"); 
+        
+        System.out.println(" FIT GAUS");
+        double tmidY = gausFunc.getParameter(0)/2;
+        double tminY = gausFunc.getParameter(3);
+        double del_min_halfmaxY = tmidY-tminY;
+        
+        double minRangeY = tmidY-del_min_halfmaxY/2;
+        double maxRangeY = tmidY;
+        if(h.getMax()>tmidY && tmidY+(h.getMax()-tmidY)/3 < h.getMax() ) {
+            maxRangeY+=(h.getMax()-tmidY)/3;
+        }
+        
+        System.out.println(" minRangeY "+minRangeY+" maxRangeY "+maxRangeY);
+        
         f1.setParameter(0, 0);
         f1.setParameter(1, 0);
 
@@ -381,29 +407,37 @@ public class T0Calib extends AnalysisMonitor{
         int t0midx = -1;
         double t0 = Double.NEGATIVE_INFINITY; 
         for (int ix =0; ix< h.getMaximumBin(); ix++) {
-            if(h.getBinContent(ix)>h.getBinContent(h.getMaximumBin())*2/3) {
+            if(h.getBinContent(ix)>=maxRangeY) {
                 t0midx= ix;
                 break;
             }
         }
         for (int ix =0; ix< h.getMaximumBin(); ix++) {
-            if(h.getBinContent(ix) >thres 
-                        && t0 == Double.NEGATIVE_INFINITY) {
-                    t0 = h.getDataX(ix);
-                    t0idx = ix;
+            if(h.getBinContent(ix)>=minRangeY) {
+                t0idx= ix;
                 break;
             }
         }
-        for (int ix =t0idx; ix< t0midx+1; ix++) {
+        int diffBins = t0midx - t0idx;
+        System.out.println("diffBins "+diffBins);
+//        for (int ix =0; ix< h.getMaximumBin(); ix++) {
+//            if(h.getBinContent(ix) >thres 
+//                        && t0 == Double.NEGATIVE_INFINITY) {
+//                    t0 = h.getDataX(ix);
+//                    t0idx = ix;
+//                break;
+//            }
+//        }
+        for (int ix =t0idx; ix< t0midx; ix++) {
             gr.addPoint(h.getDataX(ix), h.getBinContent(ix), 0, h.getBinError(ix));
         }
         
         if(gr.getDataSize(0)>1) {
-            f1.setRange(h.getDataX(t0idx), h.getDataX(t0midx+1));
+            f1.setRange(h.getDataX(t0idx), h.getDataX(t0midx));
             DataFitter.fit(f1, gr, "Q"); 
         }
         
-        double n = h.getDataX(t0idx)-f1.getParameter(1);
+        double n = tminY-f1.getParameter(1);
         double d = f1.getParameter(0);
         double en = -f1.parameter(1).error();
         double ed = f1.parameter(0).error();
@@ -415,10 +449,10 @@ public class T0Calib extends AnalysisMonitor{
         String t = "T0 = "+(float)T0;
         h.setTitle(t);
         T0s.put(new Coordinate(i,j,k, l), T0);
-        this.updateTable(i, j, k, t0);
+        this.updateTable(i, j, k, T0);
         TDCFits.put(new Coordinate(i,j,k,l), 
                 new FitLine("f"+""+i+""+j+""+k+""+l, i, j, k, l, 
-                h.getDataX(t0idx), h.getDataX(t0midx+1)) );
+                T0, h.getDataX(t0midx+diffBins/2)) );
         TDCFits.get(new Coordinate(i,j,k,l)).setLineStyle(4);
         TDCFits.get(new Coordinate(i,j,k,l)).setLineWidth(5);
         TDCFits.get(new Coordinate(i,j,k,l)).setLineColor(8);
