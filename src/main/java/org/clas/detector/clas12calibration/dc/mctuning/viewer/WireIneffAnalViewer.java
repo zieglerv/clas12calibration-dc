@@ -3,13 +3,12 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.clas.detector.clas12calibration.viewer;
+package org.clas.detector.clas12calibration.dc.mctuning.viewer;
 
 import java.awt.BorderLayout;
 import java.awt.Dialog;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -34,11 +33,11 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
-import javax.swing.JTextField;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-import org.clas.detector.clas12calibration.dc.analysis.configButtonPanel;
-import org.clas.detector.clas12calibration.dc.caltdccuts.TDCCuts;
+import org.clas.detector.clas12calibration.dc.mctuning.analysis.configButtonPanel;
+import org.clas.detector.clas12calibration.dc.mctuning.analysis.wireineff.WireIneffAnal;
+import org.jlab.clas.swimtools.MagFieldsEngine;
 import org.jlab.detector.base.DetectorType;
 import org.jlab.detector.base.GeometryFactory;
 import org.jlab.detector.calib.utils.ConstantsManager;
@@ -59,6 +58,7 @@ import org.jlab.io.base.DataEventType;
 import org.jlab.io.task.DataSourceProcessorPane;
 import org.jlab.io.task.IDataEventListener;
 import org.jlab.rec.dc.Constants;
+import org.jlab.service.dc.LayerEfficiencyAnalyzer;
 /**
  *
  * @author ziegler
@@ -66,7 +66,7 @@ import org.jlab.rec.dc.Constants;
 
     
 
-public class TDCViewer implements IDataEventListener, DetectorListener, ActionListener, ChangeListener {
+public class WireIneffAnalViewer implements IDataEventListener, DetectorListener, ActionListener, ChangeListener {
     
     List<DetectorPane2D> AnalysisPanels 	= new ArrayList<DetectorPane2D>();
     JTabbedPane tabbedpane           		= null;
@@ -93,17 +93,12 @@ public class TDCViewer implements IDataEventListener, DetectorListener, ActionLi
     
     private JLabel[] superlayer = {new JLabel("", JLabel.CENTER),new JLabel("", JLabel.CENTER),new JLabel("", JLabel.CENTER),new JLabel("", JLabel.CENTER),new JLabel("", JLabel.CENTER),new JLabel("", JLabel.CENTER)};
     
-    public static JTextField betaCut = new JTextField(3);
-    public static JTextField npassWires = new JTextField(3);
-    public static JTextField nWires = new JTextField(3);
-    public static JTextField deltaWire = new JTextField(3);
-    
-    
      // detector monitors
     AnalysisMonitor[] monitors ; 
-        
-    public TDCViewer() throws FileNotFoundException {    	
-        this.monitors = new AnalysisMonitor[]{new TDCCuts("TDC Cuts",ccdb)};		
+    private WireIneffAnal _wireIneffAnal ;     
+    public WireIneffAnalViewer() throws FileNotFoundException {  
+        this._wireIneffAnal = new WireIneffAnal("Wire Inefficiency Analysis",ccdb);
+        this.monitors = new AnalysisMonitor[]{this._wireIneffAnal};		
 	// create menu bar
         menuBar = new JMenuBar();
         JMenuItem menuItem;
@@ -197,8 +192,14 @@ public class TDCViewer implements IDataEventListener, DetectorListener, ActionLi
         // set directory to local
         this.Dir = System.getProperty("user.dir");
         System.out.println("Work directory set to " + this.Dir);
+        
+        enf.init();
+        //tm.init(); 
     }
-      
+    public static MagFieldsEngine enf = new MagFieldsEngine();
+        
+    //public static LayerEfficiencyAnalyzer tm = new LayerEfficiencyAnalyzer();
+        
     public void actionPerformed(ActionEvent e) {
         System.out.println(e.getActionCommand());
         if(e.getActionCommand()=="Set GUI update interval...") {
@@ -226,7 +227,7 @@ public class TDCViewer implements IDataEventListener, DetectorListener, ActionLi
             this.printHistosToFile();
         }
         if(e.getActionCommand()=="Refit") {
-            
+            this._wireIneffAnal.Refit();
         }
         if(e.getActionCommand()=="Save histograms to file...") {
             DateFormat df = new SimpleDateFormat("MM-dd-yyyy_hh.mm.ss_aa");
@@ -242,14 +243,14 @@ public class TDCViewer implements IDataEventListener, DetectorListener, ActionLi
             }
             this.saveHistosToFile(fileName);
         }
-        		if (e.getActionCommand().compareTo("Next")==0) {
-			int currentTab = configPane.getSelectedIndex();
-			for (int i=currentTab+1; i<configPane.getTabCount(); i++) {
-				if (configPane.isEnabledAt(i)) {
-					configPane.setSelectedIndex(i);
-					break;
-				}
-			}
+                    if (e.getActionCommand().compareTo("Next")==0) {
+                    int currentTab = configPane.getSelectedIndex();
+                    for (int i=currentTab+1; i<configPane.getTabCount(); i++) {
+                        if (configPane.isEnabledAt(i)) {
+                                configPane.setSelectedIndex(i);
+                                break;
+                        }
+                    }
 		}
 		if (e.getActionCommand().compareTo("Back")==0) {
 			int currentTab = configPane.getSelectedIndex();
@@ -461,9 +462,9 @@ public class TDCViewer implements IDataEventListener, DetectorListener, ActionLi
     
     public static void main(String[] args) throws FileNotFoundException {
         
-        JFrame frame = new JFrame("TDC Cuts");
+        JFrame frame = new JFrame("DC Calibration");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        TDCViewer viewer = new TDCViewer();
+        WireIneffAnalViewer viewer = new WireIneffAnalViewer();
         frame.add(viewer.mainPanel);
         frame.setJMenuBar(viewer.menuBar);
         frame.setSize(1400, 800);

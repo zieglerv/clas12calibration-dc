@@ -88,7 +88,7 @@ public class T2DViewer implements IDataEventListener, DetectorListener, ActionLi
     private int canvasUpdateTime = 10000;
     private int analysisUpdateTime = 10000;
     private int runNumber  = 0;
-    private String Dir = "/Users/ziegler";
+    private String Dir = System.getProperty("user.dir");
     
     
     private JLabel[] superlayer = {new JLabel("", JLabel.CENTER),new JLabel("", JLabel.CENTER),new JLabel("", JLabel.CENTER),new JLabel("", JLabel.CENTER),new JLabel("", JLabel.CENTER),new JLabel("", JLabel.CENTER)};

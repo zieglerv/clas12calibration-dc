@@ -3,13 +3,12 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.clas.detector.clas12calibration.viewer;
+package org.clas.detector.clas12calibration.dc.mctuning.viewer;
 
 import java.awt.BorderLayout;
 import java.awt.Dialog;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -37,8 +36,8 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-import org.clas.detector.clas12calibration.dc.analysis.configButtonPanel;
-import org.clas.detector.clas12calibration.dc.caltdccuts.TDCCuts;
+import org.clas.detector.clas12calibration.dc.mctuning.analysis.configButtonPanel;
+import org.clas.detector.clas12calibration.dc.mctuning.analysis.docasmear.DocaSmearAnal;
 import org.jlab.detector.base.DetectorType;
 import org.jlab.detector.base.GeometryFactory;
 import org.jlab.detector.calib.utils.ConstantsManager;
@@ -66,7 +65,7 @@ import org.jlab.rec.dc.Constants;
 
     
 
-public class TDCViewer implements IDataEventListener, DetectorListener, ActionListener, ChangeListener {
+public class DocaSmearAnalViewer implements IDataEventListener, DetectorListener, ActionListener, ChangeListener {
     
     List<DetectorPane2D> AnalysisPanels 	= new ArrayList<DetectorPane2D>();
     JTabbedPane tabbedpane           		= null;
@@ -102,8 +101,8 @@ public class TDCViewer implements IDataEventListener, DetectorListener, ActionLi
      // detector monitors
     AnalysisMonitor[] monitors ; 
         
-    public TDCViewer() throws FileNotFoundException {    	
-        this.monitors = new AnalysisMonitor[]{new TDCCuts("TDC Cuts",ccdb)};		
+    public DocaSmearAnalViewer() throws FileNotFoundException {    	
+        this.monitors = new AnalysisMonitor[]{new DocaSmearAnal("Doca Smearing Analysis",ccdb)};		
 	// create menu bar
         menuBar = new JMenuBar();
         JMenuItem menuItem;
@@ -140,14 +139,6 @@ public class TDCViewer implements IDataEventListener, DetectorListener, ActionLi
         settings.add(menuItem);
         menuBar.add(settings);
         
-        JMenu fits = new JMenu("Fits");
-        fits.getAccessibleContext().setAccessibleDescription("Choose parameters");
-        menuItem = new JMenuItem("Refit");
-        menuItem.getAccessibleContext().setAccessibleDescription("...");
-        menuItem.addActionListener(this);
-        fits.add(menuItem);
-        menuBar.add(fits);
-           
         // create main panel
         mainPanel = new JPanel();	
 	mainPanel.setLayout(new BorderLayout());
@@ -461,9 +452,9 @@ public class TDCViewer implements IDataEventListener, DetectorListener, ActionLi
     
     public static void main(String[] args) throws FileNotFoundException {
         
-        JFrame frame = new JFrame("TDC Cuts");
+        JFrame frame = new JFrame("DC Calibration");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        TDCViewer viewer = new TDCViewer();
+        DocaSmearAnalViewer viewer = new DocaSmearAnalViewer();
         frame.add(viewer.mainPanel);
         frame.setJMenuBar(viewer.menuBar);
         frame.setSize(1400, 800);
