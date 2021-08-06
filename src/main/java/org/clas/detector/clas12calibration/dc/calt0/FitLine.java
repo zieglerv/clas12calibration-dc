@@ -33,6 +33,14 @@ public class FitLine extends Func1D{
         this.min = min;
         this.max = max;
     }
+    
+    public FitLine(String name, int i, int j, double min, double max) {
+        super(name, min, max);
+        this.i = i;
+        this.j = j;
+        this.min = min;
+        this.max = max;
+    }
 
     public void setParameters(double[] pars) {
         for(int p = 0; p< nPars; p++) {

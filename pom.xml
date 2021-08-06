@@ -7,9 +7,10 @@
     <packaging>jar</packaging>
     <dependencies>
         <dependency>
-       <groupId>org.jlab.jnp</groupId>
-       <artifactId>jnp-physics</artifactId>
-       <version>1.1-SNAPSHOT</version>
+            <groupId>org.jlab.coat</groupId>
+            <artifactId>coat-libs</artifactId>
+            <version>7.0.0-SNAPSHOT</version>
+            <type>jar</type>
         </dependency>
         <dependency>
             <groupId>org.jlab.clas12.detector</groupId>
@@ -17,12 +18,6 @@
             <version>1.0-SNAPSHOT</version>
             <type>jar</type>
         </dependency>
-       <dependency>           
-        <groupId>org.jlab.coat</groupId>
-        <artifactId>coat-libs</artifactId>
-        <version>6.5.3-SNAPSHOT</version>
-         <type>jar</type>
-      </dependency>
     </dependencies> 
     <repositories>
      <repository>

@@ -6,6 +6,7 @@
 package org.clas.detector.clas12calibration.viewer;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dialog;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -39,6 +40,7 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import org.clas.detector.clas12calibration.dc.analysis.configButtonPanel;
 import org.clas.detector.clas12calibration.dc.calt0.T0Calib;
+import org.clas.detector.clas12calibration.dc.calt0.T00Calib;
 import org.jlab.detector.base.DetectorType;
 import org.jlab.detector.base.GeometryFactory;
 import org.jlab.detector.calib.utils.ConstantsManager;
@@ -72,6 +74,7 @@ public class T0Viewer implements IDataEventListener, DetectorListener, ActionLis
     JTabbedPane tabbedpane           		= null;
     JPanel mainPanel 				= null;
     JSplitPane splitpane                        = null;
+    JSplitPane splitpane2                        = null;
     JMenuBar menuBar                            = null;
     DataSourceProcessorPane processorPane 	= null;
     EmbeddedCanvasTabbed CLAS12Canvas           = null;
@@ -103,7 +106,7 @@ public class T0Viewer implements IDataEventListener, DetectorListener, ActionLis
     AnalysisMonitor[] monitors ; 
         
     public T0Viewer() throws FileNotFoundException {    	
-        this.monitors = new AnalysisMonitor[]{new T0Calib("T0 Calibration",ccdb)};		
+        this.monitors = new AnalysisMonitor[]{new T00Calib("T00 Calibration",ccdb),new T0Calib("T0 Calibration",ccdb)};		
 	// create menu bar
         menuBar = new JMenuBar();
         JMenuItem menuItem;
@@ -151,18 +154,27 @@ public class T0Viewer implements IDataEventListener, DetectorListener, ActionLis
         // create main panel
         mainPanel = new JPanel();	
 	mainPanel.setLayout(new BorderLayout());
-        splitpane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
-      	tabbedpane 	= new JTabbedPane();
+        splitpane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
+        tabbedpane 	= new JTabbedPane();
 
         processorPane = new DataSourceProcessorPane();
         processorPane.setUpdateRate(analysisUpdateTime);
-
-        mainPanel.add(splitpane);
+        splitpane2 = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
+        
+        
+        mainPanel.add(splitpane2);
         splitpane.setTopComponent(tabbedpane);
         
         splitpane.setBottomComponent(monitors[0].getCcview());
         splitpane.setDividerLocation(0.75);
         splitpane.setResizeWeight(0.75);
+        
+        tabbedpane.setBorder(null);
+        splitpane2.setTopComponent(splitpane);
+        splitpane2.setBottomComponent(monitors[1].getCcview());
+        splitpane2.setDividerLocation(0.75);
+        splitpane2.setResizeWeight(0.75);
+        
         mainPanel.add(processorPane,BorderLayout.PAGE_END);
         
     
@@ -175,8 +187,8 @@ public class T0Viewer implements IDataEventListener, DetectorListener, ActionLis
         tabbedpane.addChangeListener(this);
        
         for(int k =0; k<this.monitors.length; k++) {
-                this.tabbedpane.add(this.monitors[k].getAnalysisPanel(), this.monitors[k].getAnalysisName());
-        	this.monitors[k].getAnalysisView().getView().addDetectorListener(this);
+            this.tabbedpane.add(this.monitors[k].getAnalysisPanel(), this.monitors[k].getAnalysisName());
+            this.monitors[k].getAnalysisView().getView().addDetectorListener(this);
         }
         this.processorPane.addEventListener(this);
         

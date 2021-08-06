@@ -21,13 +21,14 @@ public class ReadTT {
     static boolean LOADED = false;
     public static synchronized void Load(int run, String variation) {
         if (LOADED) return;
-        System.out.println(" TT TABLE FILLED..... for Run "+run+" with VARIATION "+variation);
+        System.out.println(" TT TABLE ..... for Run "+run+" with VARIATION "+variation);
         DatabaseConstantProvider dbprovider = new DatabaseConstantProvider(run, variation);
         dbprovider.loadTable("/daq/tt/dc");
         //disconnect from database. Important to do this after loading tables.
+        System.out.println(" T0 TABLE ..... for Run "+run+" with VARIATION "+variation);
+        dbprovider.loadTable("/calibration/dc/time_corrections/T0Corrections");
+        //disconnect from database. Important to do this after loading tables.
         dbprovider.disconnect();
-        
-        
         for (int i = 0; i < dbprovider.length("/daq/tt/dc/crate"); i++) {
             int crate = dbprovider.getInteger("/daq/tt/dc/crate", i);
             int slot = dbprovider.getInteger("/daq/tt/dc/slot", i);
@@ -44,6 +45,26 @@ public class ReadTT {
             Components[crate - 41][slot - 1][chan] = comp;
 		
         }
+        
+        
+        // T0-subtraction
+        //double[][][][] T0 ;
+        //double[][][][] T0ERR ;
+        //T0s
+        //T0 = new double[6][6][7][6]; //nSec*nSL*nSlots*nCables
+        //T0ERR = new double[6][6][7][6]; //nSec*nSL*nSlots*nCables
+        for (int i = 0; i < dbprovider.length("/calibration/dc/time_corrections/T0Corrections/Sector"); i++) {
+            int iSec = dbprovider.getInteger("/calibration/dc/time_corrections/T0Corrections/Sector", i);
+            int iSly = dbprovider.getInteger("/calibration/dc/time_corrections/T0Corrections/Superlayer", i);
+            int iSlot = dbprovider.getInteger("/calibration/dc/time_corrections/T0Corrections/Slot", i);
+            int iCab = dbprovider.getInteger("/calibration/dc/time_corrections/T0Corrections/Cable", i);
+            double t0 = dbprovider.getDouble("/calibration/dc/time_corrections/T0Corrections/T0Correction", i);
+            double t0Error = dbprovider.getDouble("/calibration/dc/time_corrections/T0Corrections/T0Error", i);
+
+            T0[iSec - 1][iSly - 1][iSlot - 1][iCab - 1] = t0; 
+            T0ERR[iSec - 1][iSly - 1][iSlot - 1][iCab - 1] = t0Error;
+        }
+        
         LOADED = true;
     }
     public static final int nCrates = 18;// Goes from 41 to 58 (one per chamber)
@@ -74,6 +95,10 @@ public class ReadTT {
             //===> 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15
             // (Local wire ID: 0 for 1st, 16th, 32th, 48th, 64th, 80th, 96th wires)
     };
+    public static double[][][][] T0 = new double[6][6][7][6]; //nSec*nSL*nSlots*nCables ;
+    public static double[][][][] T0ERR = new double[6][6][7][6]; //nSec*nSL*nSlots*nCables ;
+    
+        
 }
         
         

@@ -37,7 +37,7 @@ import org.jlab.utils.system.ClasUtilsFile;
  *
  * @author KPAdhikari, ziegler
  */
-public class T0Calib extends AnalysisMonitor{
+public class T00Calib extends AnalysisMonitor{
     //public HipoDataSync writer = null;
     //private HipoDataEvent hipoEvent = null;
     private SchemaFactory schemaFactory = new SchemaFactory();
@@ -45,13 +45,13 @@ public class T0Calib extends AnalysisMonitor{
     File outfile = null;
     private int runNumber;
     private String analTabs = "Corrected TDC";;
-    public T0Calib(String name, ConstantsManager ccdb) throws FileNotFoundException {
+    public T00Calib(String name, ConstantsManager ccdb) throws FileNotFoundException {
         super(name, ccdb);
         this.setAnalysisTabNames(analTabs);
-        this.init(false, "T0");
-        outfile = new File("Files/ccdbConstantst0.txt");
+        this.init(false, "T00");
+        outfile = new File("Files/ccdbConstantstT00.txt");
         pw = new PrintWriter(outfile);
-        pw.printf("#& Sector Superlayer Slot Cable T0Correction T0Error\n");
+        pw.printf("#& Sector Superlayer T0Correction T0Error\n");
         
         String dir = ClasUtilsFile.getResourceDir("CLAS12DIR", "etc/bankdefs/hipo4");
         schemaFactory.initFromDirectory(dir);
@@ -72,14 +72,8 @@ public class T0Calib extends AnalysisMonitor{
     }
     int nsl  = 6;
     int nsec = 6;
-    int nCrates = 18;// Goes from 41 to 58 (one per chamber)
-    int nSlots = 20; // Total slots in each crate (only 14 used)
-    int nChannels = 96;// Total channels per Slot (one channel per wire)
-    int nLayers0to35 = 36;// Layers in each sector (0th is closest to CLAS
-    int nCables = 84;
-    int nCables6 = 6; // # of Cables per DCRB or STB.
-    int nSlots7 = 7; // # of STBs or occupied DCRB slots per SL.
-    boolean[][][][] Fitted = new boolean[nsec][nsl][nSlots7][nCables6];
+    
+    boolean[][] Fitted = new boolean[nsec][nsl];
     int[] nTdcBins =
     { 50, 50, 50, 50, 50, 50 };
     int[] nTimeBins =
@@ -90,7 +84,7 @@ public class T0Calib extends AnalysisMonitor{
     public static final double[] tLow4T0Fits  = {-40.0, -40.0, -40.0, -40.0, -40.0, -40.0};
     public static final double[] tHigh4T0Fits  = {380.0, 380.0, 680.0, 780.0, 1080.0, 1080.0}; 
 
-    public static  double[][][][] fitMax ;
+    public static  double[][] fitMax ;
 
 
     //H1F[][][][] h = new H1F[6][6][nSlots7][nCables6];
@@ -101,10 +95,10 @@ public class T0Calib extends AnalysisMonitor{
     @Override
     public void createHistos() {
         //histo max range for the fit
-        fitMax = new double[nsec][nsl][nSlots][nCables]; 
+        fitMax = new double[nsec][nsl]; 
         // initialize canvas and create histograms
         this.setNumberOfEvents(0);
-        DataGroup hgrps = new DataGroup(6,7);
+        DataGroup hgrps = new DataGroup();
         String hNm;
         String hTtl;
         int ijk=-1;
@@ -112,39 +106,31 @@ public class T0Calib extends AnalysisMonitor{
         {
             for (int j = 0; j < nsl; j++)
             {
-                for (int k = 0; k < nSlots7; k++)
-                {
-                    for (int l = 0; l < nCables6; l++)
-                    {
-                        hNm = String.format("timeS%dS%dS%dCbl%d", i + 1, j + 1, k + 1, l + 1);
-                        
-                        TDCHis.put(new Coordinate(i,j,k, l), new H1F(hNm, 150, tLow4T0Fits[j], tHigh4T0Fits[j])); 
-                                                                                                                                                                                        // HBHits
-                        hTtl = String.format("time (Sec%d SL%d Slot%d Cable%d)", i + 1, j + 1, k + 1, l + 1);
-                        TDCHis.get(new Coordinate(i,j,k, l)).setTitleX(hTtl);
-                        TDCHis.get(new Coordinate(i,j,k, l)).setLineColor(1);
-                        TDCFits.put(new Coordinate(i,j,k, l), new FitLine());
-                        hgrps.addDataSet(TDCHis.get(new Coordinate(i, j, k, l)), 0);
-                        
-                        T0s.put(new Coordinate(i,j,k, l), ReadTT.T0[i][j][k][l]);
-                        
-                        Fitted[i][j][k][l] = false;
-                    }
-                    this.getDataGroup().add(hgrps, i+1, j+1, k+1);
-                }
+                hNm = String.format("timeS%dS%d", i + 1, j + 1);
+
+                TDCHis.put(new Coordinate(i,j), new H1F(hNm, 150, tLow4T0Fits[j], tHigh4T0Fits[j])); 
+                                                                                                                                                                                // HBHits
+                hTtl = String.format("time (Sec%d SL%d)", i + 1, j + 1);
+                TDCHis.get(new Coordinate(i,j)).setTitleX(hTtl);
+                TDCHis.get(new Coordinate(i,j)).setLineColor(1);
+                TDCFits.put(new Coordinate(i,j), new FitLine());
+                hgrps.addDataSet(TDCHis.get(new Coordinate(i, j)), 0);
+
+                T0s.put(new Coordinate(i,j), 0.0);
+
+                Fitted[i][j] = false;
                 
             }
+                
+            this.getDataGroup().add(hgrps, i+1,0,0);
         }
 
         this.getDataGroup().add(hgrps,0,0,0);
+        
         for (int i = 0; i < nsec; i++) {
-            for (int j = 0; j < nsl; j++) {
-                for (int k = 0; k < nSlots7; k++) {
-                    this.getCalib().addEntry(i+1,j+1,k+1);
-                }
-            }
+                this.getCalib().addEntry(i+1,0,0);
         }
-        this.getCalib().setName("T0 Table (slot 7)");
+        this.getCalib().setName("T00 Table");
         this.getCalib().fireTableDataChanged();
     }
      
@@ -152,7 +138,7 @@ public class T0Calib extends AnalysisMonitor{
     public void plotHistos() {
         this.getAnalysisCanvas().getCanvas(analTabs).setGridX(false);
         this.getAnalysisCanvas().getCanvas(analTabs).setGridY(false);
-        this.getAnalysisCanvas().getCanvas(analTabs).divide(nCables6/2, 2);
+        this.getAnalysisCanvas().getCanvas(analTabs).divide(3, 2);
         this.getAnalysisCanvas().getCanvas(analTabs).update();
         
         
@@ -171,7 +157,7 @@ public class T0Calib extends AnalysisMonitor{
         File file2 = new File("");
         file2 = outfile;
         DateFormat df = new SimpleDateFormat("MM-dd-yyyy_hh.mm.ss_aa");
-        String fileName = "Files/ccdb_T0Corr_run" + this.runNumber + "time_" 
+        String fileName = "Files/ccdb_T00Corr_run" + this.runNumber + "time_" 
                 + df.format(new Date())  + ".txt";
         file2.renameTo(new File(fileName));
         
@@ -179,17 +165,11 @@ public class T0Calib extends AnalysisMonitor{
         {
             for (int j = 0; j < nsl; j++)
             {
-                for (int k = 0; k < nSlots7; k++)
-                {
-                    for (int l = 0; l < nCables6; l++)
-                    { 
-                        if(this.fitThisHisto(this.TDCHis.get(new Coordinate(i,j,k,l)))==true) {
-                            this.runFit(i, j, k, l);
-                            int binmax = this.TDCHis.get(new Coordinate(i,j,k,l)).getMaximumBin();
-                            fitMax[i][j][k][l] = this.TDCHis.get(new Coordinate(i,j,k,l)).getDataX(binmax);
-                            
-                        }
-                    }
+                if(this.fitThisHisto(this.TDCHis.get(new Coordinate(i,j)))==true) {
+                    this.runFit(i, j);
+                    int binmax = this.TDCHis.get(new Coordinate(i,j)).getMaximumBin();
+                    fitMax[i][j] = this.TDCHis.get(new Coordinate(i,j)).getDataX(binmax);
+
                 }
             }
         }
@@ -199,29 +179,29 @@ public class T0Calib extends AnalysisMonitor{
     }
     
     public int NbRunFit = 0;
-    public void runFit(int i, int j, int k, int l) {
+    public void runFit(int i, int j) {
         
         System.out.println(" **************** ");
         System.out.println(" RUNNING THE FITS ");
         System.out.println(" **************** "); 
 	
-        double[] Tminmax = this.getT0(i, j, k, l);
+        double[] Tminmax = this.getT0(i, j);
         
         //Sector Superlayer Slot Cable T0Correction T0Error
-        pw.printf("%d\t %d\t %d\t %d\t %.6f\t %.6f\n",
-            (i+1), (j+1), (k+1), (l+1), 
+        pw.printf("%d\t %d\t %.6f\t %.6f\n",
+            (i+1), (j+1), 
             Tminmax[0], 
             Tminmax[1]);
-        System.out.printf("%d\t %d\t %d\t %d\t %.6f\t %.6f\n",
-            (i+1), (j+1), (k+1), (l+1), 
+        System.out.printf("%d\t %d\t %.6f\t %.6f\n",
+            (i+1), (j+1),
             Tminmax[0], 
             Tminmax[1]);
         
-        Fitted[i][j][k][l] = true;
-        System.out.println(" FITTED ? "+Fitted[i][j][k][l]);
+        Fitted[i][j] = true;
+        System.out.println(" FITTED ? "+Fitted[i][j]);
     }
-     private void updateTable(int i, int j,  int k, double t0) {
-       this.getCalib().setDoubleValue(t0, "T0", i+1, j+1, k+1);
+     private void updateTable(int i, int j, double t0) {
+       this.getCalib().setDoubleValue(t0, "T00", i+1, j+1, 0);
      }
     
     int counter = 0;
@@ -267,32 +247,24 @@ public class T0Calib extends AnalysisMonitor{
             
             int sec = bnkHits.getInt("sector", j);
             int sl = bnkHits.getInt("superlayer", j);
-            int lay = bnkHits.getInt("layer", j);// layer goes from 1 to 6 in data
-            int wire = bnkHits.getInt("wire", j);// wire goes from 1 to 112 in data
-            //int lay0to35 = (sl - 1) * 6 + lay - 1;
-            //int region0to2 = (int) ((sl - 1) / 2);
-            int slot1to7  = (int) ((wire - 1) / 16) + 1;
-            int wire1to16 = (int) ((wire - 1) % 16 + 1);
-            int cable1to6 = ReadTT.CableID[lay - 1][wire1to16 - 1];
-            double time = (double) bnkHits.getFloat("time", j)
-                    + (double) bnkHits.getFloat("T0", j);   
+            
+            double time = (double) bnkHits.getFloat("time", j);
             if(bnkHits.getByte("trkID", j)!=-1)
-                this.TDCHis.get(new Coordinate(sec-1, sl-1, slot1to7-1, cable1to6-1))
+                this.TDCHis.get(new Coordinate(sec-1, sl-1))
                     .fill(time);
             }
         } 
     
-    public void Plot(int i , int j, int k) {
-        
-        for (int l = 0; l < nCables6; l++){
-            this.getAnalysisCanvas().getCanvas(analTabs).cd(l);
+    public void Plot(int i ) {
+        for(int j = 0; j<nsl; j++) {
+            this.getAnalysisCanvas().getCanvas(analTabs).cd(j);
             this.getAnalysisCanvas().getCanvas(analTabs)
-                    .draw(this.TDCHis.get(new Coordinate(i, j, k, l)));
-            
-            if(Fitted[i][j][k][l]==true) {
-                this.getAnalysisCanvas().getCanvas(analTabs).cd(l);
+                    .draw(this.TDCHis.get(new Coordinate(i, j)));
+
+            if(Fitted[i][j]==true) {
+                this.getAnalysisCanvas().getCanvas(analTabs).cd(j);
                             this.getAnalysisCanvas().getCanvas(analTabs)
-                                .draw(this.TDCFits.get(new Coordinate(i, j, k, l)), "same");
+                                .draw(this.TDCFits.get(new Coordinate(i, j)), "same");
             }
         }
     }
@@ -300,17 +272,14 @@ public class T0Calib extends AnalysisMonitor{
     @Override
     public void constantsEvent(CalibrationConstants cc, int col, int row) {
         String str_sector    = (String) cc.getValueAt(row, 0);
-        String str_layer     = (String) cc.getValueAt(row, 1);
-        String str_slot     = (String) cc.getValueAt(row, 2);
-        System.out.println(str_sector + " " + str_layer + " " );
+        
+        System.out.println("sector" +str_sector );
         IndexedList<DataGroup> group = this.getDataGroup();
 
        int sector    = Integer.parseInt(str_sector);
-       int layer     = Integer.parseInt(str_layer);
-       int slot      = Integer.parseInt(str_slot);
 
-       if(group.hasItem(sector,layer,slot)==true){
-           this.Plot(sector-1, layer-1, slot-1);
+       if(group.hasItem(sector,0,0)==true){
+           this.Plot(sector-1);
        } else {
            System.out.println(" ERROR: can not find the data group");
        }
@@ -367,9 +336,9 @@ public class T0Calib extends AnalysisMonitor{
         DataFitter.fit(f0, gr, "Q"); 
         return f0.getParameter(0);
     }
-    private double[] getT0(int i, int j, int k, int l) {
-        System.out.println("Getting t0 for i,j,k,l = "+i+" "+j+" "+k+" "+l );
-        H1F h = this.TDCHis.get(new Coordinate(i,j,k,l));
+    private double[] getT0(int i, int j) {
+        System.out.println("Getting t0 for i,j = "+i+" "+j);
+        H1F h = this.TDCHis.get(new Coordinate(i,j));
         
         double thres = 0;//this.getThreshold(h);
         double [] T0val = new double[2];
@@ -443,23 +412,23 @@ public class T0Calib extends AnalysisMonitor{
         double T0 = n/d;
         double T0Err = this.calcError(n, en, d, ed);
         if(Double.isNaN(T0)|| Double.isNaN(T0Err)){
-            T0 = ReadTT.T0[i][j][k][l];
-            T0Err = ReadTT.T0ERR[i][j][k][l];
+            T0 = 0;
+            T0Err = 1.42;
         }
         T0val[1] =T0Err;
         T0val[0] = T0;
         h.setOptStat(0);
-        String t = "T0 = "+(float)T0;
+        String t = "T00 = "+(float)T0;
         h.setTitle(t);
-        T0s.put(new Coordinate(i,j,k, l), T0);
-        this.updateTable(i, j, k, T0);
-        TDCFits.put(new Coordinate(i,j,k,l), 
-                new FitLine("f"+""+i+""+j+""+k+""+l, i, j, k, l, 
+        T0s.put(new Coordinate(i,j), T0);
+        this.updateTable(i, j, T0);
+        TDCFits.put(new Coordinate(i,j), 
+                new FitLine("f"+""+i+""+j, i, j, 
                 T0, h.getDataX(t0midx+diffBins/2)) );
-        TDCFits.get(new Coordinate(i,j,k,l)).setLineStyle(4);
-        TDCFits.get(new Coordinate(i,j,k,l)).setLineWidth(5);
-        TDCFits.get(new Coordinate(i,j,k,l)).setLineColor(8);
-        TDCFits.get(new Coordinate(i,j,k,l)).setParameters(new double[] {f1.getParameter(0), f1.getParameter(1)});
+        TDCFits.get(new Coordinate(i,j)).setLineStyle(4);
+        TDCFits.get(new Coordinate(i,j)).setLineWidth(5);
+        TDCFits.get(new Coordinate(i,j)).setLineColor(6);
+        TDCFits.get(new Coordinate(i,j)).setParameters(new double[] {f1.getParameter(0), f1.getParameter(1)});
         
         return T0val;
     }
