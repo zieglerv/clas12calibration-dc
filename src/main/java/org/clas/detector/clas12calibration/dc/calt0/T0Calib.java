@@ -43,8 +43,10 @@ public class T0Calib extends AnalysisMonitor{
     private SchemaFactory schemaFactory = new SchemaFactory();
     PrintWriter pw = null;
     PrintWriter pw2 = null;
+    PrintWriter pw3 = null;
     File outfile = null;
     File outfile2 = null;
+    File outfile3 = null;
     private int runNumber;
     private String analTabs = "Corrected Time + T0";
     public T0Calib(String name, ConstantsManager ccdb) throws FileNotFoundException {
@@ -53,10 +55,13 @@ public class T0Calib extends AnalysisMonitor{
         this.init(false, "T0");
         outfile = new File("Files/ccdbConstantst0.txt");
         outfile2 = new File("Files/ccdbConstantst00.txt");
+        outfile3 = new File("Files/ccdbConstantst00todb.txt");
         pw = new PrintWriter(outfile);
         pw.printf("#& Sector Superlayer Slot Cable T0Correction T0Error\n");
         pw2 = new PrintWriter(outfile2);
         pw2.printf("#& Sector Superlayer Slot Cable T0Correction T0Error\n");
+        pw3 = new PrintWriter(outfile3);
+        pw3.printf("#& Sector Superlayer Slot Cable T0Correction T0Error\n");
         
         String dir = ClasUtilsFile.getResourceDir("CLAS12DIR", "etc/bankdefs/hipo4");
         schemaFactory.initFromDirectory(dir);
@@ -177,6 +182,8 @@ public class T0Calib extends AnalysisMonitor{
         file2 = outfile;
         File file20 = new File("");
         file20 = outfile2;
+        File file20db = new File("");
+        file20db = outfile3;
         DateFormat df = new SimpleDateFormat("MM-dd-yyyy_hh.mm.ss_aa");
         String fileName = "Files/ccdb_T0Corr_run" + this.runNumber + "time_" 
                 + df.format(new Date())  + ".txt";
@@ -184,6 +191,9 @@ public class T0Calib extends AnalysisMonitor{
         String fileName2 = "Files/ccdb_T0CorrT00Sub_run" + this.runNumber + "time_" 
                 + df.format(new Date())  + ".txt";
         file20.renameTo(new File(fileName2));
+        String fileName3 = "Files/ccdb_T0CorrT00SubT0DB_run" + this.runNumber + "time_" 
+                + df.format(new Date())  + ".txt";
+        file20db.renameTo(new File(fileName3));
         for (int i = 0; i < nsec; i++)
         {
             for (int j = 0; j < nsl; j++)
@@ -231,11 +241,11 @@ public class T0Calib extends AnalysisMonitor{
             (i+1), (j+1), (k+1), (l+1), 
             (Tminmax[0]-T00Calib.T00Array[i][j]), 
             Tminmax[1]);
-        System.out.printf("%d\t %d\t %d\t %d\t %.6f\t %.6f\n",
-            (i+1), (j+1), (k+1), (l+1), 
-            (Tminmax[0]), 
-            Tminmax[1]);
         
+        pw3.printf("%d\t %d\t %d\t %d\t %.6f\t %.6f\n",
+            (i+1), (j+1), (k+1), (l+1), 
+            (ReadTT.T0[i][j][k][l]-T00Calib.T00Array[i][j]), 
+            ReadTT.T0ERR[i][j][k][l]);
         Fitted[i][j][k][l] = true;
         System.out.println(" FITTED ? "+Fitted[i][j][k][l]);
     }
