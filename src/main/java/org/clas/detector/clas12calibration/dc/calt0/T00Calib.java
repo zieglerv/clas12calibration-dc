@@ -44,11 +44,12 @@ public class T00Calib extends AnalysisMonitor{
     PrintWriter pw = null;
     File outfile = null;
     private int runNumber;
-    private String analTabs = "Corrected TDC";;
+    private String analTabs = "Fully Corrected Time";
     public T00Calib(String name, ConstantsManager ccdb) throws FileNotFoundException {
         super(name, ccdb);
         this.setAnalysisTabNames(analTabs);
         this.init(false, "T00");
+        T00Array = new double[nsec][nsl];
         outfile = new File("Files/ccdbConstantstT00.txt");
         pw = new PrintWriter(outfile);
         pw.printf("#& Sector Superlayer T0Correction T0Error\n");
@@ -179,6 +180,7 @@ public class T00Calib extends AnalysisMonitor{
     }
     
     public int NbRunFit = 0;
+    public static double[][] T00Array; 
     public void runFit(int i, int j) {
         
         System.out.println(" **************** ");
@@ -186,7 +188,7 @@ public class T00Calib extends AnalysisMonitor{
         System.out.println(" **************** "); 
 	
         double[] Tminmax = this.getT0(i, j);
-        
+        T00Array[i][j] = Tminmax[0];
         //Sector Superlayer Slot Cable T0Correction T0Error
         pw.printf("%d\t %d\t %.6f\t %.6f\n",
             (i+1), (j+1), 
@@ -196,12 +198,12 @@ public class T00Calib extends AnalysisMonitor{
             (i+1), (j+1),
             Tminmax[0], 
             Tminmax[1]);
-        
+        this.updateTable(i, Tminmax[0]);
         Fitted[i][j] = true;
         System.out.println(" FITTED ? "+Fitted[i][j]);
     }
-     private void updateTable(int i, int j, double t0) {
-       this.getCalib().setDoubleValue(t0, "T00", i+1, j+1, 0);
+     private void updateTable(int i, double t0) {
+       this.getCalib().setDoubleValue(t0, "T00", i+1, 0, 0);
      }
     
     int counter = 0;
@@ -421,7 +423,7 @@ public class T00Calib extends AnalysisMonitor{
         String t = "T00 = "+(float)T0;
         h.setTitle(t);
         T0s.put(new Coordinate(i,j), T0);
-        this.updateTable(i, j, T0);
+        //this.updateTable(i, j, T0);
         TDCFits.put(new Coordinate(i,j), 
                 new FitLine("f"+""+i+""+j, i, j, 
                 T0, h.getDataX(t0midx+diffBins/2)) );
