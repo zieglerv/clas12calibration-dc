@@ -137,7 +137,6 @@ public class T0Calib extends AnalysisMonitor{
                         hgrps.addDataSet(TDCHis.get(new Coordinate(i, j, k, l)), 0);
                         
                         T0s.put(new Coordinate(i,j,k, l), ReadTT.T0[i][j][k][l]);
-                        
                         Fitted[i][j][k][l] = false;
                     }
                     this.getDataGroup().add(hgrps, i+1, j+1, k+1);
@@ -207,18 +206,24 @@ public class T0Calib extends AnalysisMonitor{
                             int binmax = this.TDCHis.get(new Coordinate(i,j,k,l)).getMaximumBin();
                             fitMax[i][j][k][l] = this.TDCHis.get(new Coordinate(i,j,k,l)).getDataX(binmax);
                             
+                        } else {
+                            this.mkTableT0(i, j, k, l);
+                            this.mkTableT0Sub1(i, j, k, l);
                         }
+                        this.mkTableT0Sub(i, j, k, l);
                     }
                 }
             }
         }
         pw.close();
         pw2.close();
+        pw3.close();
         this.getCalib().fireTableDataChanged();  
         
     }
     
     public int NbRunFit = 0;
+    int countFits = 0;
     public void runFit(int i, int j, int k, int l) {
         
         System.out.println(" **************** ");
@@ -242,16 +247,36 @@ public class T0Calib extends AnalysisMonitor{
             (Tminmax[0]-T00Calib.T00Array[i][j]), 
             Tminmax[1]);
         
+        Fitted[i][j][k][l] = true;
+        System.out.println((countFits++) +") FITTED ? "+Fitted[i][j][k][l]);
+    }
+    
+    public void mkTableT0Sub1(int i, int j, int k, int l) {
+       
+        pw2.printf("%d\t %d\t %d\t %d\t %.6f\t %.6f\n",
+            (i+1), (j+1), (k+1), (l+1), 
+            (ReadTT.T0[i][j][k][l]-T00Calib.T00Array[i][j]), 
+            ReadTT.T0ERR[i][j][k][l]);
+    }
+    
+    public void mkTableT0Sub(int i, int j, int k, int l) {
+       
         pw3.printf("%d\t %d\t %d\t %d\t %.6f\t %.6f\n",
             (i+1), (j+1), (k+1), (l+1), 
             (ReadTT.T0[i][j][k][l]-T00Calib.T00Array[i][j]), 
             ReadTT.T0ERR[i][j][k][l]);
-        Fitted[i][j][k][l] = true;
-        System.out.println(" FITTED ? "+Fitted[i][j][k][l]);
     }
-     private void updateTable(int i, int j,  int k, double t0) {
+    public void mkTableT0(int i, int j, int k, int l) {
+       
+        pw3.printf("%d\t %d\t %d\t %d\t %.6f\t %.6f\n",
+            (i+1), (j+1), (k+1), (l+1), 
+            ReadTT.T0[i][j][k][l], 
+            ReadTT.T0ERR[i][j][k][l]);
+    }
+     
+    private void updateTable(int i, int j,  int k, double t0) {
        this.getCalib().setDoubleValue(t0, "T0", i+1, j+1, k+1);
-     }
+    }
     
     int counter = 0;
     public  HipoDataSource reader = new HipoDataSource();
