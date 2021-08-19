@@ -17,7 +17,7 @@ import org.jlab.detector.calib.utils.DatabaseConstantProvider;
 
 
 public class ReadTT {
-    
+    public static double t0min = 9999;
     static boolean LOADED = false;
     public static synchronized void Load(int run, String variation) {
         if (LOADED) return;
@@ -63,8 +63,11 @@ public class ReadTT {
 
             T0[iSec - 1][iSly - 1][iSlot - 1][iCab - 1] = t0; 
             T0ERR[iSec - 1][iSly - 1][iSlot - 1][iCab - 1] = t0Error;
+            if(t0<t0min) {
+                t0min=t0;
+            }
         }
-        
+        System.out.println(" CCDB MIN TO "+t0min);
         LOADED = true;
     }
     public static final int nCrates = 18;// Goes from 41 to 58 (one per chamber)
