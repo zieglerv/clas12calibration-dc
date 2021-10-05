@@ -83,7 +83,7 @@ public class T00Calib extends AnalysisMonitor{
     { 80.0, 80.0, 80.0, 80.0, 80.0, 80.0 };
     
     public static final double[] tLow4T0Fits  = {-40.0, -40.0, -40.0, -40.0, -40.0, -40.0};
-    public static final double[] tHigh4T0Fits  = {380.0, 380.0, 680.0, 780.0, 1080.0, 1080.0}; 
+    public static final double[] tHigh4T0Fits  = {100.0, 100.0, 100.0, 100.0, 100.0, 100.0}; 
 
     public static  double[][] fitMax ;
 
@@ -109,7 +109,7 @@ public class T00Calib extends AnalysisMonitor{
             {
                 hNm = String.format("timeS%dS%d", i + 1, j + 1);
 
-                TDCHis.put(new Coordinate(i,j), new H1F(hNm, 150, tLow4T0Fits[j], tHigh4T0Fits[j])); 
+                TDCHis.put(new Coordinate(i,j), new H1F(hNm, 80, tLow4T0Fits[j], tHigh4T0Fits[j])); 
                                                                                                                                                                                 // HBHits
                 hTtl = String.format("time (Sec%d SL%d)", i + 1, j + 1);
                 TDCHis.get(new Coordinate(i,j)).setTitleX(hTtl);
@@ -428,7 +428,7 @@ public class T00Calib extends AnalysisMonitor{
                 new FitLine("f"+""+i+""+j, i, j, 
                 T0, h.getDataX(t0midx+diffBins/2)) );
         TDCFits.get(new Coordinate(i,j)).setLineStyle(4);
-        TDCFits.get(new Coordinate(i,j)).setLineWidth(5);
+        TDCFits.get(new Coordinate(i,j)).setLineWidth(2);
         TDCFits.get(new Coordinate(i,j)).setLineColor(6);
         TDCFits.get(new Coordinate(i,j)).setParameters(new double[] {f1.getParameter(0), f1.getParameter(1)});
         

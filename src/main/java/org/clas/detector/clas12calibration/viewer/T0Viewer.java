@@ -61,6 +61,11 @@ import org.jlab.io.base.DataEventType;
 import org.jlab.io.task.DataSourceProcessorPane;
 import org.jlab.io.task.IDataEventListener;
 import org.jlab.rec.dc.Constants;
+ 
+import org.jlab.io.hipo.HipoDataEvent;
+import org.jlab.io.task.DataSourceProcessorPane;
+import org.jlab.io.task.IDataEventListener;
+import org.jlab.io.hipo.HipoDataSource;
 /**
  *
  * @author ziegler
@@ -91,7 +96,7 @@ public class T0Viewer implements IDataEventListener, DetectorListener, ActionLis
     private int canvasUpdateTime = 10000;
     private int analysisUpdateTime = 10000;
     private int runNumber  = 0;
-    private String Dir = System.getProperty("user.dir");
+    private String workDir = System.getProperty("user.dir");
     
     
     private JLabel[] superlayer = {new JLabel("", JLabel.CENTER),new JLabel("", JLabel.CENTER),new JLabel("", JLabel.CENTER),new JLabel("", JLabel.CENTER),new JLabel("", JLabel.CENTER),new JLabel("", JLabel.CENTER)};
@@ -112,6 +117,12 @@ public class T0Viewer implements IDataEventListener, DetectorListener, ActionLis
         JMenuItem menuItem;
         JMenu file = new JMenu("File");
         file.getAccessibleContext().setAccessibleDescription("File options");
+        menuItem = new JMenuItem("Load files...");
+        menuItem.getAccessibleContext().setAccessibleDescription("Load files");
+        menuItem.addActionListener(this);
+        file.add(menuItem);        
+        file.addSeparator();
+        file.getAccessibleContext().setAccessibleDescription("File options");
         menuItem = new JMenuItem("Open histograms file...");
         menuItem.getAccessibleContext().setAccessibleDescription("Open histograms file");
         menuItem.addActionListener(this);
@@ -123,7 +134,12 @@ public class T0Viewer implements IDataEventListener, DetectorListener, ActionLis
         menuItem = new JMenuItem("Save histograms to file...");
         menuItem.getAccessibleContext().setAccessibleDescription("Save histograms to file");
         menuItem.addActionListener(this);
-        file.add(menuItem);
+        file.getAccessibleContext().setAccessibleDescription("File options");
+        menuItem = new JMenuItem("Load files...");
+        menuItem.getAccessibleContext().setAccessibleDescription("Load files");
+        menuItem.addActionListener(this);
+        file.add(menuItem);        
+        file.addSeparator();
         menuBar.add(file);
         JMenu settings = new JMenu("Settings");
         settings.getAccessibleContext().setAccessibleDescription("Choose monitoring parameters");
@@ -150,7 +166,7 @@ public class T0Viewer implements IDataEventListener, DetectorListener, ActionLis
         menuItem.addActionListener(this);
         fits.add(menuItem);
         menuBar.add(fits);
-           
+        
         // create main panel
         mainPanel = new JPanel();	
 	mainPanel.setLayout(new BorderLayout());
@@ -207,14 +223,17 @@ public class T0Viewer implements IDataEventListener, DetectorListener, ActionLis
         dcDetector = new DCGeant4Factory(provider, DCGeant4Factory.MINISTAGGERON, true);
 
         // set directory to local
-        this.Dir = System.getProperty("user.dir");
-        System.out.println("Work directory set to " + this.Dir);
+        this.workDir = System.getProperty("user.dir");
+        System.out.println("Work directory set to " + this.workDir);
     }
       
     public void actionPerformed(ActionEvent e) {
         System.out.println(e.getActionCommand());
-        if(e.getActionCommand()=="Set GUI update interval...") {
-            this.chooseUpdateInterval();
+        //if(e.getActionCommand()=="Set GUI update interval...") {
+        //    this.chooseUpdateInterval();
+        //}
+        if(e.getActionCommand()=="Load Files...") {
+            this.readFiles();
         }
         if(e.getActionCommand()=="Set Style to default") {
             this.setStyle(0);
@@ -226,7 +245,7 @@ public class T0Viewer implements IDataEventListener, DetectorListener, ActionLis
             String fileName = null;
             JFileChooser fc = new JFileChooser();
             fc.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
-            File workingDirectory = new File(this.Dir + "/cal-histos");
+            File workingDirectory = new File(this.workDir + "/cal-histos");
             fc.setCurrentDirectory(workingDirectory);
             int option = fc.showOpenDialog(null);
             if (option == JFileChooser.APPROVE_OPTION) {
@@ -240,11 +259,12 @@ public class T0Viewer implements IDataEventListener, DetectorListener, ActionLis
         if(e.getActionCommand()=="Refit") {
             
         }
+        
         if(e.getActionCommand()=="Save histograms to file...") {
             DateFormat df = new SimpleDateFormat("MM-dd-yyyy_hh.mm.ss_aa");
             String fileName = "clas12rec_run_" + this.runNumber + "_" + df.format(new Date()) + ".hipo";
             JFileChooser fc = new JFileChooser();
-            File workingDirectory = new File(this.Dir + "/kpp-histos");
+            File workingDirectory = new File(this.workDir + "/kpp-histos");
             fc.setCurrentDirectory(workingDirectory);
             File file = new File(fileName);
             fc.setSelectedFile(file);
@@ -363,7 +383,7 @@ public class T0Viewer implements IDataEventListener, DetectorListener, ActionLis
     
     public void printHistosToFile() {
         DateFormat df = new SimpleDateFormat("MM-dd-yyyy_hh.mm.ss_aa");
-        String data = this.Dir + "/clas12rec_run_" + this.runNumber + "_" + df.format(new Date());        
+        String data = this.workDir + "/clas12rec_run_" + this.runNumber + "_" + df.format(new Date());        
         File theDir = new File(data);
         // if the directory does not exist, create it
         if (!theDir.exists()) {
@@ -483,6 +503,52 @@ public class T0Viewer implements IDataEventListener, DetectorListener, ActionLis
         viewer.configFrame.setModalityType(Dialog.ModalityType.APPLICATION_MODAL);
 	viewer.configure();
 
+    }
+
+    private void readFiles() {
+        JFileChooser fc = new JFileChooser();
+        fc.setDialogTitle("Choose input files directory...");
+        fc.setMultiSelectionEnabled(true);
+        fc.setAcceptAllFileFilterUsed(false);
+        File workingDirectory = new File(this.workDir);
+        fc.setCurrentDirectory(workingDirectory);
+        int returnValue = fc.showOpenDialog(null);
+        if (returnValue == JFileChooser.APPROVE_OPTION) {
+            int nf = 0;
+            for (File fd : fc.getSelectedFiles()) {
+                if (fd.isFile()) {
+                    Integer current = 0;
+                    Integer nevents = 0;
+                    DataEvent event = null;
+                    HipoDataSource hipoReader = new HipoDataSource();
+                    hipoReader.open(fd);
+                    current = hipoReader.getCurrentIndex();
+                    nevents = hipoReader.getSize();
+                    System.out.println("\nFILE: " + nf + " " + fd.getName() + " N.EVENTS: " + nevents.toString() + "  CURRENT : " + current.toString());
+                    for (int k = 0; k < nevents; k++) {
+                        if (hipoReader.hasEvent() == true) {
+                            event = hipoReader.getNextEvent();
+                        }
+                        if (event != null) {
+                            this.dataEventAction(event);
+                            if (k % 10000 == 0) {
+                                System.out.println("Read " + k + " events");
+                            }
+                        }
+                    }
+                    hipoReader.close();
+                    for (int k = 0; k < this.monitors.length; k++) {
+                        this.monitors[k].analyze();
+                        //this.monitors[k].fillSummary(this.getRunNumber(event));
+                        //this.monitors[k].plotHistos(this.getRunNumber(event));
+//                            this.monitors[k]..getDetectorCanvas().u
+                    }
+                    nf++;
+                }
+            }
+//            this.updateTable();
+            System.out.println("Task completed");
+        }
     }
    
 }
