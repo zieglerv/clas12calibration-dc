@@ -350,8 +350,8 @@ public class T00Calib extends AnalysisMonitor{
                 h.getDataX(0), h.getDataX(h.getMaximumBin())); 
         
         gausFunc.setParameter(0, h.getMax());
-        gausFunc.setParameter(1, -0.0);
-        gausFunc.setParameter(2, 0.05);
+        gausFunc.setParameter(1, h.getDataX(h.getMaximumBin()));
+        gausFunc.setParameter(2, 25);
         gausFunc.setParameter(3, 0);
         
         DataFitter.fit(gausFunc, h, "Q"); 
