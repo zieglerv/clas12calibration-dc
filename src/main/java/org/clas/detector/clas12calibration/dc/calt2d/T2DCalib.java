@@ -62,9 +62,9 @@ public class T2DCalib extends AnalysisMonitor{
         super(name, ccdb);
         this.setAnalysisTabNames("TrackDoca vs T","TrackDoca vs T Graphs","CalcDoca vs T","Time Residuals","Parameters");
         this.init(false, "v0:vmid:R:tmax:distbeta:delBf:b1:b2:b3:b4");
-        outfile = new File("Files/ccdbConstants.txt");
-        pw = new PrintWriter(outfile);
-        pw.printf("#& sector superlayer component v0 deltanm tmax distbeta delta_bfield_coefficient b1 b2 b3 b4 delta_T0 c1 c2 c3\n");
+        //outfile = new File("Files/ccdbConstants.txt");
+        //pw = new PrintWriter(outfile);
+        //pw.printf("#& sector superlayer component v0 deltanm tmax distbeta delta_bfield_coefficient b1 b2 b3 b4 delta_T0 c1 c2 c3\n");
         
         String dir = ClasUtilsFile.getResourceDir("CLAS12DIR", "etc/bankdefs/hipo4");
         schemaFactory.initFromDirectory(dir);
@@ -248,15 +248,19 @@ public class T2DCalib extends AnalysisMonitor{
         //pw.close();
         fp.updateFitButton();
     }
-    public void plotFits() {
-        if(fp.fitted==true) {
-            pw.close();
-            File file2 = new File("");
-            file2 = outfile;
+    public void plotFits(boolean fitted) throws FileNotFoundException {
+        if(fitted==true) {
+            //pw.close();
+            //File file2 = new File("");
+            //file2 = outfile;
             DateFormat df = new SimpleDateFormat("MM-dd-yyyy_hh.mm.ss_aa");
             String fileName = "Files/ccdb_run" + this.runNumber + "time_" 
                     + df.format(new Date())+ "iteration_"+this.iterationNum  + ".txt";
-            file2.renameTo(new File(fileName));
+            //file2.renameTo(new File(fileName));
+           
+            pw = new PrintWriter(fileName);
+            pw.printf("#& sector superlayer component v0 deltanm tmax distbeta delta_bfield_coefficient b1 b2 b3 b4 delta_T0 c1 c2 c3\n");
+        
             int ij =0;
             int ip =0;
             NbRunFit++;
@@ -315,6 +319,27 @@ public class T2DCalib extends AnalysisMonitor{
                 }
             }
             this.getCalib().fireTableDataChanged();    
+            for(int isec = 0; isec < 6; isec++) {
+                for(int i = 0; i<6; i++) {
+                    pw.printf("%d\t %d\t %d\t %.6f\t %d\t %.6f\t %.6f\t %.6f\t %.6f\t %.6f\t %.6f\t %.6f\t %d\t %.6f\t %.6f\t %d\n",
+                    (isec+1), (i+1), 0,
+                    TvstrkdocasFitPars.get(new Coordinate(i)).value(0),
+                    0,
+                    TvstrkdocasFitPars.get(new Coordinate(i)).value(3),
+                    TvstrkdocasFitPars.get(new Coordinate(i)).value(4),
+                    TvstrkdocasFitPars.get(new Coordinate(i)).value(5),
+                    TvstrkdocasFitPars.get(new Coordinate(i)).value(6),
+                    TvstrkdocasFitPars.get(new Coordinate(i)).value(7),
+                    TvstrkdocasFitPars.get(new Coordinate(i)).value(8),
+                    TvstrkdocasFitPars.get(new Coordinate(i)).value(9),
+                    0,
+                    TvstrkdocasFitPars.get(new Coordinate(i)).value(2),
+                    TvstrkdocasFitPars.get(new Coordinate(i)).value(1),
+                    0);
+                    
+                }
+            }
+            pw.close();
             //this.reProcess();
         }
     }
@@ -371,24 +396,24 @@ public class T2DCalib extends AnalysisMonitor{
             
         }
         
-        for(int isec = 0; isec < 6; isec++) {
-           
-            pw.printf("%d\t %d\t %d\t %.6f\t %d\t %.6f\t %.6f\t %.6f\t %.6f\t %.6f\t %.6f\t %.6f\t %d\t %.6f\t %.6f\t %d\n",
-                (isec+1), (i+1), 0,
-                TvstrkdocasFitPars.get(new Coordinate(i)).value(0),
-                0,
-                TvstrkdocasFitPars.get(new Coordinate(i)).value(3),
-                TvstrkdocasFitPars.get(new Coordinate(i)).value(4),
-                TvstrkdocasFitPars.get(new Coordinate(i)).value(5),
-                TvstrkdocasFitPars.get(new Coordinate(i)).value(6),
-                TvstrkdocasFitPars.get(new Coordinate(i)).value(7),
-                TvstrkdocasFitPars.get(new Coordinate(i)).value(8),
-                TvstrkdocasFitPars.get(new Coordinate(i)).value(9),
-                0,
-                TvstrkdocasFitPars.get(new Coordinate(i)).value(2),
-                TvstrkdocasFitPars.get(new Coordinate(i)).value(1),
-                0);
-        }
+//        for(int isec = 0; isec < 6; isec++) {
+//           
+//            pw.printf("%d\t %d\t %d\t %.6f\t %d\t %.6f\t %.6f\t %.6f\t %.6f\t %.6f\t %.6f\t %.6f\t %d\t %.6f\t %.6f\t %d\n",
+//                (isec+1), (i+1), 0,
+//                TvstrkdocasFitPars.get(new Coordinate(i)).value(0),
+//                0,
+//                TvstrkdocasFitPars.get(new Coordinate(i)).value(3),
+//                TvstrkdocasFitPars.get(new Coordinate(i)).value(4),
+//                TvstrkdocasFitPars.get(new Coordinate(i)).value(5),
+//                TvstrkdocasFitPars.get(new Coordinate(i)).value(6),
+//                TvstrkdocasFitPars.get(new Coordinate(i)).value(7),
+//                TvstrkdocasFitPars.get(new Coordinate(i)).value(8),
+//                TvstrkdocasFitPars.get(new Coordinate(i)).value(9),
+//                0,
+//                TvstrkdocasFitPars.get(new Coordinate(i)).value(2),
+//                TvstrkdocasFitPars.get(new Coordinate(i)).value(1),
+//                0);
+//        }
         
         //release all so they can be fixed again
         TvstrkdocasFitPars.get(new Coordinate(i)).release(10);

@@ -11,9 +11,12 @@ import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JFrame;
@@ -58,7 +61,7 @@ public class FitPanel {
         panel.fitButton.setBackground(Color.GREEN);
     }
     public boolean fitted = false;
-    public void refit(Map<Coordinate, MnUserParameters> TvstrkdocasFitPars){
+    public void refit(Map<Coordinate, MnUserParameters> TvstrkdocasFitPars) throws FileNotFoundException{
         boolean[][] fixedPars = new boolean[10][6];
         for(int j = 0; j<6; j++) {
             pars.get(j).clear();
@@ -104,7 +107,7 @@ public class FitPanel {
             }
         }
         fitted = true;
-        this._pM.plotFits();
+        this._pM.plotFits(fitted);
     }
     
     
@@ -230,7 +233,11 @@ public class FitPanel {
             fitButton.setFont(bBold);
             fitButton.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
-                    refit(TvstrkdocasFitPars);
+                    try {
+                        refit(TvstrkdocasFitPars);
+                    } catch (FileNotFoundException ex) {
+                        Logger.getLogger(FitPanel.class.getName()).log(Level.SEVERE, null, ex);
+                    }
                     return;
                 }
             });
