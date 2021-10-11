@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.TreeMap;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
+import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -100,11 +101,15 @@ public class T2DViewer implements IDataEventListener, DetectorListener, ActionLi
     public static JTextField nWires = new JTextField(3);
     public static JTextField deltaWire = new JTextField(3);
     
+    String[] calVars = {"default", "dc_team_rga_fall2018", ""};
+    public static JComboBox  calVariation ;
     
      // detector monitors
     AnalysisMonitor[] monitors ; 
         
-    public T2DViewer() throws FileNotFoundException {    	
+    public T2DViewer() throws FileNotFoundException {    
+        calVariation = new JComboBox(calVars);
+        calVariation.setEditable(true);
         this.monitors = new AnalysisMonitor[]{new T2DCalib("Time to Distance",ccdb)};		
 	// create menu bar
         menuBar = new JMenuBar();
@@ -188,7 +193,7 @@ public class T2DViewer implements IDataEventListener, DetectorListener, ActionLi
             "/geometry/dc/superlayer/wpdist",
             "/calibration/dc/time_to_distance/time2dist",
             "/calibration/dc/time_jitter"}));
-        ccdb.setVariation("default");
+        //ccdb.setVariation("default");
         ConstantProvider provider = GeometryFactory.getConstants(DetectorType.DC, 11, "default");
         for(int l=0; l<6; l++) {
             Constants.wpdist[l] = provider.getDouble("/geometry/dc/superlayer/wpdist", l);
@@ -595,10 +600,27 @@ public class T2DViewer implements IDataEventListener, DetectorListener, ActionLi
         c.gridy = y;
         trPanel.add(new JLabel(""),c);
         
+         //
+        y++;
+        y++;
+        c.gridx = 2;
+        c.gridy = y;
+        tgmPanel = new JPanel();
+        trPanel.add(new JLabel("variation", JLabel.LEADING),c);
+        
+        calVariation.addActionListener(this);
+        tgmPanel.add(calVariation);
+        c.gridx = 3;
+	c.gridy = y;
+        trPanel.add(tgmPanel,c);
+        c.gridx = 2;
+        c.gridy = y;
+        trPanel.add(new JLabel(""),c);
+        
         JPanel butPage3 = new configButtonPanel(this, true, "Finish");
         trOuterPanel.add(butPage3, BorderLayout.SOUTH);
 
-        configPane.add("Cuts", trOuterPanel);
+        configPane.add("Selection Criteria", trOuterPanel);
 
         configFrame.add(configPane);
         configFrame.setVisible(true);

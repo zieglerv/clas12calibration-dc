@@ -21,6 +21,7 @@ import org.clas.detector.clas12calibration.dc.analysis.FitPanel;
 import org.clas.detector.clas12calibration.dc.t2d.TimeToDistanceEstimator;
 import org.clas.detector.clas12calibration.viewer.AnalysisMonitor;
 import org.clas.detector.clas12calibration.viewer.T2DViewer;
+import static org.clas.detector.clas12calibration.viewer.T2DViewer.ccdb;
 import org.freehep.math.minuit.FCNBase;
 import org.freehep.math.minuit.FunctionMinimum;
 import org.freehep.math.minuit.MnMigrad;
@@ -96,8 +97,9 @@ public class T2DCalib extends AnalysisMonitor{
     private Map<Coordinate, FitFunction> TvstrkdocasFit             = new HashMap<Coordinate, FitFunction>();
     private Map<Coordinate, MnUserParameters> TvstrkdocasFitPars    = new HashMap<Coordinate, MnUserParameters>();
     public  Map<Coordinate, FitLine> TvstrkdocasFits                = new HashMap<Coordinate, FitLine>();
-    private Map<Coordinate, H1F> timeResi       = new HashMap<Coordinate, H1F>();
-    private Map<Coordinate, H1F> timeResiNew    = new HashMap<Coordinate, H1F>();
+    private Map<Coordinate, H1F> timeResi               = new HashMap<Coordinate, H1F>();
+    private Map<Coordinate, H1F> timeResiFromFile       = new HashMap<Coordinate, H1F>();
+    private Map<Coordinate, H1F> timeResiNew            = new HashMap<Coordinate, H1F>();
     private Map<Coordinate, H1F> fitResi        = new HashMap<Coordinate, H1F>();
     private Map<Coordinate, H1F> B              = new HashMap<Coordinate, H1F>(); //histogram to get B values centroids
     private Map<Coordinate, H1F> ParsVsIter    = new HashMap<Coordinate, H1F>();
@@ -125,10 +127,12 @@ public class T2DCalib extends AnalysisMonitor{
         for (int i = 0; i < nsl; i++) {
             TvstrkdocasFitPars.put(new Coordinate(i), new MnUserParameters());
             timeResi.put(new Coordinate(i), new H1F("time residual for sly " + (i+1), 100, -0.5, 0.5)); 
+            timeResiFromFile.put(new Coordinate(i), new H1F("time residual for sly " + (i+1), 100, -0.5, 0.5)); 
             timeResiNew.put(new Coordinate(i), new H1F("time residual for sly " + (i+1), 100, -0.5, 0.5)); 
             fitResi.put(new Coordinate(i), new H1F("fit residual for sly " + (i+1), 100, -0.5, 0.5));
             
             tr.addDataSet(timeResi.get(new Coordinate(i)), i);
+            tr.addDataSet(timeResiFromFile.get(new Coordinate(i)), i);
             tr.addDataSet(timeResiNew.get(new Coordinate(i)), i);
             fr.addDataSet(fitResi.get(new Coordinate(i)), i);
             
@@ -422,6 +426,12 @@ public class T2DCalib extends AnalysisMonitor{
                 TvstrkdocasFitPars.get(new Coordinate(i)).release(p);
             }
         }
+        if(i==5) {
+            System.err.println("***************************************************");
+            System.err.println("*                  FITS ARE DONE!                 *");
+            System.err.println("***************************************************");  
+            
+        }
     }
     
     int counter = 0;
@@ -510,11 +520,7 @@ public class T2DCalib extends AnalysisMonitor{
                     if(this.getHit(bnkHits, i)!=null)
                         hits.add(this.getHit(bnkHits, i));
                 }
-//                // fill uncalibrated plot
-//                for(FittedHit hit : hits) {
-//                    fitResi.get(new Coordinate(hit.get_Superlayer()-1)).fill(hit.get_Residual());
-//                    System.out.println("====================== filling the residuals");
-//                }
+
                 for(FittedHit hit : hits) {
                     hit.set_TimeResidual(-999);
                     updateHit(hit);
@@ -575,14 +581,17 @@ public class T2DCalib extends AnalysisMonitor{
             }
         }
         this.getAnalysisCanvas().getCanvas("Time Residuals").clear();
-        this.getAnalysisCanvas().getCanvas("Time Residuals").divide(nsl, 2);
+        this.getAnalysisCanvas().getCanvas("Time Residuals").divide(nsl, 3);
         //
         for(int i = 0; i<this.nsl; i++) {
             this.getAnalysisCanvas().getCanvas("Time Residuals").cd(i);
             //this.getAnalysisCanvas().getCanvas("Time Residuals").draw(timeResi.get(new Coordinate(i)));
-            this.fitTimeResPlot(timeResi.get(new Coordinate(i)), 
+            this.fitTimeResPlot(timeResiFromFile.get(new Coordinate(i)), 
                     this.getAnalysisCanvas().getCanvas("Time Residuals"));
             this.getAnalysisCanvas().getCanvas("Time Residuals").cd(i+6);
+            this.fitTimeResPlot(timeResi.get(new Coordinate(i)), 
+                    this.getAnalysisCanvas().getCanvas("Time Residuals"));
+            this.getAnalysisCanvas().getCanvas("Time Residuals").cd(i+12);
             //this.getAnalysisCanvas().getCanvas("Time Residuals").draw(timeResiNew.get(new Coordinate(i)));
             this.fitTimeResPlot(timeResiNew.get(new Coordinate(i)), 
                     this.getAnalysisCanvas().getCanvas("Time Residuals"));
@@ -597,6 +606,7 @@ public class T2DCalib extends AnalysisMonitor{
     }
          
     private void fitTimeResPlot(H1F h1, EmbeddedCanvas canvasRes) {
+        if (h1==null) return;
         F1D gausFunc = new F1D("gausFunc", "[amp]*gaus(x,[mean],[sigma])+[amp2]*gaus(x,[mean],[sigma2])", -0.5, 0.5); 
         gausFunc.setLineColor(4);
         gausFunc.setLineStyle(1);
@@ -611,7 +621,8 @@ public class T2DCalib extends AnalysisMonitor{
         //canvasRes.clear();
         
         DataFitter.fit(gausFunc, h1, "Q");
-        gausFunc.setOptStat(101100);
+        //gausFunc.setOptStat(101100);
+        gausFunc.setOptStat(0);
         
         int effSig = (int) (10000*this.getError(gausFunc.getParameter(0), gausFunc.getParameter(1), gausFunc.getParameter(2), 
                 gausFunc.getParameter(3), gausFunc.getParameter(1), gausFunc.getParameter(4)));
@@ -738,7 +749,10 @@ public class T2DCalib extends AnalysisMonitor{
        
         if(count==1) {
             Constants.Load();
-            TableLoader.FillT0Tables(newRun, "default");
+            String newVar = String.valueOf(T2DViewer.calVariation.getSelectedItem());
+            System.out.println("* VARIATION *"+newVar);
+            ccdb.setVariation(newVar);
+            TableLoader.FillT0Tables(newRun, newVar);
             TableLoader.Fill(T2DViewer.ccdb.getConstants(newRun, "/calibration/dc/time_to_distance/time2dist"));  
             this.loadFitPars(); 
             polarity = (int)Math.signum(event.getBank("RUN::config").getFloat("torus",0));
@@ -790,6 +804,12 @@ public class T2DCalib extends AnalysisMonitor{
                         B.get(new Coordinate(superlayer-3, alphaBin, bBin))
                                 .fill(bFieldVal);
                 }
+                
+                // fill uncalibrated plot
+                timeResiFromFile.get(new Coordinate(bnkHits.getInt("superlayer", i) - 1))
+                                .fill(bnkHits.getFloat("timeResidual", i));
+//                    System.out.println("====================== filling the residuals");
+//                }
             }
         }
         hipoEvent = (HipoDataEvent) writer.createEvent();
