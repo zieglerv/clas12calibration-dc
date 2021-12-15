@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
+import org.clas.detector.clas12calibration.dc.analysis.Coordinate;
 import org.jlab.detector.calib.tasks.CalibrationEngine;
 import org.jlab.detector.calib.utils.CalibrationConstants;
 import org.jlab.detector.calib.utils.CalibrationConstantsListener;
@@ -66,7 +67,7 @@ public class AnalysisMonitor extends CalibrationEngine implements IDataEventList
 
     
     public void analyze() {
-        // analyze detector data at the end of data processing
+        // analyze detector data at the end of data processing;
     }
 
     public void createHistos() {
