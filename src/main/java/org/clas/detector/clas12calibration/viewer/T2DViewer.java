@@ -95,8 +95,8 @@ public class T2DViewer implements IDataEventListener, DetectorListener, ActionLi
     private JLabel[] superlayer = {new JLabel("", JLabel.CENTER),new JLabel("", JLabel.CENTER),new JLabel("", JLabel.CENTER),new JLabel("", JLabel.CENTER),new JLabel("", JLabel.CENTER),new JLabel("", JLabel.CENTER)};
     public static JTextField[] alphaCuts1 = {new JTextField(7),new JTextField(7),new JTextField(7),new JTextField(7),new JTextField(7),new JTextField(7)};
     public static JTextField[] alphaCuts2 = {new JTextField(7),new JTextField(7),new JTextField(7),new JTextField(7),new JTextField(7),new JTextField(7)};
-   
     public static JTextField betaCut = new JTextField(3);
+    public static JTextField fitresiCut = new JTextField(3);
     public static JTextField npassWires = new JTextField(3);
     public static JTextField nWires = new JTextField(3);
     public static JTextField deltaWire = new JTextField(3);
@@ -548,7 +548,22 @@ public class T2DViewer implements IDataEventListener, DetectorListener, ActionLi
         c.gridx = 2;
         c.gridy = y;
         trPanel.add(new JLabel(""),c);
+        //
+        y++;
+        c.gridx = 2;
+        c.gridy = y;
+        tgmPanel = new JPanel();
+        trPanel.add(new JLabel("fitResi (um)>", JLabel.LEADING),c);
         
+        fitresiCut.setText("1000");
+        betaCut.addActionListener(this);
+        tgmPanel.add(fitresiCut);
+        c.gridx = 3;
+	c.gridy = y;
+        trPanel.add(tgmPanel,c);
+        c.gridx = 2;
+        c.gridy = y;
+        trPanel.add(new JLabel(""),c);
         //npassWires ,nWires ,deltaWire
         y++;
         c.gridx = 2;

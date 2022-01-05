@@ -1339,7 +1339,7 @@ public class T2DCalib extends AnalysisMonitor{
 
         if (bnkHits.getByte("trkID", i) >0 
                     && bnkHits.getFloat("TFlight", i)>0 
-                    && Math.abs(bnkHits.getFloat("fitResidual", i))<0.075
+                    && Math.abs(bnkHits.getFloat("fitResidual", i))<0.0001*Double.parseDouble(T2DViewer.fitresiCut.getText()) 
                     && this.passPID(event, bnkHits, i)==true)
             {
                 pass = true;
@@ -1362,7 +1362,7 @@ public class T2DCalib extends AnalysisMonitor{
                     && bnkHits.getFloat("TFlight", i)>0 
                     && segPropMap.get(bnkHits.getInt("clusterID", i)).getNumWireWithinDW()<=Integer.parseInt(T2DViewer.npassWires.getText())
                     && segPropMap.get(bnkHits.getInt("clusterID", i)).getSize()>Integer.parseInt(T2DViewer.nWires.getText())
-                    && Math.abs(bnkHits.getFloat("fitResidual", i))<0.075
+                    && Math.abs(bnkHits.getFloat("fitResidual", i))<0.0001*Double.parseDouble(T2DViewer.fitresiCut.getText()) 
                     && this.passPID(event, bnkHits, i)==true)
             {
                 pass = true;
@@ -1384,7 +1384,7 @@ public class T2DCalib extends AnalysisMonitor{
                     && this.selectOnAlpha(superlayer, alphaRadUncor)==true
                     && bnkHits.getFloat("TFlight", i)>0 
                     && segPropMap.get(bnkHits.getInt("clusterID", i)).getNumWireWithinDW()<=Integer.parseInt(T2DViewer.npassWires.getText())
-                    && Math.abs(bnkHits.getFloat("fitResidual", i))<0.075
+                    && Math.abs(bnkHits.getFloat("fitResidual", i))<0.0001*Double.parseDouble(T2DViewer.fitresiCut.getText()) 
                     && segPropMap.get(bnkHits.getInt("clusterID", i)).getSize()>Integer.parseInt(T2DViewer.nWires.getText()))
             {
                 pass = true;
