@@ -798,11 +798,16 @@ public class T2DCalib extends AnalysisMonitor{
     public List<FittedHit> hits = new ArrayList<>();
     Map<Integer, ArrayList<Integer>> segMapTBHits = new HashMap<Integer, ArrayList<Integer>>();
     Map<Integer, SegmentProperty> segPropMap = new HashMap<Integer, SegmentProperty>();
+    Map<Integer, FittedHit> calhitmap = new HashMap<>();
     List<FittedHit> calhitlist = new ArrayList<>();
+    Map<Integer, FittedHit> hitmap = new HashMap<>();
     List<FittedHit> hitlist = new ArrayList<>();
     @Override
     public void processEvent(DataEvent event) {
-        
+        hitmap.clear();
+        calhitmap.clear();
+        hitlist.clear();
+        calhitlist.clear();
         if (!event.hasBank("RUN::config")) {
             return ;
         }
@@ -842,38 +847,52 @@ public class T2DCalib extends AnalysisMonitor{
             double alphaRadUncor = bnkHits.getFloat("Alpha", i)+(double)T2DCalib.polarity*theta0;
 
             int alphaBin = this.getAlphaBin(alphaRadUncor);
-            if(this.passResiCuts(event, bnkHits, i))
-                hitlist.add(this.getHit(bnkHits, i));
-            if(this.passCalibCuts(event,bnkHits, i)){
-                calhitlist.add(this.getHit(bnkHits, i));
-                double calibTime = (double) (bnkHits.getInt("TDC", i) - bnkHits.getFloat("TProp", i)
-                                        - bnkHits.getFloat("TFlight", i) - bnkHits.getFloat("TStart", i) 
-                                        - bnkHits.getFloat("T0", i));
-
-                Tvstrkdocas.get(new Coordinate(bnkHits.getInt("superlayer", i) - 1, alphaBin, this.BBins))
-                                .fill(bnkHits.getFloat("trkDoca", i), calibTime);
-                Tvscalcdocas.get(new Coordinate(bnkHits.getInt("superlayer", i) - 1, alphaBin, this.BBins))
-                                .fill(bnkHits.getFloat("doca", i), calibTime);
-                //Fill region 2 for different b-field values
-                if(superlayer>2 && superlayer<5) { 
-                    int bBin = this.getBBin(bFieldVal);
-                    Tvstrkdocas.get(new Coordinate(bnkHits.getInt("superlayer", i) - 1, alphaBin, bBin))
-                                .fill(bnkHits.getFloat("trkDoca", i), calibTime);
-                    Tvscalcdocas.get(new Coordinate(bnkHits.getInt("superlayer", i) - 1, alphaBin, bBin))
-                                .fill(bnkHits.getFloat("doca", i), calibTime);
-                    // fill B values histograms
-                    if(superlayer ==3 || superlayer ==4)
-                        B.get(new Coordinate(superlayer-3, alphaBin, bBin))
-                                .fill(bFieldVal);
+            FittedHit theHit = this.getHit(bnkHits, i);
+            if(this.passResiCuts(event, bnkHits, i)){//no previous entries
+                if(hitmap.get(theHit.get_Id())==null) {
+                    hitmap.put(theHit.get_Id(), theHit);
                 }
+            }
+            if(this.passCalibCuts(event,bnkHits, i) && calhitmap.get(theHit.get_Id())!=null){
+               
+            }
+            if(this.passCalibCuts(event,bnkHits, i)){
+                if(calhitmap.get(theHit.get_Id())!=null) {
+                    System.out.println("in list "+calhitmap.get(theHit.get_Id()).printInfo());
+                    System.out.println("skip? "+theHit.printInfo());
+                } else {
+                    calhitmap.put(theHit.get_Id(), theHit);
                 
-                // fill uncalibrated plot
-                timeResiFromFile.get(new Coordinate(bnkHits.getInt("superlayer", i) - 1))
-                                .fill(bnkHits.getFloat("timeResidual", i));
+                    double calibTime = (double) (bnkHits.getInt("TDC", i) - bnkHits.getFloat("TProp", i)
+                                            - bnkHits.getFloat("TFlight", i) - bnkHits.getFloat("TStart", i) 
+                                            - bnkHits.getFloat("T0", i));
+
+                    Tvstrkdocas.get(new Coordinate(bnkHits.getInt("superlayer", i) - 1, alphaBin, this.BBins))
+                                    .fill(bnkHits.getFloat("trkDoca", i), calibTime);
+                    Tvscalcdocas.get(new Coordinate(bnkHits.getInt("superlayer", i) - 1, alphaBin, this.BBins))
+                                    .fill(bnkHits.getFloat("doca", i), calibTime);
+                    //Fill region 2 for different b-field values
+                    if(superlayer>2 && superlayer<5) { 
+                        int bBin = this.getBBin(bFieldVal);
+                        Tvstrkdocas.get(new Coordinate(bnkHits.getInt("superlayer", i) - 1, alphaBin, bBin))
+                                    .fill(bnkHits.getFloat("trkDoca", i), calibTime);
+                        Tvscalcdocas.get(new Coordinate(bnkHits.getInt("superlayer", i) - 1, alphaBin, bBin))
+                                    .fill(bnkHits.getFloat("doca", i), calibTime);
+                        // fill B values histograms
+                        if(superlayer ==3 || superlayer ==4)
+                            B.get(new Coordinate(superlayer-3, alphaBin, bBin))
+                                    .fill(bFieldVal);
+                    }
+
+                    // fill uncalibrated plot
+                    timeResiFromFile.get(new Coordinate(bnkHits.getInt("superlayer", i) - 1))
+                                    .fill(bnkHits.getFloat("timeResidual", i));
 //                    System.out.println("====================== filling the residuals");
-//                }
+               }
             }
         }
+        hitmap.forEach((k,v) -> hitlist.add(v));
+        calhitmap.forEach((k,v) -> calhitlist.add(v));
         calhipoEvent = (HipoDataEvent) calwriter.createEvent();
         hipoEvent = (HipoDataEvent) writer.createEvent();
         //selected.show();
@@ -1080,11 +1099,11 @@ public class T2DCalib extends AnalysisMonitor{
         hit.set_TimeResidual(resiTime);
         hit.set_Residual(resiFit);
         //this.getSegProperty(bnkHits);
-        if(this.passCalibCuts(bnkHits, i)) {            
+        //if(this.passCalibCuts(bnkHits, i)) {            
             return hit;
-        } else {
-            return null;
-        }
+        //} else {
+        //    return null;
+        //}
     }
     private FittedHit getHit(DataBank bnkHits, int i) {
         FittedHit hit = null;
