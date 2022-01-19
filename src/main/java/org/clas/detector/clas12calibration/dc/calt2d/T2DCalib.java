@@ -1050,8 +1050,9 @@ public class T2DCalib extends AnalysisMonitor{
         double bFieldVal = (double) bnkHits.getFloat("B", i);
         //int region = (int) (superlayer + 1) / 2;
         // alpha in the bank is corrected for B field.  To fill the alpha bin use the uncorrected value
-        double theta0 = Math.toDegrees(Math.acos(1-0.02*bFieldVal));
-        double alphaRadUncor = bnkHits.getFloat("Alpha", i)+(double)T2DCalib.polarity*theta0;
+        //double theta0 = Math.toDegrees(Math.acos(1-0.02*bFieldVal));
+        //double alphaRadUncor = bnkHits.getFloat("Alpha", i)+(double)T2DCalib.polarity*theta0;
+        double alpha = bnkHits.getFloat("Alpha", i);
 
         hit = new FittedHit(sector, superlayer, layer, wire, TDC, id);
         hit.set_Id(id); // use event number as id to recompose the clusters
@@ -1072,13 +1073,13 @@ public class T2DCalib extends AnalysisMonitor{
         hit.set_DeltaTimeBeta(tBeta);
         hit.set_Doca(doca);
         hit.set_Time(time);
-        hit.setAlpha(alphaRadUncor);
+        hit.setAlpha(alpha);
         hit.set_DocaErr(docaError);
         hit.set_AssociatedClusterID(clusterID);
         hit.set_AssociatedHBTrackID(trkID); 
         hit.set_TimeResidual(resiTime);
         hit.set_Residual(resiFit);
-        this.getSegProperty(bnkHits);
+        //this.getSegProperty(bnkHits);
         if(this.passCalibCuts(bnkHits, i)) {            
             return hit;
         } else {
@@ -1117,8 +1118,9 @@ public class T2DCalib extends AnalysisMonitor{
         //int region = (int) (superlayer + 1) / 2;
         // alpha in the bank is corrected for B field.  To fill the alpha bin use the uncorrected value
         double theta0 = Math.toDegrees(Math.acos(1-0.02*bFieldVal));
-        double alphaRadUncor = bnkHits.getFloat("Alpha", i)+(double)T2DCalib.polarity*theta0;
-
+        //double alphaRadUncor = bnkHits.getFloat("Alpha", i)+(double)T2DCalib.polarity*theta0;
+        double alpha = bnkHits.getFloat("Alpha", i);
+        
         hit = new FittedHit(sector, superlayer, layer, wire, TDC, id);
         hit.set_Id(id); // use event number as id to recompose the clusters
         hit.setB(B);
@@ -1138,13 +1140,13 @@ public class T2DCalib extends AnalysisMonitor{
         hit.set_DeltaTimeBeta(tBeta);
         hit.set_Doca(doca);
         hit.set_Time(time);
-        hit.setAlpha(alphaRadUncor);
+        hit.setAlpha(alpha);
         hit.set_DocaErr(docaError);
         hit.set_AssociatedClusterID(clusterID);
         hit.set_AssociatedHBTrackID(trkID); 
         hit.set_TimeResidual(resiTime);
         hit.set_Residual(resiFit);
-        this.getSegProperty(bnkHits);
+        //this.getSegProperty(bnkHits);
         
         return hit;
     }
@@ -1383,9 +1385,10 @@ public class T2DCalib extends AnalysisMonitor{
                     && bnkHits.getFloat("beta", i)> Double.parseDouble(T2DViewer.betaCut.getText()) 
                     && this.selectOnAlpha(superlayer, alphaRadUncor)==true
                     && bnkHits.getFloat("TFlight", i)>0 
-                    && segPropMap.get(bnkHits.getInt("clusterID", i)).getNumWireWithinDW()<=Integer.parseInt(T2DViewer.npassWires.getText())
+                    //&& segPropMap.get(bnkHits.getInt("clusterID", i)).getNumWireWithinDW()<=Integer.parseInt(T2DViewer.npassWires.getText())
                     && Math.abs(bnkHits.getFloat("fitResidual", i))<0.0001*Double.parseDouble(T2DViewer.fitresiCut.getText()) 
-                    && segPropMap.get(bnkHits.getInt("clusterID", i)).getSize()>Integer.parseInt(T2DViewer.nWires.getText()))
+                    //&& segPropMap.get(bnkHits.getInt("clusterID", i)).getSize()>Integer.parseInt(T2DViewer.nWires.getText())
+                )
             {
                 pass = true;
             }
