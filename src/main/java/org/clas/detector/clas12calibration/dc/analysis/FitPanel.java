@@ -57,8 +57,11 @@ public class FitPanel {
 //        frame.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
             
     }
-    public void updateFitButton() {
+    public void setGreenFitButton() {
         panel.fitButton.setBackground(Color.GREEN);
+    }
+    public void setRedFitButton() {
+        panel.fitButton.setBackground(Color.RED);
     }
     public boolean fitted = false;
     public void refit(Map<Coordinate, MnUserParameters> TvstrkdocasFitPars) throws FileNotFoundException{
@@ -112,7 +115,7 @@ public class FitPanel {
     
     
     public void plotResiduals() {
-        this._pM.reProcess();
+        this._pM.rePlotResi();
     }
     public void reCook() {
         this._pM.reCook();
@@ -188,7 +191,7 @@ public class FitPanel {
             });
             panel.add(resetButton);
             
-            resButton = new JButton("Residuals");
+            resButton = new JButton("RESI");
             resButton.setUI(new MetalButtonUI());
             resButton.setBackground(Color.YELLOW);
             resButton.setContentAreaFilled(false);
@@ -202,7 +205,7 @@ public class FitPanel {
             });
             panel.add(resButton);
             
-            reCookButton = new JButton("Reprocess");
+            reCookButton = new JButton("RECOOK");
             reCookButton.setUI(new MetalButtonUI());
             reCookButton.setBackground(Color.ORANGE);
             reCookButton.setContentAreaFilled(false);

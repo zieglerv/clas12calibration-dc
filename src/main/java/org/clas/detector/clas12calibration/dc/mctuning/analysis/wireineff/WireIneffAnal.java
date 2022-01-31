@@ -18,6 +18,7 @@ import java.util.Map;
 import org.clas.detector.clas12calibration.dc.mctuning.analysis.Coordinate;
 import org.clas.detector.clas12calibration.dc.mctuning.viewer.AnalysisMonitor;
 import org.clas.detector.clas12calibration.dc.mctuning.viewer.WireIneffAnalViewer;
+import org.clas.detector.clas12calibration.dc.t2d.TableLoader;
 import org.freehep.math.minuit.FCNBase;
 import org.freehep.math.minuit.FunctionMinimum;
 import org.freehep.math.minuit.MnMigrad;
@@ -44,7 +45,6 @@ import org.jlab.rec.dc.cluster.FittedCluster;
 import org.jlab.rec.dc.hit.FittedHit;
 import org.jlab.rec.dc.segment.Segment;
 //import org.jlab.rec.dc.segment.SegmentFinder;
-import org.jlab.rec.dc.timetodistance.TableLoader;
 import org.jlab.rec.dc.trajectory.SegmentTrajectory;
 import org.jlab.utils.groups.IndexedList;
 import org.jlab.utils.system.ClasUtilsFile;
@@ -368,7 +368,7 @@ public class WireIneffAnal extends AnalysisMonitor{
         }
        
         if(count==1) {
-            Constants.Load();
+            Constants.getInstance().initialize("DCCAL");
             TableLoader.FillT0Tables(newRun, "default");
             TableLoader.Fill(ccdb.getConstants(newRun, Constants.TIME2DIST));  
             runNumber = newRun;
@@ -483,7 +483,7 @@ public class WireIneffAnal extends AnalysisMonitor{
             }
             //System.out.println(" Layer eff num for ["+Bank.getByte("sector", i)+"]["+ Bank.getByte("superlayer", i)+"]["+Bank.getByte("layer", i)+"] = "+effLay[Bank.getByte("sector", i)-1][Bank.getByte("superlayer", i)-1][Bank.getByte("layer", i)-1]);
 
-            int bb = this.getTrkDocBin(Math.abs(Bank.getFloat("trkDoca", i))/(2.0*Constants.wpdist[Bank.getByte("superlayer", i)-1]));
+            int bb = this.getTrkDocBin(Math.abs(Bank.getFloat("trkDoca", i))/(2.0*Constants.getInstance().wpdist[Bank.getByte("superlayer", i)-1]));
             
             if(bb<40) {
                 //(int)((Math.floor(Math.abs(Bank.getFloat("trkDoca", i))/(2.*Constants.wpdist[Bank.getByte("superlayer", i)-1])/trkDBinning)))

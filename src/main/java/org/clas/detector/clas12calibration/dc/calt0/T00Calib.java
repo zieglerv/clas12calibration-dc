@@ -233,7 +233,7 @@ public class T00Calib extends AnalysisMonitor{
         }
         
         if(count==1) {
-            Constants.Load();
+            Constants.getInstance().initialize("DCCAL");
             TableLoader.FillT0Tables(newRun, "default");
             ReadTT.Load(newRun, "default"); 
             runNumber = newRun; 

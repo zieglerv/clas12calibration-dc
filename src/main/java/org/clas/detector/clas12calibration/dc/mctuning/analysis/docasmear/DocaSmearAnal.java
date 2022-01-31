@@ -406,7 +406,7 @@ public class DocaSmearAnal extends AnalysisMonitor{
         }
        
         if(count==1) {
-            Constants.Load();
+            Constants.getInstance().initialize("DCCAL");
             polarity = (int)Math.signum(event.getBank("RUN::config").getFloat("torus",0));
             runNumber = newRun;
             IndexedTable tab = DocaSmearAnalViewer.ccdb.getConstants(newRun, 
@@ -439,7 +439,7 @@ public class DocaSmearAnal extends AnalysisMonitor{
                 int betaBin = this.getBetaBin(superlayer-1, beta);
                 
                 timeResVsTrkDoca.get(new Coordinate(bnkHits.getInt("superlayer", i) - 1, betaBin))
-                                .fill(Math.abs(bnkHits.getFloat("trkDoca", i))/(2.0*Constants.wpdist[bnkHits.getByte("superlayer", i)-1]), 
+                                .fill(Math.abs(bnkHits.getFloat("trkDoca", i))/(2.0*Constants.getInstance().wpdist[bnkHits.getByte("superlayer", i)-1]), 
                                         bnkHits.getFloat("timeResidual", i));
                 
             }

@@ -31,7 +31,8 @@ public class TableLoader {
     public static double[][][][][] DISTFROMTIME = new double[6][6][maxBinIdxB+1][maxBinIdxAlpha+1][nBinsT]; // sector slyr alpha Bfield time bins [s][r][ibfield][icosalpha][tbin]
     
     
-    
+    private static double[][][][] T0 ;
+    private static double[][][][] T0ERR ;
     public static synchronized void FillT0Tables(int run, String variation) {
         if (T0LOADED) return;
         System.out.println(" T0 TABLE FILLED..... for Run "+run+" with VARIATION "+variation);
@@ -52,15 +53,43 @@ public class TableLoader {
             int iCab = dbprovider.getInteger("/calibration/dc/time_corrections/T0Corrections/Cable", i);
             double t0 = dbprovider.getDouble("/calibration/dc/time_corrections/T0Corrections/T0Correction", i);
             double t0Error = dbprovider.getDouble("/calibration/dc/time_corrections/T0Corrections/T0Error", i);
-
             T0[iSec - 1][iSly - 1][iSlot - 1][iCab - 1] = t0; 
             T0ERR[iSec - 1][iSly - 1][iSlot - 1][iCab - 1] = t0Error;
-            Constants.setT0(T0);
-            Constants.setT0Err(T0ERR);
+            TableLoader.setT0(T0);
+            TableLoader.setT0Err(T0ERR);
             //System.out.println("T0 = "+t0);
         }
         T0LOADED = true;
     }
+
+    /**
+     * @return the T0
+     */
+    public static double[][][][] getT0() {
+        return T0;
+    }
+
+    /**
+     * @param aT0 the T0 to set
+     */
+    public static void setT0(double[][][][] aT0) {
+        T0 = aT0;
+    }
+
+    /**
+     * @return the T0ERR
+     */
+    public static double[][][][] getT0Err() {
+        return T0ERR;
+    }
+
+    /**
+     * @param aT0ERR the T0ERR to set
+     */
+    public static void setT0Err(double[][][][] aT0ERR) {
+        T0ERR = aT0ERR;
+    }
+    
     public static int getAlphaBin(double Alpha) {
         int bin = 0;
         for(int b =0; b<6; b++) {
@@ -120,7 +149,7 @@ public class TableLoader {
                     Tmax[s][r] = tab.getDoubleValue("tmax", s+1,r+1,0);
                     // end fill constants
                     //System.out.println("sector "+(s+1)+" sly "+(r+1)+" v0 "+v0[s][r]+" vmid "+vmid[s][r]+" R "+FracDmaxAtMinVel[s][r]);
-                    double dmax = 2.*Constants.wpdist[r]; 
+                    double dmax = 2.*Constants.getInstance().wpdist[r]; 
                     //double tmax = CCDBConstants.getTMAXSUPERLAYER()[s][r];
                     for(int ibfield =0; ibfield<maxBinIdxB+1; ibfield++) {
                         double bfield = BfieldValues[ibfield];
@@ -184,7 +213,7 @@ public class TableLoader {
                 for(int icosalpha =0; icosalpha<maxBinIdxAlpha+1; icosalpha++) {
                     double cos30minusalpha = Math.cos(Math.toRadians(30.)) + (double) (icosalpha)*(1. - Math.cos(Math.toRadians(30.)))/5.;
                     double alpha = -(Math.toDegrees(Math.acos(cos30minusalpha)) - 30);
-                    int nxmax = (int) (2.*Constants.wpdist[r]*cos30minusalpha/0.0010); 
+                    int nxmax = (int) (2.*Constants.getInstance().wpdist[r]*cos30minusalpha/0.0010); 
 
                     System.out.println("superlayer "+(r+1)+" B bin "+ibfield+" alpha bin "+icosalpha+
                             "B "+(float)+ Math.sqrt(BfieldValues[ibfield])+" nteps "+nxmax
@@ -208,7 +237,7 @@ public class TableLoader {
                 for(int r = 0; r<6; r++ ){ //loop over slys
                     // end fill constants
                     //System.out.println(v0[s][r]+" "+vmid[s][r]+" "+FracDmaxAtMinVel[s][r]);
-                    double dmax = 2.*Constants.wpdist[r]; 
+                    double dmax = 2.*Constants.getInstance().wpdist[r]; 
                     //double tmax = CCDBConstants.getTMAXSUPERLAYER()[s][r];
                     for(int ibfield =0; ibfield<maxBinIdxB+1; ibfield++) {
                         double bfield = BfieldValues[ibfield];
@@ -299,7 +328,7 @@ public class TableLoader {
     public static synchronized double calc_Time(double x, double alpha, double bfield, int sector, int superlayer) {
         int s = sector - 1;
         int r = superlayer - 1;
-        double dmax = 2.*Constants.wpdist[r]; 
+        double dmax = 2.*Constants.getInstance().wpdist[r]; 
         double tmax = Tmax[s][r];
         double delBf = delta_bfield_coefficient[s][r]; 
         double Bb1 = b1[s][r];

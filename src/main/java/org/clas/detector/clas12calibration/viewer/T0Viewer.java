@@ -217,9 +217,9 @@ public class T0Viewer implements IDataEventListener, DetectorListener, ActionLis
         ccdb.setVariation("default");
         ConstantProvider provider = GeometryFactory.getConstants(DetectorType.DC, 11, "default");
         for(int l=0; l<6; l++) {
-            Constants.wpdist[l] = provider.getDouble("/geometry/dc/superlayer/wpdist", l);
+            Constants.getInstance().wpdist[l] = provider.getDouble("/geometry/dc/superlayer/wpdist", l);
         }
-        Constants.setT2D(1);
+        Constants.getInstance().setT2D(1);
         dcDetector = new DCGeant4Factory(provider, DCGeant4Factory.MINISTAGGERON, true);
 
         // set directory to local
