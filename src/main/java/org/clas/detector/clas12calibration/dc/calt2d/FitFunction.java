@@ -17,7 +17,8 @@ import org.jlab.rec.dc.Constants;
  */
 public class FitFunction implements FCNBase{
 
-    public double _beta = 1.0;
+    public double beta = 1.0;
+    private Utilities util = new Utilities();
     
     private Map<Coordinate, GraphErrors> _tvstrkdocasProf;
     private int i;
@@ -25,6 +26,7 @@ public class FitFunction implements FCNBase{
     public FitFunction() {
         
     }
+    
     public FitFunction(int i, Map<Coordinate, GraphErrors> tvstrkdocasProf) {
         this.i = i;
         _tvstrkdocasProf = tvstrkdocasProf;
@@ -43,13 +45,20 @@ public class FitFunction implements FCNBase{
         double Bb4 = par[9]; 
         double R = par[2];
         double dmax = par[10];
-        double deltatime_beta = (Math.sqrt(x * x + (distbeta * _beta * _beta) 
-                * (distbeta* _beta * _beta)) - x) / Constants.V0AVERAGED;
-
-        double calcTime = this.polyFcnMac(x,  ralpha,  B,  v_0,  vm,  R, 
-            tmax,  dmax,  delBf,  Bb1,  Bb2,  Bb3,  Bb4, i+1) + deltatime_beta ;
         
-        return calcTime;
+        double deltatime_beta = 0;
+        double time = 0;
+        double calcTime = this.polyFcnMac(x,  ralpha,  B,  v_0,  vm,  R, 
+            tmax,  dmax,  delBf,  Bb1,  Bb2,  Bb3,  Bb4, i+1) ;
+        if(Utilities.NEWDELTATBETAFCN==false) {
+            deltatime_beta = util.calcDeltaTimeBeta(x, distbeta, beta);
+        } else {
+            deltatime_beta = util.calcDeltaTimeBetaNewFCN(calcTime, distbeta, beta);
+        }
+        
+        time = calcTime + deltatime_beta;
+        
+        return time;
     }
     public double polyFcnMac(double x, double alpha, double bfield, double v_0, double vm, double R, 
             double tmax, double dmax, double delBf, double Bb1, double Bb2, double Bb3, double Bb4, int superlayer) {
@@ -101,7 +110,7 @@ public class FitFunction implements FCNBase{
                         // correct alpha with theta0, the angle corresponding to the isochrone lines twist due to the electric field
                         alpha-=(double)T2DCalib.polarity*theta0;
                         //reduce the corrected angle
-                        double ralpha = (double) this.getReducedAngle(alpha);
+                        double ralpha = (double) util.getReducedAngle(alpha);
                         GraphErrors gr = _tvstrkdocasProf.get(new Coordinate(this.i, j, k));
                             
                         for (int ix =0; ix< gr.getDataSize(0); ix++) {
@@ -121,7 +130,7 @@ public class FitFunction implements FCNBase{
                     //local angle correction
                     double alpha = T2DCalib.AlphaValues[j];
                     //reduce the corrected angle
-                    double ralpha = (double) this.getReducedAngle(alpha);
+                    double ralpha = (double) util.getReducedAngle(alpha);
                     GraphErrors gr = _tvstrkdocasProf.get(new Coordinate(this.i, j, T2DCalib.BBins));
 
                     for (int ix =0; ix< gr.getDataSize(0); ix++) {
@@ -140,21 +149,5 @@ public class FitFunction implements FCNBase{
         return chisq;
         
     }
-    
-    public double getReducedAngle(double alpha) {
-        double ralpha = 0;
-
-        ralpha = Math.abs(Math.toRadians(alpha));
-
-        while (ralpha > Math.PI / 3.) {
-            ralpha -= Math.PI / 3.;
-        }
-        if (ralpha > Math.PI / 6.) {
-            ralpha = Math.PI / 3. - ralpha;
-        }
-
-        return Math.toDegrees(ralpha);
-    }  
-    
     
 }
