@@ -11,6 +11,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import org.clas.detector.clas12calibration.viewer.T2DViewer;
+import org.jlab.clas.swimtools.Swimmer;
 import org.jlab.rec.dc.cluster.Cluster;
 import org.jlab.rec.dc.cluster.ClusterFitter;
 import org.jlab.rec.dc.cluster.FittedCluster;
@@ -22,10 +23,7 @@ import org.jlab.rec.dc.hit.FittedHit;
  */
 public class Refit {
     
-    public List<FittedHit> hits;
-    public Refit(List<FittedHit> fhits) {
-        hits = new ArrayList<FittedHit>();
-        hits.addAll(fhits);
+    public Refit() {
     }
     public List<FittedCluster> recomposeClusters(List<FittedHit> fhits) {
         Map<Integer, ArrayList<FittedHit>> grpHits = new HashMap<Integer, ArrayList<FittedHit>>();
@@ -67,19 +65,26 @@ public class Refit {
         return clusters;
     }
     private ClusterFitter cf = new ClusterFitter();
-    public void reFit() {
+    public void reFit(List<FittedHit> hits) {
         List<FittedCluster> clusters = this.recomposeClusters(hits);
         for(FittedCluster clus : clusters) {
             cf.SetFitArray(clus, "TSC");
             cf.Fit(clus, true);
-            cf.SetResidualDerivedParams(clus, true, false, T2DViewer.dcDetector); //calcTimeResidual=false, resetLRAmbig=false 
+            cf.SetResidualDerivedParams(clus, false, false, T2DViewer.dcDetector); //calcTimeResidual=false, resetLRAmbig=false 
             
             double trkAngle = clus.get_clusterLineFitSlope();
-            //local angle updated
-            double alpha = Math.toDegrees(Math.atan(trkAngle));
+            
             for(FittedHit h : clus) {
-                h.setAlpha(alpha);
+                //local angle updated
+                h.setAlpha(Math.toDegrees(Math.atan(trkAngle) - Math.acos(1-0.02*h.getB())));
+                double cosTkAng = 1./Math.sqrt(trkAngle*trkAngle + 1.);
+                h.set_X(h.get_XWire() + h.get_LeftRightAmb() * (h.get_Doca() / cosTkAng) );
             }
+            //refit after updating alpha
+            cf.SetFitArray(clus, "TSC");
+            cf.Fit(clus, true);
+            cf.SetResidualDerivedParams(clus, true, false, T2DViewer.dcDetector); //calcTimeResidual=false, resetLRAmbig=false 
+            
         }
         clusters.clear();
     }
