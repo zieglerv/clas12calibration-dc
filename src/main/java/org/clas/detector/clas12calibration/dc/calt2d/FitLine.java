@@ -17,6 +17,8 @@ public class FitLine extends Func1D{
     public int j;
     public int k;
     private FitFunction fc ;
+    private Utilities util = new Utilities();
+    
     public FitLine() {
         super("fcn", 0.0, 2.0);
         fc = new FitFunction();
@@ -50,7 +52,7 @@ public class FitLine extends Func1D{
             B = T2DCalib.BfieldValuesUpd[i-2][j][k];
         }
         //reduce the corrected angle
-        double ralpha = (double) fc.getReducedAngle(alpha);
+        double ralpha = (double) util.getReducedAngle(alpha);
         double v_0 = par[0];
         double vm = par[1];
         double tmax = par[3];
@@ -62,12 +64,18 @@ public class FitLine extends Func1D{
         double Bb4 = par[9]; 
         double R = par[2];
         double dmax = par[10];
-        double deltatime_beta = (Math.sqrt(x * x + (distbeta * fc._beta * fc._beta) 
-                * (distbeta* fc._beta * fc._beta)) - x) / Constants.V0AVERAGED;
-
-        calcTime = fc.polyFcnMac(x,  ralpha,  B,  v_0,  vm,  R, 
-            tmax,  dmax,  delBf,  Bb1,  Bb2,  Bb3,  Bb4, i+1) + deltatime_beta ;
         
+        double deltatime_beta = 0;
+        double time = 0;
+        calcTime = fc.polyFcnMac(x,  ralpha,  B,  v_0,  vm,  R, 
+            tmax,  dmax,  delBf,  Bb1,  Bb2,  Bb3,  Bb4, i+1) ;
+        if(Utilities.NEWDELTATBETAFCN==false) {
+            deltatime_beta = util.calcDeltaTimeBeta(x, distbeta, fc.beta);
+        } else {
+            deltatime_beta = util.calcDeltaTimeBetaNewFCN(calcTime, distbeta, fc.beta);
+        }
+        
+        time = calcTime + deltatime_beta;
         //System.out.println("ijk "+i+""+j+""+k+" b "+(float)T2DCalib.BfieldValues[k]+" ralpha "+(float)ralpha+" x "+x+" time "+(float)calcTime);
         return calcTime;
     }
