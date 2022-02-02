@@ -177,7 +177,7 @@ public class FitPanel {
             maxRange.setText(Double.toString(2.0));
             panel.add(maxRange);
             
-            resetButton = new JButton("RESET");
+            resetButton = new JButton("RESET PARAMETERS");
             resetButton.setUI(new MetalButtonUI());
             resetButton.setBackground(Color.CYAN);
             resetButton.setContentAreaFilled(false);
@@ -189,9 +189,9 @@ public class FitPanel {
                     return;
                 }
             });
-            panel.add(resetButton);
+                panel.add(resetButton);
             
-            resButton = new JButton("RESI");
+            resButton = new JButton("PLOT RESIDUALS");
             resButton.setUI(new MetalButtonUI());
             resButton.setBackground(Color.YELLOW);
             resButton.setContentAreaFilled(false);
@@ -205,7 +205,7 @@ public class FitPanel {
             });
             panel.add(resButton);
             
-            reCookButton = new JButton("RECOOK");
+            reCookButton = new JButton("REDO SEGMENT FITS");
             reCookButton.setUI(new MetalButtonUI());
             reCookButton.setBackground(Color.ORANGE);
             reCookButton.setContentAreaFilled(false);
@@ -228,7 +228,7 @@ public class FitPanel {
             });
             panel.add(reCookButton);
             
-            fitButton = new JButton("FIT");
+            fitButton = new JButton("FIT TIME TO DISTANCE");
             fitButton.setUI(new MetalButtonUI());
             fitButton.setBackground(Color.RED);
             fitButton.setContentAreaFilled(false);
