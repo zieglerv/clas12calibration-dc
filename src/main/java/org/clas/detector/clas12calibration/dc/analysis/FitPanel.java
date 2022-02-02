@@ -147,18 +147,34 @@ public class FitPanel {
                 }
             }
             int npar = 10;
-            panel = new JPanel(new GridLayout(npar+1, 6));            
+            //panel = new JPanel(new GridLayout(npar+1, 6));            
+            panel = new JPanel(new GridLayout(npar+2, 6));            
+            panel.add(new JLabel("")); panel.add(new JLabel("      Super Layer 1"));
+            panel.add(new JLabel("")); panel.add(new JLabel("      Super Layer 2"));
+            panel.add(new JLabel("")); panel.add(new JLabel("      Super Layer 3"));
+            panel.add(new JLabel("")); panel.add(new JLabel("      Super Layer 4"));
+            panel.add(new JLabel("")); panel.add(new JLabel("      Super Layer 5"));
+            panel.add(new JLabel("")); panel.add(new JLabel("      Super Layer 6"));
+            panel.add(new JLabel(""));
             fixFit = new JCheckBox[10][6];
             for (int i = 0; i < npar; i++) {  
                 JLabel l = new JLabel("      "+parNames[i], JLabel.LEADING);
                 panel.add(l);
                 for (int j = 0; j < 6; j++) {
                     fixFit[i][j] = new JCheckBox("Fix");
-                    if(i==2 || i>4) {
+                    boolean aa = i==2 || i==4 || i>5;
+                    boolean bb = i==3 && (j==2 || j==3);
+                    boolean cc = i==5 && (j==0 || j==1 || j==4 || j==5);
+                    if(aa || bb || cc) {
                         fixFit[i][j].setSelected(true);
                     } else {
                         fixFit[i][j].setSelected(false);
                     }
+                    //if(i==2 || i>4) {
+                    //    fixFit[i][j].setSelected(true);
+                    //} else {
+                    //    fixFit[i][j].setSelected(false);
+                    //}
                     
                     params[i][j] = new JTextField(3);
                     if(i!=3) {
