@@ -623,7 +623,7 @@ public class T2DCalib extends AnalysisMonitor{
         gausFunc.setParameter(3, gaus1Func.getParameter(0)*0.15);
         gausFunc.setParameter(4, gaus1Func.getParameter(2));
         gausFunc.setOptStat(1110);
-        h1.setOptStat(1111);
+        h1.setOptStat(1110);
         //canvasRes.clear();
         
         DataFitter.fit(gausFunc, h1, "Q");
