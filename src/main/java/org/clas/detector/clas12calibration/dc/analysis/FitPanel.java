@@ -149,12 +149,12 @@ public class FitPanel {
             int npar = 10;
             //panel = new JPanel(new GridLayout(npar+1, 6));            
             panel = new JPanel(new GridLayout(npar+2, 6));            
-            panel.add(new JLabel("")); panel.add(new JLabel("      Super Layer 1"));
-            panel.add(new JLabel("")); panel.add(new JLabel("      Super Layer 2"));
-            panel.add(new JLabel("")); panel.add(new JLabel("      Super Layer 3"));
-            panel.add(new JLabel("")); panel.add(new JLabel("      Super Layer 4"));
-            panel.add(new JLabel("")); panel.add(new JLabel("      Super Layer 5"));
-            panel.add(new JLabel("")); panel.add(new JLabel("      Super Layer 6"));
+            panel.add(new JLabel("")); panel.add(new JLabel("Super Layer 1"));
+            panel.add(new JLabel("")); panel.add(new JLabel("Super Layer 2"));
+            panel.add(new JLabel("")); panel.add(new JLabel("Super Layer 3"));
+            panel.add(new JLabel("")); panel.add(new JLabel("Super Layer 4"));
+            panel.add(new JLabel("")); panel.add(new JLabel("Super Layer 5"));
+            panel.add(new JLabel("")); panel.add(new JLabel("Super Layer 6"));
             panel.add(new JLabel(""));
             fixFit = new JCheckBox[10][6];
             for (int i = 0; i < npar; i++) {  
@@ -192,6 +192,9 @@ public class FitPanel {
             panel.add(new JLabel("    Fit range max"));
             maxRange.setText(Double.toString(2.0));
             panel.add(maxRange);
+
+            JPanel buttonsPanel = new JPanel();
+            buttonsPanel.setLayout(new GridLayout(1, 4));
             
             resetButton = new JButton("RESET PARAMETERS");
             resetButton.setUI(new MetalButtonUI());
@@ -205,7 +208,6 @@ public class FitPanel {
                     return;
                 }
             });
-                panel.add(resetButton);
             
             resButton = new JButton("PLOT RESIDUALS");
             resButton.setUI(new MetalButtonUI());
@@ -219,7 +221,6 @@ public class FitPanel {
                     return;
                 }
             });
-            panel.add(resButton);
             
             reCookButton = new JButton("REDO SEGMENT FITS");
             reCookButton.setUI(new MetalButtonUI());
@@ -242,7 +243,6 @@ public class FitPanel {
                     return;
                 }
             });
-            panel.add(reCookButton);
             
             fitButton = new JButton("FIT TIME TO DISTANCE");
             fitButton.setUI(new MetalButtonUI());
@@ -260,9 +260,15 @@ public class FitPanel {
                     return;
                 }
             });
+
+            buttonsPanel.add(fitButton);
+            buttonsPanel.add(reCookButton);
+            buttonsPanel.add(resButton);
+            buttonsPanel.add(resetButton);
             
             this.add(panel, BorderLayout.CENTER);
-            this.add(fitButton, BorderLayout.PAGE_END);
+            this.add(buttonsPanel, BorderLayout.PAGE_END);
+            //this.add(fitButton, BorderLayout.PAGE_END);
             
             
             label = new JLabel("Click the \"Show it!\" button"
