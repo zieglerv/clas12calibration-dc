@@ -100,12 +100,15 @@ public class T2DViewer implements IDataEventListener, DetectorListener, ActionLi
     public static JTextField npassWires = new JTextField(3);
     public static JTextField nWires = new JTextField(3);
     public static JTextField deltaWire = new JTextField(3);
+    public static JTextField enternofevents = new JTextField(3); 
     
     String[] calVars = {"default", "dc_team_rga_fall2018", ""};
     public static JComboBox  calVariation ;
     
     String[] distBetaFCNSelect = {"old", "new"};
     public static JComboBox  distBetaFCN ;
+    
+
     
      // detector monitors
     AnalysisMonitor[] monitors ; 
@@ -649,6 +652,24 @@ public class T2DViewer implements IDataEventListener, DetectorListener, ActionLi
         tgmPanel.add(distBetaFCN);
         c.gridx = 3;
 	c.gridy = y;
+        trPanel.add(tgmPanel,c);
+        c.gridx = 2;
+        c.gridy = y;
+        trPanel.add(new JLabel(""),c);
+        
+        
+        //add number of events selection
+        y++;
+        c.gridx = 2;
+        c.gridy = y;
+        tgmPanel = new JPanel();
+        trPanel.add(new JLabel("number of events = ", JLabel.LEADING),c);
+        
+        enternofevents.setText("-1");
+        enternofevents.addActionListener(this);
+        tgmPanel.add(enternofevents);
+        c.gridx = 3;
+        c.gridy = y;
         trPanel.add(tgmPanel,c);
         c.gridx = 2;
         c.gridy = y;
