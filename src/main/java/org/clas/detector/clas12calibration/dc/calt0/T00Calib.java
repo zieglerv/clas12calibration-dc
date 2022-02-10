@@ -272,10 +272,16 @@ public class T00Calib extends AnalysisMonitor{
             //debug output
            // System.out.println("Sector " + sec + " sl " + sl + " distbeta is " + distbeta);
            // System.out.println("time " + time + " calibtime " + calibtime + " calib-newtbeta " + timecorrected + " tbetafromfile " + bnkHits.getFloat("tBeta",j) + " tbetarecal " + newtbetacorr);
-            
-            if(bnkHits.getByte("trkID", j)!=-1)
-                this.TDCHis.get(new Coordinate(sec-1, sl-1))
-                    .fill(timecorrected);
+            int trkID = bnkHits.getByte("trkID", j);
+            if(trkID!=-1) {
+                 int pid = this.readPID(event, trkID);            
+            	 //pid 11 is electron, 2212 proton and 211 pion
+                //pass if the track is identified as an electron or as a hadron
+                 if(pid==11) {
+                	 this.TDCHis.get(new Coordinate(sec-1, sl-1))
+                     .fill(timecorrected);
+                 }
+                }
             }
         } 
     
@@ -456,6 +462,27 @@ public class T00Calib extends AnalysisMonitor{
         
         return T0val;
     }
+    
+    private int readPID(DataEvent event, int trkId) {
+        int pid = 0;
+        //fetch the track associated pid from the REC tracking bank
+        if (!event.hasBank("REC::Particle") || !event.hasBank("REC::Track"))
+            return pid;
+        DataBank bank = event.getBank("REC::Track");
+        //match the index and return the pid
+        int rows = bank.rows();
+        for (int i = 0; i < rows; i++) {
+            if (bank.getByte("detector", i) == 6 &&
+                    bank.getShort("index", i) == trkId - 1) {
+                DataBank bank2 = event.getBank("REC::Particle");
+                if(bank2.getByte("charge", bank.getShort("pindex", i))!=0) {
+                    pid = bank2.getInt("pid", bank.getShort("pindex", i));
+                }
+            }
+        }
+        
+        return pid;
+    } 
 
     private double calcError(double n, double en, double d, double ed) {
         return Math.sqrt((en/d)*(en/d)+(ed*n/(d*d))*(ed*n/(d*d)));
