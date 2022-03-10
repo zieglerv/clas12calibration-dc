@@ -147,34 +147,18 @@ public class FitPanel {
                 }
             }
             int npar = 10;
-            //panel = new JPanel(new GridLayout(npar+1, 6));            
-            panel = new JPanel(new GridLayout(npar+2, 6));            
-            panel.add(new JLabel("")); panel.add(new JLabel("Super Layer 1"));
-            panel.add(new JLabel("")); panel.add(new JLabel("Super Layer 2"));
-            panel.add(new JLabel("")); panel.add(new JLabel("Super Layer 3"));
-            panel.add(new JLabel("")); panel.add(new JLabel("Super Layer 4"));
-            panel.add(new JLabel("")); panel.add(new JLabel("Super Layer 5"));
-            panel.add(new JLabel("")); panel.add(new JLabel("Super Layer 6"));
-            panel.add(new JLabel(""));
+            panel = new JPanel(new GridLayout(npar+1, 6));            
             fixFit = new JCheckBox[10][6];
             for (int i = 0; i < npar; i++) {  
                 JLabel l = new JLabel("      "+parNames[i], JLabel.LEADING);
                 panel.add(l);
                 for (int j = 0; j < 6; j++) {
                     fixFit[i][j] = new JCheckBox("Fix");
-                    boolean aa = i==2 || i==4 || i>5;
-                    boolean bb = i==3 && (j==2 || j==3);
-                    boolean cc = i==5 && (j==0 || j==1 || j==4 || j==5);
-                    if(aa || bb || cc) {
+                    if(i==2 || i>4) {
                         fixFit[i][j].setSelected(true);
                     } else {
                         fixFit[i][j].setSelected(false);
                     }
-                    //if(i==2 || i>4) {
-                    //    fixFit[i][j].setSelected(true);
-                    //} else {
-                    //    fixFit[i][j].setSelected(false);
-                    //}
                     
                     params[i][j] = new JTextField(3);
                     if(i!=3) {
@@ -193,10 +177,7 @@ public class FitPanel {
             maxRange.setText(Double.toString(2.0));
             panel.add(maxRange);
 
-            JPanel buttonsPanel = new JPanel();
-            buttonsPanel.setLayout(new GridLayout(1, 4));
-            
-            resetButton = new JButton("RESET PARAMETERS");
+            resetButton = new JButton("RESET");
             resetButton.setUI(new MetalButtonUI());
             resetButton.setBackground(Color.CYAN);
             resetButton.setContentAreaFilled(false);
@@ -208,8 +189,9 @@ public class FitPanel {
                     return;
                 }
             });
+            panel.add(resetButton);
             
-            resButton = new JButton("PLOT RESIDUALS");
+            resButton = new JButton("RESI");
             resButton.setUI(new MetalButtonUI());
             resButton.setBackground(Color.YELLOW);
             resButton.setContentAreaFilled(false);
@@ -221,8 +203,9 @@ public class FitPanel {
                     return;
                 }
             });
+            panel.add(resButton);
             
-            reCookButton = new JButton("REDO SEGMENT FITS");
+            reCookButton = new JButton("RECOOK");
             reCookButton.setUI(new MetalButtonUI());
             reCookButton.setBackground(Color.ORANGE);
             reCookButton.setContentAreaFilled(false);
@@ -243,8 +226,9 @@ public class FitPanel {
                     return;
                 }
             });
+            panel.add(reCookButton);
             
-            fitButton = new JButton("FIT TIME TO DISTANCE");
+            fitButton = new JButton("FIT");
             fitButton.setUI(new MetalButtonUI());
             fitButton.setBackground(Color.RED);
             fitButton.setContentAreaFilled(false);
@@ -261,14 +245,8 @@ public class FitPanel {
                 }
             });
 
-            buttonsPanel.add(fitButton);
-            buttonsPanel.add(reCookButton);
-            buttonsPanel.add(resButton);
-            buttonsPanel.add(resetButton);
-            
             this.add(panel, BorderLayout.CENTER);
-            this.add(buttonsPanel, BorderLayout.PAGE_END);
-            //this.add(fitButton, BorderLayout.PAGE_END);
+            this.add(fitButton, BorderLayout.PAGE_END);
             
             
             label = new JLabel("Click the \"Show it!\" button"
