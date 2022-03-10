@@ -147,14 +147,12 @@ public class FitPanel {
                 }
             }
             int npar = 10;
-            //panel = new JPanel(new GridLayout(npar+1, 6));            
             panel = new JPanel(new GridLayout(npar+2, 6));            
-            panel.add(new JLabel("")); panel.add(new JLabel("Super Layer 1"));
-            panel.add(new JLabel("")); panel.add(new JLabel("Super Layer 2"));
-            panel.add(new JLabel("")); panel.add(new JLabel("Super Layer 3"));
-            panel.add(new JLabel("")); panel.add(new JLabel("Super Layer 4"));
-            panel.add(new JLabel("")); panel.add(new JLabel("Super Layer 5"));
-            panel.add(new JLabel("")); panel.add(new JLabel("Super Layer 6"));
+            for (int i = 0; i < 6; i++) {
+                String SuperLayer = Integer.toString(i + 1);
+                panel.add(new JLabel(""));
+                panel.add(new JLabel("Super Layer " + SuperLayer));
+            }
             panel.add(new JLabel(""));
             fixFit = new JCheckBox[10][6];
             for (int i = 0; i < npar; i++) {  
@@ -162,19 +160,17 @@ public class FitPanel {
                 panel.add(l);
                 for (int j = 0; j < 6; j++) {
                     fixFit[i][j] = new JCheckBox("Fix");
+                    // aa is true for parameters "R", "distbeta", "b1", "b2", "b3", and "b4"
                     boolean aa = i==2 || i==4 || i>5;
+                    // bb is true for parameter "tmax" on superlayers 3 and 4 only
                     boolean bb = i==3 && (j==2 || j==3);
+                    // cc is true for parameter "delBf" on superlayers 1, 2, 5, and 6 only
                     boolean cc = i==5 && (j==0 || j==1 || j==4 || j==5);
                     if(aa || bb || cc) {
                         fixFit[i][j].setSelected(true);
                     } else {
                         fixFit[i][j].setSelected(false);
                     }
-                    //if(i==2 || i>4) {
-                    //    fixFit[i][j].setSelected(true);
-                    //} else {
-                    //    fixFit[i][j].setSelected(false);
-                    //}
                     
                     params[i][j] = new JTextField(3);
                     if(i!=3) {
@@ -208,6 +204,7 @@ public class FitPanel {
                     return;
                 }
             });
+            panel.add(resetButton);
             
             resButton = new JButton("PLOT RESIDUALS");
             resButton.setUI(new MetalButtonUI());
@@ -221,6 +218,7 @@ public class FitPanel {
                     return;
                 }
             });
+            panel.add(resButton);
             
             reCookButton = new JButton("REDO SEGMENT FITS");
             reCookButton.setUI(new MetalButtonUI());
@@ -243,6 +241,7 @@ public class FitPanel {
                     return;
                 }
             });
+            panel.add(reCookButton);
             
             fitButton = new JButton("FIT TIME TO DISTANCE");
             fitButton.setUI(new MetalButtonUI());
@@ -268,7 +267,6 @@ public class FitPanel {
             
             this.add(panel, BorderLayout.CENTER);
             this.add(buttonsPanel, BorderLayout.PAGE_END);
-            //this.add(fitButton, BorderLayout.PAGE_END);
             
             
             label = new JLabel("Click the \"Show it!\" button"
