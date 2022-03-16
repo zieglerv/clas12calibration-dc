@@ -105,7 +105,7 @@ public class T2DViewer implements IDataEventListener, DetectorListener, ActionLi
     String[] calVars = {"default", "dc_team_rga_fall2018", ""};
     public static JComboBox  calVariation ;
     
-    String[] distBetaFCNSelect = {"old", "new"};
+    String[] distBetaFCNSelect = {"new", "old"};
     public static JComboBox  distBetaFCN ;
     
 
