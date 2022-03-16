@@ -561,7 +561,7 @@ public class T2DViewer implements IDataEventListener, DetectorListener, ActionLi
         c.gridx = 2;
         c.gridy = y;
         tgmPanel = new JPanel();
-        trPanel.add(new JLabel("fitResi (um)>", JLabel.LEADING),c);
+        trPanel.add(new JLabel("fitResi (um)<", JLabel.LEADING),c);
         
         fitresiCut.setText("1000");
         betaCut.addActionListener(this);
