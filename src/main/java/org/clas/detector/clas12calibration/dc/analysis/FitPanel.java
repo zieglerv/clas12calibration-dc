@@ -204,7 +204,6 @@ public class FitPanel {
                     return;
                 }
             });
-            //panel.add(resetButton);
             
             resButton = new JButton("PLOT RESIDUALS");
             resButton.setUI(new MetalButtonUI());
@@ -218,7 +217,6 @@ public class FitPanel {
                     return;
                 }
             });
-            //panel.add(resButton);
             
             reCookButton = new JButton("REDO SEGMENT FITS");
             reCookButton.setUI(new MetalButtonUI());
@@ -241,7 +239,6 @@ public class FitPanel {
                     return;
                 }
             });
-            //panel.add(reCookButton);
             
             fitButton = new JButton("FIT TIME TO DISTANCE");
             fitButton.setUI(new MetalButtonUI());
