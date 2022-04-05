@@ -155,13 +155,13 @@ public class T2DViewer implements IDataEventListener, DetectorListener, ActionLi
         settings.add(menuItem);
         menuBar.add(settings);
         
-        JMenu fits = new JMenu("Fits");
-        fits.getAccessibleContext().setAccessibleDescription("Choose parameters");
-        menuItem = new JMenuItem("Refit");
-        menuItem.getAccessibleContext().setAccessibleDescription("...");
-        menuItem.addActionListener(this);
-        fits.add(menuItem);
-        menuBar.add(fits);
+        //JMenu fits = new JMenu("Fits");
+        //fits.getAccessibleContext().setAccessibleDescription("Choose parameters");
+        //menuItem = new JMenuItem("Refit");
+        //menuItem.getAccessibleContext().setAccessibleDescription("...");
+        //menuItem.addActionListener(this);
+        //fits.add(menuItem);
+        //menuBar.add(fits);
            
         // create main panel
         mainPanel = new JPanel();	
