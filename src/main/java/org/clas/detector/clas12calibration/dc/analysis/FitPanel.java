@@ -147,8 +147,6 @@ public class FitPanel {
                 }
             }
             int npar = 10;
-<<<<<<< HEAD
-=======
             panel = new JPanel(new GridLayout(npar+2, 6));            
             for (int i = 0; i < 6; i++) {
                 String SuperLayer = Integer.toString(i + 1);
@@ -156,15 +154,12 @@ public class FitPanel {
                 panel.add(new JLabel("Super Layer " + SuperLayer));
             }
             panel.add(new JLabel(""));
->>>>>>> 79cbd9e429210051db91b41703fdea911ee6943f
             fixFit = new JCheckBox[10][6];
             for (int i = 0; i < npar; i++) {  
                 JLabel l = new JLabel("      "+parNames[i], JLabel.LEADING);
                 panel.add(l);
                 for (int j = 0; j < 6; j++) {
                     fixFit[i][j] = new JCheckBox("Fix");
-<<<<<<< HEAD
-=======
                     // aa is true for parameters "R", "distbeta", "b1", "b2", "b3", and "b4"
                     boolean aa = i==2 || i==4 || i>5;
                     // bb is true for parameter "tmax" on superlayers 3 and 4 only
@@ -172,7 +167,6 @@ public class FitPanel {
                     // cc is true for parameter "delBf" on superlayers 1, 2, 5, and 6 only
                     boolean cc = i==5 && (j==0 || j==1 || j==4 || j==5);
                     if(aa || bb || cc) {
->>>>>>> 79cbd9e429210051db91b41703fdea911ee6943f
                         fixFit[i][j].setSelected(true);
                     } else {
                         fixFit[i][j].setSelected(false);
@@ -264,10 +258,7 @@ public class FitPanel {
             });
 
             this.add(panel, BorderLayout.CENTER);
-<<<<<<< HEAD
-=======
             this.add(buttonsPanel, BorderLayout.PAGE_END);
->>>>>>> 79cbd9e429210051db91b41703fdea911ee6943f
             
             
             label = new JLabel("Click the \"Show it!\" button"
