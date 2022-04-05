@@ -61,6 +61,7 @@ public class T2DCalib extends AnalysisMonitor{
     File outfile = null;
     private int runNumber;
     private Utilities util = new Utilities();
+    private int numberprocessedevents;
     
     public T2DCalib(String name, ConstantsManager ccdb) throws FileNotFoundException {
         super(name, ccdb);
@@ -471,12 +472,21 @@ public class T2DCalib extends AnalysisMonitor{
                 }
             }
         }
-        
+        System.out.println("***********************************************");       
+        System.out.println("****** Reprocessing TestCalOutPut.hipo ********");
+        System.out.println("***********************************************");
         calreader = new HipoDataSource();
         calreader.open("TestCalOutPut.hipo");
+        System.out.println("Events in hipofile " +  calreader.getSize() );  
+        int numberofeventsinfile = calreader.getSize();
+        int eventcounter = 0;
         while (calreader.hasEvent()) { 
             hits.clear();
             DataEvent event = calreader.getNextEvent();
+            eventcounter++;
+            if ((eventcounter%10000 == 0) && (eventcounter < numberofeventsinfile) ) {
+             	 System.out.println("Processed " + eventcounter + " events from " + numberofeventsinfile);  
+            }
             if(event.hasBank("TimeBasedTrkg::TBHits")) {
                 DataBank bnkHits = event.getBank("TimeBasedTrkg::TBHits");
                 
@@ -499,13 +509,23 @@ public class T2DCalib extends AnalysisMonitor{
             }
         }
         // the newly calibrated hits
+        System.out.println("*************************************************");       
+        System.out.println("*** Done Reprocessing with initial parameters ***");
+        System.out.println("*************************************************");
+        
         
         reLoadFitPars();
+        //Parameters are now fit values
         System.out.println("************  Fit Parameters Reloaded! ************");
         calreader.gotoEvent(0);
+        eventcounter = 0;
         while (calreader.hasEvent()) { 
             calhits.clear();
             DataEvent event = calreader.getNextEvent();
+            eventcounter++;
+            if ((eventcounter%10000 == 0) && (eventcounter < numberofeventsinfile) ) {
+            	 System.out.println("Processed " + eventcounter + " events from " + numberofeventsinfile);  
+            }
             if(event.hasBank("TimeBasedTrkg::TBHits")) {
                 DataBank bnkHits = event.getBank("TimeBasedTrkg::TBHits");
                 
@@ -603,7 +623,7 @@ public class T2DCalib extends AnalysisMonitor{
         gausFunc.setParameter(3, gaus1Func.getParameter(0)*0.15);
         gausFunc.setParameter(4, gaus1Func.getParameter(2));
         gausFunc.setOptStat(1110);
-        h1.setOptStat(1111);
+        h1.setOptStat(1110);
         //canvasRes.clear();
         
         DataFitter.fit(gausFunc, h1, "Q");
@@ -742,6 +762,7 @@ public class T2DCalib extends AnalysisMonitor{
            count++;
         }
         
+        
         //if(count>20000) return;
         if(count==1) {
             Constants.getInstance().initialize("DCCAL");
@@ -761,12 +782,25 @@ public class T2DCalib extends AnalysisMonitor{
                 Utilities.NEWDELTATBETAFCN = true;
                 System.out.println("USING NEW DISTBETA FCN!!!!");
             }
+            numberprocessedevents = Integer.parseInt(T2DViewer.enternofevents.getText());
+            if (numberprocessedevents==-1)
+            {
+            	System.out.println("All events are processed!!!!");
+            }
+            else {
+            	System.out.println(numberprocessedevents + " events will be processed!!!!");
+            }
         }
         if(!event.hasBank("TimeBasedTrkg::TBHits")) {
             return;
         } 
-        // get segment property
+     
+        if (count > numberprocessedevents && numberprocessedevents!=-1) {
+        	return;
+        }
         
+        
+        // get segment property     
         DataBank bnkHits = event.getBank("TimeBasedTrkg::TBHits");
         this.getSegProperty(bnkHits);
         
@@ -1371,8 +1405,8 @@ public class T2DCalib extends AnalysisMonitor{
             }
         return pass;
     } 
-    
-    private boolean passCalibCuts(DataBank bnkHits, int i) {
+    //Function is not used, could be deleted F.H. 2/2/22
+  /*  private boolean passCalibCuts(DataBank bnkHits, int i) {
         boolean pass = false;
         
         double bFieldVal = (double) bnkHits.getFloat("B", i);
@@ -1393,6 +1427,6 @@ public class T2DCalib extends AnalysisMonitor{
                 pass = true;
             }
         return pass;
-    } 
+    } */
 }
 
