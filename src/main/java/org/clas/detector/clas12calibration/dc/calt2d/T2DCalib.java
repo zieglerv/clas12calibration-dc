@@ -461,6 +461,8 @@ public class T2DCalib extends AnalysisMonitor{
     private final Map<Integer, Double> hitid2B = new HashMap<Integer, Double>();
     private final Map<Integer, Double> hitid2tProp = new HashMap<Integer, Double>();
     private final Map<Integer, Double> hitid2tFlight = new HashMap<Integer, Double>();
+    private final Map<Integer, Double> mapHB_hitsdocaerror = new HashMap<Integer, Double>();
+    private final Map<Integer, Double> mapHB_hitstrackdoca = new HashMap<Integer, Double>();
     
     public void reCook() {
         iterationNum++;
@@ -470,6 +472,8 @@ public class T2DCalib extends AnalysisMonitor{
         hitid2B.clear();
         hitid2tProp.clear();
         hitid2tFlight.clear();
+        mapHB_hitsdocaerror.clear();
+        mapHB_hitstrackdoca.clear();
         
         //reset histos to refill
         for (int i = 0; i < this.nsl; i++) {
@@ -501,15 +505,22 @@ public class T2DCalib extends AnalysisMonitor{
             if(event.hasBank("TimeBasedTrkg::TBHits")) {
                 DataBank bnkHits = event.getBank("TimeBasedTrkg::TBHits");
                 
-          //      DataBank bnkHBHits = event.getBank("HitBasedTrkg::HBHits");
+                DataBank bnkHBHits = event.getBank("HitBasedTrkg::HBHits");
                 DataBank bnkHBHitTrkID = event.getBank("HitBasedTrkg::HBHitTrkId"); 
-              //  if (eventcounter==2) bnkHBHitTrkID.show();
+                if (eventcounter==2) bnkHBHits.show();
+                if (eventcounter==2) bnkHBHitTrkID.show();
+                if (eventcounter==2) bnkHits.show();
                 
                 for (int idrow = 0; idrow < bnkHBHitTrkID.rows(); idrow++ ) {
                 	hitid2tid.put((int)bnkHBHitTrkID.getShort("id", idrow), (int)bnkHBHitTrkID.getShort("tid", idrow));
                 	hitid2B.put((int)bnkHBHitTrkID.getShort("id", idrow), (double)bnkHBHitTrkID.getFloat("B", idrow));
                 	hitid2tFlight.put((int)bnkHBHitTrkID.getShort("id", idrow), (double)bnkHBHitTrkID.getFloat("TFlight", idrow));
                 	hitid2tProp.put((int)bnkHBHitTrkID.getShort("id", idrow), (double)bnkHBHitTrkID.getFloat("TProp", idrow));                
+                }
+                
+                for (int hitrow = 0; hitrow < bnkHBHits.rows(); hitrow++ ) {
+                	mapHB_hitstrackdoca.put((int)bnkHBHits.getShort("id", hitrow), (double)bnkHBHits.getFloat("trkDoca", hitrow));
+                   	mapHB_hitsdocaerror.put((int)bnkHBHits.getShort("id", hitrow), (double)bnkHBHits.getFloat("docaError", hitrow));
                 }
                 
                 for (int i = 0; i < bnkHits.rows(); i++) {
@@ -519,33 +530,48 @@ public class T2DCalib extends AnalysisMonitor{
                 for(FittedHit hit : hits) {
                     hit.set_TimeResidual(-999);
                     int tempid = hit.get_Id();
-                   // if (eventcounter==2) {
-                   // 	System.out.println(hit.printInfo());
-                   // 	System.out.println("Hit before TFlight " + hit.getTFlight());
-                   // }
-                    hit.setTFlight(hitid2tFlight.get(tempid));
-                    hit.setTProp(hitid2tProp.get(tempid));
-                    hit.setB(hitid2B.get(tempid));
+                    if (eventcounter==2) {
+                    	System.out.println(hit.printInfo());
+                    	System.out.println("Hit before TFlight " + hit.getTFlight());
+                    	             	
+                    	System.out.println("docerror before reset value "+hit.get_DocaErr());
+                    	
+                    }
+                  //  hit.setTFlight(hitid2tFlight.get(tempid));
+                  //  hit.setTProp(hitid2tProp.get(tempid));
+                  //  hit.setB(hitid2B.get(tempid));
+                   // hit.set_DocaErr(mapHB_hitsdocaerror.get(tempid));
+                 //   hit.set_ClusFitDoca(mapHB_hitstrackdoca.get(tempid));
                     
                     
-                  //  if (eventcounter==2) {
-                   // 	System.out.println(hit.printInfo());
-                  //  	System.out.println("Hit after TFlight " + hit.getTFlight());
-                   // }
+                    if (eventcounter==2) {
+                    	System.out.println(hit.printInfo());
+                   	System.out.println("Hit after TFlight " + hit.getTFlight());
+                    System.out.println("docerror after reset value "+hit.get_DocaErr());
+                    System.out.println("x-wire before updateHIt "+hit.get_XWire());            
+                    System.out.println("x before updateHIt "+hit.get_X());
+                    }
                     
                     
                     updateHit(hit); //update the hit with previous cal results
                     
-                   // if (eventcounter==2) {
-                   // 	System.out.println("after updateHit function");
-                   // 	System.out.println(hit.printInfo());
-                   // }
+                    if (eventcounter==2) {
+                    	System.out.println("after updateHit function");
+                    	System.out.println(hit.printInfo());
+                    	System.out.println("x after updateHIt "+hit.get_X());
+                    }
                 }
               //  refit with new constants
                 Refit rf = new Refit();
                 rf.reFit(hits);    //refit to get the parameters
                 
                 for(FittedHit hit : hits) {
+                	if (eventcounter==2) {
+                		System.out.println("after refit");
+                    	System.out.println(hit.printInfo());
+                    	System.out.println("docerror after refit"+hit.get_DocaErr());
+                    	
+                    }
                     //filling the timeResi for the previously calibrated hits
                     timeResi.get(new Coordinate(hit.get_Superlayer()-1)).fill(hit.get_TimeResidual());
                 }
@@ -557,7 +583,7 @@ public class T2DCalib extends AnalysisMonitor{
         System.out.println("*************************************************");
         
         
-        reLoadFitPars();
+        //reLoadFitPars();
         //Parameters are now fit values
         System.out.println("************  Fit Parameters Reloaded! ************");
         calreader.gotoEvent(0);
@@ -579,10 +605,12 @@ public class T2DCalib extends AnalysisMonitor{
                 for(FittedHit hit : calhits) {
                     hit.set_TimeResidual(-999);
                     int tempid = hit.get_Id();
-                    hit.setTFlight(hitid2tFlight.get(tempid));
-                    hit.setTProp(hitid2tProp.get(tempid));
-                    hit.setB(hitid2B.get(tempid));
-                    updateHit(hit);
+                  //   hit.setTFlight(hitid2tFlight.get(tempid));
+                   //  hit.setTProp(hitid2tProp.get(tempid));
+                   //  hit.setB(hitid2B.get(tempid));
+                   // hit.set_DocaErr(mapHB_hitsdocaerror.get(tempid));
+                    //   hit.set_ClusFitDoca(mapHB_hitstrackdoca.get(tempid));
+                   // updateHit(hit);
                 }
                // refit with new constants
                 Refit rf = new Refit();
@@ -865,6 +893,12 @@ public class T2DCalib extends AnalysisMonitor{
                 continue;
             
             FittedHit theHit = this.getHit(bnkHits, i);
+            if( newRun == 11 || newRun == 10) { //MC set TFlight, Tprop and Tbeta to 0
+            	theHit.setTFlight(0);
+            	theHit.setTProp(0);
+            	
+            	
+            }
             if(this.passResiCuts(event, bnkHits, i)){//no previous entries
                 if(hitmap.get(theHit.get_Id())==null) {
                     hitmap.put(theHit.get_Id(), theHit);
@@ -878,7 +912,12 @@ public class T2DCalib extends AnalysisMonitor{
                     double calibTime = (double) (bnkHits.getInt("TDC", i) - bnkHits.getFloat("TProp", i)
                                             - bnkHits.getFloat("TFlight", i) - bnkHits.getFloat("TStart", i) 
                                             - bnkHits.getFloat("T0", i));
-                   
+                    if ( newRun == 11 || newRun == 10) { //MC set TFlight, Tprop and Tbeta to 0
+                      //for MC no TFlight and Tprop correction because they are 0!
+                    	calibTime = (double) (bnkHits.getInt("TDC", i) - bnkHits.getFloat("TStart", i) 
+                              - bnkHits.getFloat("T0", i));
+                    
+                    }
                     Tvstrkdocas.get(new Coordinate(bnkHits.getInt("superlayer", i) - 1, alphaBin, this.BBins))
                                     .fill(bnkHits.getFloat("trkDoca", i), calibTime);
                     
