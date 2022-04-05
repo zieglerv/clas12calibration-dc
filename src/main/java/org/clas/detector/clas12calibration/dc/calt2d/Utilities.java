@@ -23,7 +23,7 @@ public class Utilities {
         double ct = (distbeta/.0050)*beta*beta;
         //see [CLAS-Note 96-008]
         double tBeta = (0.5 *ct*ct*ct*t)/(ct*ct*ct+t*t*t);
-        return tBeta*beta*beta;
+        return tBeta;
     }
     
     public double getReducedAngle(double alpha) {
