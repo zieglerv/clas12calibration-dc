@@ -102,7 +102,7 @@ public class T2DViewer implements IDataEventListener, DetectorListener, ActionLi
     public static JTextField deltaWire = new JTextField(3);
     public static JTextField enternofevents = new JTextField(3); 
     
-    String[] calVars = {"default", "dc_team_rga_fall2018", ""};
+    String[] calVars = {"dc_team_rga_fall2018", "default", ""};
     public static JComboBox  calVariation ;
     
     String[] distBetaFCNSelect = {"new", "old"};
@@ -613,7 +613,7 @@ public class T2DViewer implements IDataEventListener, DetectorListener, ActionLi
         tgmPanel = new JPanel();
         trPanel.add(new JLabel("deltaWire=", JLabel.LEADING),c);
         
-        deltaWire.setText("3");
+        deltaWire.setText("9");
         deltaWire.addActionListener(this);
         tgmPanel.add(deltaWire);
         c.gridx = 3;
