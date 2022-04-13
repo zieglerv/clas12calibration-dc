@@ -93,8 +93,8 @@ public class T2DViewer implements IDataEventListener, DetectorListener, ActionLi
     
     
     private JLabel[] superlayer = {new JLabel("", JLabel.CENTER),new JLabel("", JLabel.CENTER),new JLabel("", JLabel.CENTER),new JLabel("", JLabel.CENTER),new JLabel("", JLabel.CENTER),new JLabel("", JLabel.CENTER)};
-    public static JTextField[] alphaCuts1 = {new JTextField(7),new JTextField(7),new JTextField(7),new JTextField(7),new JTextField(7),new JTextField(7)};
-    public static JTextField[] alphaCuts2 = {new JTextField(7),new JTextField(7),new JTextField(7),new JTextField(7),new JTextField(7),new JTextField(7)};
+    public static JTextField[] alphaCuts1 = {new JTextField(9),new JTextField(9),new JTextField(9),new JTextField(9),new JTextField(9),new JTextField(9)};
+    public static JTextField[] alphaCuts2 = {new JTextField(9),new JTextField(9),new JTextField(9),new JTextField(9),new JTextField(9),new JTextField(9)};
     public static JTextField betaCut = new JTextField(3);
     public static JTextField fitresiCut = new JTextField(3);
     public static JTextField npassWires = new JTextField(3);
@@ -490,7 +490,8 @@ public class T2DViewer implements IDataEventListener, DetectorListener, ActionLi
         trOuterPanel.add(trPanel, BorderLayout.NORTH);
         c.weighty = 1;
         c.anchor = c.NORTHWEST;
-        c.insets = new Insets(3,3,3,3);
+        //c.insets = new Insets(3,3,3,3);
+        c.insets = new Insets(0,0,0,0);
 
         // Target GMEAN channel
         c.gridx = 0;
@@ -500,7 +501,8 @@ public class T2DViewer implements IDataEventListener, DetectorListener, ActionLi
         c.gridy = y;
         JPanel tgmPanel = new JPanel();
         for(int i = 0; i < 6; i++) {
-            superlayer[i].setText("Superlayer "+(i+1)+"    ");
+            //superlayer[i].setText("Superlayer "+(i+1)+"    ");
+            superlayer[i].setText("Superlayer "+(i+1)+"   ");
             tgmPanel.add(superlayer[i]);
         }
         trPanel.add(tgmPanel,c);
@@ -542,6 +544,30 @@ public class T2DViewer implements IDataEventListener, DetectorListener, ActionLi
         trPanel.add(new JLabel(""),c);
         //
         y++;
+        y++;
+        //---------------------------------------------------------------------
+        //c.gridx = 0;
+	//c.gridy = y;
+        //tgmPanel = new JPanel();
+        //trPanel.add(new JLabel("beta>"),c);
+        //betaCut.setText("0.9");
+        //betaCut.addActionListener(this);
+        //tgmPanel.add(betaCut,c);
+
+        //tgmPanel.add(new JLabel("fitResi (um)<"),c);
+        //fitresiCut.setText("1000");
+        //fitresiCut.addActionListener(this);
+        //tgmPanel.add(fitresiCut,c);
+
+        //tgmPanel.add(new JLabel("nhits>"),c);
+        //nWires.setText("4");
+        //nWires.addActionListener(this);
+        //tgmPanel.add(nWires,c);
+
+        //c.gridx = 1;
+        //trPanel.add(tgmPanel,c);
+        //---------------------------------------------------------------------
+
         c.gridx = 2;
         c.gridy = y;
         tgmPanel = new JPanel();
@@ -564,7 +590,10 @@ public class T2DViewer implements IDataEventListener, DetectorListener, ActionLi
         trPanel.add(new JLabel("fitResi (um)<", JLabel.LEADING),c);
         
         fitresiCut.setText("1000");
-        betaCut.addActionListener(this);
+        //---!!!---
+        //betaCut.addActionListener(this);
+        fitresiCut.addActionListener(this);
+        //---!!!---
         tgmPanel.add(fitresiCut);
         c.gridx = 3;
 	c.gridy = y;
