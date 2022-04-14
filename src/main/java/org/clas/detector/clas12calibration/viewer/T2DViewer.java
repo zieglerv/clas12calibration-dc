@@ -101,6 +101,7 @@ public class T2DViewer implements IDataEventListener, DetectorListener, ActionLi
     public static JTextField nWires = new JTextField(3);
     public static JTextField deltaWire = new JTextField(3);
     public static JTextField enternofevents = new JTextField(3); 
+    public static JTextField sectorN = new JTextField(3); 
     
     String[] calVars = {"dc_team_rga_fall2018", "default", ""};
     public static JComboBox  calVariation ;
@@ -490,8 +491,7 @@ public class T2DViewer implements IDataEventListener, DetectorListener, ActionLi
         trOuterPanel.add(trPanel, BorderLayout.NORTH);
         c.weighty = 1;
         c.anchor = c.NORTHWEST;
-        //c.insets = new Insets(3,3,3,3);
-        c.insets = new Insets(0,0,0,0);
+        c.insets = new Insets(3,3,3,3);
 
         // Target GMEAN channel
         c.gridx = 0;
@@ -513,7 +513,7 @@ public class T2DViewer implements IDataEventListener, DetectorListener, ActionLi
         c.gridx = 0;
         c.gridy = y;
         tgmPanel = new JPanel();
-        trPanel.add(new JLabel("alpha>"),c);
+        trPanel.add(new JLabel("alpha > "),c);
         for(int i = 0; i < 6; i++) {
             alphaCuts1[i].setText("-30");
             alphaCuts1[i].addActionListener(this);
@@ -524,13 +524,13 @@ public class T2DViewer implements IDataEventListener, DetectorListener, ActionLi
         trPanel.add(tgmPanel,c);
         c.gridx = 2;
         c.gridy = y;
+        trPanel.add(new JLabel(""),c);
         
-        //trPanel.add(new JLabel(""),c);
         y++;
         c.gridx = 0;
         c.gridy = y;
         tgmPanel = new JPanel();
-        trPanel.add(new JLabel("alpha<"),c);
+        trPanel.add(new JLabel("alpha < "),c);
         for(int i = 0; i < 6; i++) {
             alphaCuts2[i].setText("30");
             alphaCuts2[i].addActionListener(this);
@@ -541,169 +541,139 @@ public class T2DViewer implements IDataEventListener, DetectorListener, ActionLi
         trPanel.add(tgmPanel,c);
         c.gridx = 2;
         c.gridy = y;
-        trPanel.add(new JLabel(""),c);
-        //
-        y++;
-        y++;
+
         //---------------------------------------------------------------------
-        //c.gridx = 0;
-	//c.gridy = y;
-        //tgmPanel = new JPanel();
-        //trPanel.add(new JLabel("beta>"),c);
-        //betaCut.setText("0.9");
-        //betaCut.addActionListener(this);
-        //tgmPanel.add(betaCut,c);
+        y++;
+        c.gridx = 1;
+	c.gridy = y;
+        trPanel.add(new JLabel(" "),c);
 
-        //tgmPanel.add(new JLabel("fitResi (um)<"),c);
-        //fitresiCut.setText("1000");
-        //fitresiCut.addActionListener(this);
-        //tgmPanel.add(fitresiCut,c);
+        y++;
+        c.gridx = 1;
+	c.gridy = y;
+        trPanel.add(new JLabel(" "),c);
 
-        //tgmPanel.add(new JLabel("nhits>"),c);
-        //nWires.setText("4");
-        //nWires.addActionListener(this);
-        //tgmPanel.add(nWires,c);
+        y++;
+        c.gridx = 1;
+	c.gridy = y;
+        trPanel.add(new JLabel("Event Selection"),c);
 
-        //c.gridx = 1;
-        //trPanel.add(tgmPanel,c);
-        //---------------------------------------------------------------------
-
-        c.gridx = 2;
-        c.gridy = y;
+        y++;
+        c.gridx = 0;
+	c.gridy = y;
+        trPanel.add(new JLabel("beta > "),c);
         tgmPanel = new JPanel();
-        trPanel.add(new JLabel("beta>", JLabel.LEADING),c);
-        
         betaCut.setText("0.9");
         betaCut.addActionListener(this);
         tgmPanel.add(betaCut);
-        c.gridx = 3;
+        c.gridx = 1;
 	c.gridy = y;
         trPanel.add(tgmPanel,c);
-        c.gridx = 2;
-        c.gridy = y;
-        trPanel.add(new JLabel(""),c);
-        //
+
         y++;
-        c.gridx = 2;
-        c.gridy = y;
+        c.gridx = 0;
+	c.gridy = y;
+        trPanel.add(new JLabel("fitResi (um) < "),c);
         tgmPanel = new JPanel();
-        trPanel.add(new JLabel("fitResi (um)<", JLabel.LEADING),c);
-        
         fitresiCut.setText("1000");
-        //---!!!---
-        //betaCut.addActionListener(this);
         fitresiCut.addActionListener(this);
-        //---!!!---
         tgmPanel.add(fitresiCut);
-        c.gridx = 3;
+        c.gridx = 1;
 	c.gridy = y;
         trPanel.add(tgmPanel,c);
-        c.gridx = 2;
-        c.gridy = y;
-        trPanel.add(new JLabel(""),c);
-        //npassWires ,nWires ,deltaWire
+
         y++;
-        c.gridx = 2;
-        c.gridy = y;
+        c.gridx = 0;
+	c.gridy = y;
+        trPanel.add(new JLabel("nhits > "),c);
         tgmPanel = new JPanel();
-        trPanel.add(new JLabel("nhits>", JLabel.LEADING),c);
-        
         nWires.setText("4");
         nWires.addActionListener(this);
         tgmPanel.add(nWires);
-        c.gridx = 3;
+        c.gridx = 1;
 	c.gridy = y;
         trPanel.add(tgmPanel,c);
-        c.gridx = 2;
-        c.gridy = y;
-        trPanel.add(new JLabel(""),c);
-        
-        //
+
         y++;
-        c.gridx = 2;
+        c.gridx = 0;
         c.gridy = y;
+        trPanel.add(new JLabel("nwires_wi_ave <= ", JLabel.LEADING),c);
         tgmPanel = new JPanel();
-        trPanel.add(new JLabel("nwires_wi_ave<=", JLabel.LEADING),c);
-        
         npassWires.setText("9");
         npassWires.addActionListener(this);
         tgmPanel.add(npassWires);
-        c.gridx = 3;
+        c.gridx = 1;
 	c.gridy = y;
         trPanel.add(tgmPanel,c);
-        c.gridx = 2;
-        c.gridy = y;
-        trPanel.add(new JLabel(""),c);
         
-        //
         y++;
-        c.gridx = 2;
+        c.gridx = 0;
         c.gridy = y;
+        trPanel.add(new JLabel("deltaWire = ", JLabel.LEADING),c);
         tgmPanel = new JPanel();
-        trPanel.add(new JLabel("deltaWire=", JLabel.LEADING),c);
-        
         deltaWire.setText("9");
         deltaWire.addActionListener(this);
         tgmPanel.add(deltaWire);
-        c.gridx = 3;
+        c.gridx = 1;
 	c.gridy = y;
         trPanel.add(tgmPanel,c);
-        c.gridx = 2;
-        c.gridy = y;
-        trPanel.add(new JLabel(""),c);
         
-         //
         y++;
+        c.gridx = 1;
+	c.gridy = y;
+        trPanel.add(new JLabel(" "),c);
+
         y++;
-        c.gridx = 2;
+        c.gridx = 1;
+	c.gridy = y;
+        trPanel.add(new JLabel("Options"),c);
+
+        y++;
+        c.gridx = 0;
         c.gridy = y;
+        trPanel.add(new JLabel("Variation", JLabel.LEADING),c);
         tgmPanel = new JPanel();
-        trPanel.add(new JLabel("variation", JLabel.LEADING),c);
-        
         calVariation.addActionListener(this);
         tgmPanel.add(calVariation);
-        c.gridx = 3;
+        c.gridx = 1;
 	c.gridy = y;
         trPanel.add(tgmPanel,c);
-        c.gridx = 2;
-        c.gridy = y;
-        trPanel.add(new JLabel(""),c);
         
-         //
         y++;
-        y++;
-        c.gridx = 2;
+        c.gridx = 0;
         c.gridy = y;
-        tgmPanel = new JPanel();
         trPanel.add(new JLabel("distbeta", JLabel.LEADING),c);
-        
+        tgmPanel = new JPanel();
         distBetaFCN.addActionListener(this);
         tgmPanel.add(distBetaFCN);
-        c.gridx = 3;
+        c.gridx = 1;
 	c.gridy = y;
         trPanel.add(tgmPanel,c);
-        c.gridx = 2;
-        c.gridy = y;
-        trPanel.add(new JLabel(""),c);
         
-        
-        //add number of events selection
         y++;
-        c.gridx = 2;
+        c.gridx = 0;
         c.gridy = y;
+        trPanel.add(new JLabel("Number of Events = ", JLabel.LEADING),c);
         tgmPanel = new JPanel();
-        trPanel.add(new JLabel("number of events = ", JLabel.LEADING),c);
-        
         enternofevents.setText("-1");
         enternofevents.addActionListener(this);
         tgmPanel.add(enternofevents);
-        c.gridx = 3;
+        c.gridx = 1;
         c.gridy = y;
         trPanel.add(tgmPanel,c);
-        c.gridx = 2;
+
+        y++;
+        c.gridx = 0;
         c.gridy = y;
-        trPanel.add(new JLabel(""),c);
-        
+        trPanel.add(new JLabel("Sector = ", JLabel.LEADING),c);
+        tgmPanel = new JPanel();
+        sectorN.setText("-1");
+        sectorN.addActionListener(this);
+        tgmPanel.add(sectorN);
+        c.gridx = 1;
+        c.gridy = y;
+        trPanel.add(tgmPanel,c);
+        //---------------------------------------------------------------------
         
         JPanel butPage3 = new configButtonPanel(this, true, "Finish");
         trOuterPanel.add(butPage3, BorderLayout.SOUTH);
