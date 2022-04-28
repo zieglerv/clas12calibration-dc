@@ -102,10 +102,10 @@ public class T2DViewer implements IDataEventListener, DetectorListener, ActionLi
     public static JTextField deltaWire = new JTextField(3);
     public static JTextField enternofevents = new JTextField(3); 
     
-    String[] calVars = {"default", "dc_team_rga_fall2018", ""};
+    String[] calVars = {"dc_team_rga_fall2018", "default", ""};
     public static JComboBox  calVariation ;
     
-    String[] distBetaFCNSelect = {"old", "new"};
+    String[] distBetaFCNSelect = {"new", "old"};
     public static JComboBox  distBetaFCN ;
     
 
@@ -155,13 +155,13 @@ public class T2DViewer implements IDataEventListener, DetectorListener, ActionLi
         settings.add(menuItem);
         menuBar.add(settings);
         
-        JMenu fits = new JMenu("Fits");
-        fits.getAccessibleContext().setAccessibleDescription("Choose parameters");
-        menuItem = new JMenuItem("Refit");
-        menuItem.getAccessibleContext().setAccessibleDescription("...");
-        menuItem.addActionListener(this);
-        fits.add(menuItem);
-        menuBar.add(fits);
+        //JMenu fits = new JMenu("Fits");
+        //fits.getAccessibleContext().setAccessibleDescription("Choose parameters");
+        //menuItem = new JMenuItem("Refit");
+        //menuItem.getAccessibleContext().setAccessibleDescription("...");
+        //menuItem.addActionListener(this);
+        //fits.add(menuItem);
+        //menuBar.add(fits);
            
         // create main panel
         mainPanel = new JPanel();	
@@ -561,7 +561,7 @@ public class T2DViewer implements IDataEventListener, DetectorListener, ActionLi
         c.gridx = 2;
         c.gridy = y;
         tgmPanel = new JPanel();
-        trPanel.add(new JLabel("fitResi (um)>", JLabel.LEADING),c);
+        trPanel.add(new JLabel("fitResi (um)<", JLabel.LEADING),c);
         
         fitresiCut.setText("1000");
         betaCut.addActionListener(this);
@@ -613,7 +613,7 @@ public class T2DViewer implements IDataEventListener, DetectorListener, ActionLi
         tgmPanel = new JPanel();
         trPanel.add(new JLabel("deltaWire=", JLabel.LEADING),c);
         
-        deltaWire.setText("3");
+        deltaWire.setText("9");
         deltaWire.addActionListener(this);
         tgmPanel.add(deltaWire);
         c.gridx = 3;

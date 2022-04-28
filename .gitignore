@@ -1,1 +1,7 @@
+
 /target/
+target/*
+env.sh
+Files/*
+TestCalOutPut.hipo
+TestOutPut.hipo
