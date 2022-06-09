@@ -46,6 +46,7 @@ import org.jlab.rec.dc.Constants;
 import org.jlab.rec.dc.hit.FittedHit;
 import org.jlab.utils.groups.IndexedList;
 import org.jlab.utils.system.ClasUtilsFile;
+import org.netlib.util.booleanW;
 /**
  *
  * @author ziegler
@@ -871,6 +872,7 @@ public class T2DCalib extends AnalysisMonitor{
         
         //refit with new constants
         if(this.refitSegs) {
+        	//Refit rf = new Refit();
             rf.reFit(calhitlist);    
             for(FittedHit hit : calhitlist) {// get the new track docas after refitting using the TB tFlight and tProp
                 double theta0 = Math.toDegrees(Math.acos(1-0.02*hit.getB()));
@@ -1373,7 +1375,15 @@ public class T2DCalib extends AnalysisMonitor{
         double theta0 = Math.toDegrees(Math.acos(1-0.02*bFieldVal));
         double alphaRadUncor = bnkHits.getFloat("Alpha", i)+(double)T2DCalib.polarity*theta0;
 
+        int sector = bnkHits.getInt("sector", i);
+        boolean sectorcut = false;
+        if (Integer.parseInt(T2DViewer.sectorN.getText())==-1 || sector == Integer.parseInt(T2DViewer.sectorN.getText()) ) {
+        //	System.out.println("Sectorcut check: sector is  " + sector + " with cut value "+ Integer.parseInt(T2DViewer.sectorN.getText()) );
+        	sectorcut = true;
+        }
+        
         if (bnkHits.getByte("trkID", i) >0 
+        		    && sectorcut
                     && bnkHits.getFloat("TFlight", i)>0 
                     && Math.abs(bnkHits.getFloat("fitResidual", i))<0.0001*Double.parseDouble(T2DViewer.fitresiCut.getText()) 
                     && this.passPID(event, bnkHits, i)==true)
@@ -1392,7 +1402,15 @@ public class T2DCalib extends AnalysisMonitor{
         double theta0 = Math.toDegrees(Math.acos(1-0.02*bFieldVal));
         double alphaRadUncor = bnkHits.getFloat("Alpha", i)+(double)T2DCalib.polarity*theta0;
 
+        int sector = bnkHits.getInt("sector", i);
+        boolean sectorcut = false;
+        if (Integer.parseInt(T2DViewer.sectorN.getText())==-1 || sector == Integer.parseInt(T2DViewer.sectorN.getText()) ) {
+        //	System.out.println("Sectorcut check: sector is  " + sector + " with cut value "+ Integer.parseInt(T2DViewer.sectorN.getText()) );
+        	sectorcut = true;
+        }
+        
         if (bnkHits.getByte("trkID", i) >0 
+        			&& sectorcut
                     && bnkHits.getFloat("beta", i)> Double.parseDouble(T2DViewer.betaCut.getText()) 
                     && this.selectOnAlpha(superlayer, alphaRadUncor)==true
                     && bnkHits.getFloat("TFlight", i)>0 
