@@ -72,7 +72,6 @@ public class T00Calib extends AnalysisMonitor{
         //hipoEvent = (HipoDataEvent) writer.createEvent();
         //writer.open("TestOutPut.hipo");
         //writer.writeEvent(hipoEvent);
-        Utilities.NEWDELTATBETAFCN = true;
 
         
     }
@@ -259,16 +258,7 @@ public class T00Calib extends AnalysisMonitor{
             
             double time = (double) bnkHits.getFloat("time", j);
             double calibtime = time + bnkHits.getFloat("tBeta",j); //time without tbeta correction
-            //tbeta correction function is in Utilities.java named calcDeltaTimeBetaNew(calibtime,distbeta,beta);
-            double beta = bnkHits.getFloat("beta",j);
-            //distbeta is from ccdb for superlayer and sector 
-            double distbeta = TableLoader.distbeta[sec-1][sl-1];
-           //scale factor on how much of the new beta correction should be applied. values should be from 0 to 1
-            double tbetascalefactor = 1; 
-            //calculate tbeta correction
-            double newtbetacorr = tbetascalefactor*util.calcDeltaTimeBetaNewFCN(calibtime, distbeta, beta);            
-           //apply tbeta correction
-            double timecorrected = calibtime - newtbetacorr;
+           
             //debug output
            // System.out.println("Sector " + sec + " sl " + sl + " distbeta is " + distbeta);
            // System.out.println("time " + time + " calibtime " + calibtime + " calib-newtbeta " + timecorrected + " tbetafromfile " + bnkHits.getFloat("tBeta",j) + " tbetarecal " + newtbetacorr);
@@ -279,7 +269,7 @@ public class T00Calib extends AnalysisMonitor{
                 //pass if the track is identified as an electron or as a hadron
                  if(pid==11) {
                 	 this.TDCHis.get(new Coordinate(sec-1, sl-1))
-                     .fill(timecorrected);
+                     .fill(calibtime);
                  }
                 }
             }

@@ -2,7 +2,11 @@ package org.clas.detector.clas12calibration.dc.t2d;
 
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
+import java.util.HashMap;
+import java.util.Map; 
 import org.jlab.detector.calib.utils.DatabaseConstantProvider;
+import org.jlab.groot.data.GraphErrors;
+import org.jlab.groot.ui.TCanvas;
 import org.jlab.rec.dc.Constants;
 import org.jlab.rec.dc.timetodistance.T2DFunctions;
 import org.jlab.utils.groups.IndexedTable;
@@ -120,7 +124,39 @@ public class TableLoader {
         AlphaBounds[0][0] = 0;
         AlphaBounds[5][1] = 30;
     }
+    static Map<Integer, GraphErrors> sup1 = new HashMap<Integer, GraphErrors>();
+    static Map<Integer, GraphErrors> sup2 = new HashMap<Integer, GraphErrors>();
+    static Map<Integer, GraphErrors> sup3 = new HashMap<Integer, GraphErrors>();
+    static Map<Integer, GraphErrors> sup4 = new HashMap<Integer, GraphErrors>();
+    static Map<Integer, GraphErrors> sup5 = new HashMap<Integer, GraphErrors>();
+    static Map<Integer, GraphErrors> sup6 = new HashMap<Integer, GraphErrors>();
     public static synchronized void Fill(IndexedTable tab) {
+        for(int a = 0; a<6; a++ ){ // loop over alpha
+            sup1.put(a, new GraphErrors()); 
+            sup1.get(a).setMarkerColor(a+1);
+            sup2.put(a, new GraphErrors()); 
+            sup2.get(a).setMarkerColor(a+1);
+            sup3.put(a, new GraphErrors()); 
+            sup3.get(a).setMarkerColor(a+1);
+            sup4.put(a, new GraphErrors()); 
+            sup4.get(a).setMarkerColor(a+1);
+            sup5.put(a, new GraphErrors()); 
+            sup5.get(a).setMarkerColor(a+1);
+            sup6.put(a, new GraphErrors()); 
+            sup6.get(a).setMarkerColor(a+1);
+        }
+        sup1.get(0).setTitleX("time (ns)");
+        sup1.get(0).setTitleY("calc doca (cm)");
+        sup2.get(0).setTitleX("time (ns)");
+        sup2.get(0).setTitleY("calc doca (cm)");
+        sup3.get(0).setTitleX("time (ns)");
+        sup3.get(0).setTitleY("calc doca (cm)");
+        sup4.get(0).setTitleX("time (ns)");
+        sup4.get(0).setTitleY("calc doca (cm)");
+        sup5.get(0).setTitleX("time (ns)");
+        sup5.get(0).setTitleY("calc doca (cm)");
+        sup6.get(0).setTitleX("time (ns)");
+        sup6.get(0).setTitleY("calc doca (cm)");
         //CCDBTables 0 =  "/calibration/dc/signal_generation/doca_resolution";
         //CCDBTables 1 =  "/calibration/dc/time_to_distance/t2d";
         //CCDBTables 2 =  "/calibration/dc/time_corrections/T0_correction";	
@@ -140,6 +176,7 @@ public class TableLoader {
                     deltanm[s][r] = tab.getDoubleValue("deltanm", s+1,r+1,0);
                     v0[s][r] = tab.getDoubleValue("v0", s+1,r+1,0);
                     vmid[s][r] = tab.getDoubleValue("c2", s+1,r+1,0);
+                    distbetascale[s][r] = 1;
                     delta_bfield_coefficient[s][r] = tab.getDoubleValue("delta_bfield_coefficient", s+1,r+1,0); 
                     distbeta[s][r] = tab.getDoubleValue("distbeta", s+1,r+1,0); 
                     b1[s][r] = tab.getDoubleValue("b1", s+1,r+1,0);
@@ -155,7 +192,7 @@ public class TableLoader {
                         double bfield = BfieldValues[ibfield];
 
                         for(int icosalpha =0; icosalpha<maxBinIdxAlpha+1; icosalpha++) {
-
+                                maxBinIdxT[s][r][ibfield][icosalpha] = nBinsT; 
                                 double cos30minusalpha = Math.cos(Math.toRadians(30.)) + (double) (icosalpha)*(1. - Math.cos(Math.toRadians(30.)))/5.;
                                 double alpha = -(Math.toDegrees(Math.acos(cos30minusalpha)) - 30);
                                 int nxmax = (int) (dmax*cos30minusalpha/stepSize); 
@@ -204,20 +241,84 @@ public class TableLoader {
         TableLoader.fillMissingTableBins();
         //TableLoader.test();
         System.out.println(" T2D TABLE FILLED.....");
+        //testBeq1();
+        //test();
         T2DLOADED = true;
      }
-    
+    private static void testBeq1() {
+        DecimalFormat df = new DecimalFormat("#");
+        df.setRoundingMode(RoundingMode.CEILING);
+        int ib = 1;
+        int s = 0;
+      
+        for(int a = 0; a < 6; a++) {
+            for(int t =0; t<800; t++) {
+                
+                double time = (double) t;
+                int tbin = Integer.parseInt(df.format(time/2.) ) -1;
+                if(tbin<0)
+                    tbin =0;
+                double cos30minusalpha = Math.cos(Math.toRadians(30.)) + (double) (a)*(1. - Math.cos(Math.toRadians(30.)))/5.;
+                double alpha = -(Math.toDegrees(Math.acos(cos30minusalpha)) - 30);
+                if(t<200)
+                    sup1.get(a).addPoint(time, DISTFROMTIME[s][0][ib][a][tbin], 0, 0);
+                if(t<240)
+                    sup2.get(a).addPoint(time, DISTFROMTIME[s][1][ib][a][tbin], 0, 0);
+                if(t<500)
+                    sup3.get(a).addPoint(time, DISTFROMTIME[s][2][ib][a][tbin], 0, 0);
+                if(t<560)
+                    sup4.get(a).addPoint(time, DISTFROMTIME[s][3][ib][a][tbin], 0, 0);
+                if(t<750)
+                        sup5.get(a).addPoint(time, DISTFROMTIME[s][4][ib][a][tbin], 0, 0);
+                if(t<780)
+                    sup6.get(a).addPoint(time, DISTFROMTIME[s][5][ib][a][tbin], 0, 0);
+            }
+        }
+        TCanvas can1 = new TCanvas("c1", 800, 800);
+        can1.divide(2, 3);
+        can1.cd(0);
+        can1.draw(sup1.get(0));
+        for(int a = 1; a < 6; a++) {
+            can1.draw(sup1.get(a), "same");
+        }
+        can1.cd(1);
+        can1.draw(sup2.get(0));
+        for(int a = 1; a < 6; a++) {
+            can1.draw(sup2.get(a), "same");
+        }
+        can1.cd(2);
+        can1.draw(sup3.get(0));
+        for(int a = 1; a < 6; a++) {
+            can1.draw(sup3.get(a), "same");
+        }
+        can1.cd(3);
+        can1.draw(sup4.get(0));
+        for(int a = 1; a < 6; a++) {
+            can1.draw(sup4.get(a), "same");
+        }
+        can1.cd(4);
+        can1.draw(sup5.get(0));
+        for(int a = 1; a < 6; a++) {
+            can1.draw(sup5.get(a), "same");
+        }
+        can1.cd(5);
+        can1.draw(sup6.get(0));
+        for(int a = 1; a < 6; a++) {
+            can1.draw(sup6.get(a), "same");
+        }
+    }
     private static void test() {
         for(int r = 2; r<3; r++ ){ //loop over slys
-            for(int ibfield =0; ibfield<4; ibfield++) {
+            for(int ibfield =1; ibfield<2; ibfield++) {
+                for(int t = 1; t<100; t++)
                 for(int icosalpha =0; icosalpha<maxBinIdxAlpha+1; icosalpha++) {
                     double cos30minusalpha = Math.cos(Math.toRadians(30.)) + (double) (icosalpha)*(1. - Math.cos(Math.toRadians(30.)))/5.;
                     double alpha = -(Math.toDegrees(Math.acos(cos30minusalpha)) - 30);
                     int nxmax = (int) (2.*Constants.getInstance().wpdist[r]*cos30minusalpha/0.0010); 
 
-                    System.out.println("superlayer "+(r+1)+" B bin "+ibfield+" alpha bin "+icosalpha+
-                            "B "+(float)+ Math.sqrt(BfieldValues[ibfield])+" nteps "+nxmax
-                            +" value "+DISTFROMTIME[0][r][ibfield][icosalpha][20]);
+                    System.out.println("t "+(t)+" B bin "+ibfield+" alpha bin "+icosalpha+
+                            "alpha "+(float) alpha+" nteps "+nxmax
+                            +" value "+DISTFROMTIME[0][r][ibfield][icosalpha][t]);
                 }
             }
         }
@@ -243,7 +344,7 @@ public class TableLoader {
                         double bfield = BfieldValues[ibfield];
 
                         for(int icosalpha =0; icosalpha<maxBinIdxAlpha+1; icosalpha++) {
-
+                                maxBinIdxT[s][r][ibfield][icosalpha] = nBinsT; 
                                 double cos30minusalpha = Math.cos(Math.toRadians(30.)) + (double) (icosalpha)*(1. - Math.cos(Math.toRadians(30.)))/5.;
                                 double alpha = -(Math.toDegrees(Math.acos(cos30minusalpha)) - 30);
                                 int nxmax = (int) (dmax*cos30minusalpha/stepSize); 
@@ -348,6 +449,7 @@ public class TableLoader {
     public static double[][] distbeta = new double[6][6];
     public static double[][] deltanm = new double[6][6];
     public static double[][] vmid = new double[6][6];
+    public static double[][] distbetascale = new double[6][6];
     public static double[][] v0 = new double[6][6];
     public static double[][] b1 = new double[6][6];
     public static double[][] b2 = new double[6][6];

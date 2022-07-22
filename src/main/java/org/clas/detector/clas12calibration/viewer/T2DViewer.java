@@ -96,6 +96,7 @@ public class T2DViewer implements IDataEventListener, DetectorListener, ActionLi
     public static JTextField[] alphaCuts1 = {new JTextField(9),new JTextField(9),new JTextField(9),new JTextField(9),new JTextField(9),new JTextField(9)};
     public static JTextField[] alphaCuts2 = {new JTextField(9),new JTextField(9),new JTextField(9),new JTextField(9),new JTextField(9),new JTextField(9)};
     public static JTextField betaCut = new JTextField(3);
+    public static JTextField betaCut2 = new JTextField(3);
     public static JTextField fitresiCut = new JTextField(3);
     public static JTextField npassWires = new JTextField(3);
     public static JTextField nWires = new JTextField(3);
@@ -515,7 +516,7 @@ public class T2DViewer implements IDataEventListener, DetectorListener, ActionLi
         tgmPanel = new JPanel();
         trPanel.add(new JLabel("alpha > "),c);
         for(int i = 0; i < 6; i++) {
-            alphaCuts1[i].setText("-30");
+            alphaCuts1[i].setText("-60");
             alphaCuts1[i].addActionListener(this);
             tgmPanel.add(alphaCuts1[i]);
         }
@@ -532,7 +533,7 @@ public class T2DViewer implements IDataEventListener, DetectorListener, ActionLi
         tgmPanel = new JPanel();
         trPanel.add(new JLabel("alpha < "),c);
         for(int i = 0; i < 6; i++) {
-            alphaCuts2[i].setText("30");
+            alphaCuts2[i].setText("60");
             alphaCuts2[i].addActionListener(this);
             tgmPanel.add(alphaCuts2[i]);
         }
@@ -570,6 +571,18 @@ public class T2DViewer implements IDataEventListener, DetectorListener, ActionLi
 	c.gridy = y;
         trPanel.add(tgmPanel,c);
 
+        y++;
+        c.gridx = 0;
+	c.gridy = y;
+        trPanel.add(new JLabel("beta < "),c);
+        tgmPanel = new JPanel();
+        betaCut2.setText("1.0");
+        betaCut2.addActionListener(this);
+        tgmPanel.add(betaCut2);
+        c.gridx = 1;
+	c.gridy = y;
+        trPanel.add(tgmPanel,c);
+        
         y++;
         c.gridx = 0;
 	c.gridy = y;
@@ -639,16 +652,16 @@ public class T2DViewer implements IDataEventListener, DetectorListener, ActionLi
 	c.gridy = y;
         trPanel.add(tgmPanel,c);
         
-        y++;
-        c.gridx = 0;
-        c.gridy = y;
-        trPanel.add(new JLabel("distbeta", JLabel.LEADING),c);
-        tgmPanel = new JPanel();
-        distBetaFCN.addActionListener(this);
-        tgmPanel.add(distBetaFCN);
-        c.gridx = 1;
-	c.gridy = y;
-        trPanel.add(tgmPanel,c);
+//        y++;
+//        c.gridx = 0;
+//        c.gridy = y;
+//        trPanel.add(new JLabel("distbeta", JLabel.LEADING),c);
+//        tgmPanel = new JPanel();
+//        distBetaFCN.addActionListener(this);
+//        tgmPanel.add(distBetaFCN);
+//        c.gridx = 1;
+//	c.gridy = y;
+//        trPanel.add(tgmPanel,c);
         
         y++;
         c.gridx = 0;

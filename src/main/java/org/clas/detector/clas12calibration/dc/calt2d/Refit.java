@@ -11,7 +11,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import org.clas.detector.clas12calibration.viewer.T2DViewer;
-import org.jlab.clas.swimtools.Swimmer;
 import org.jlab.rec.dc.cluster.Cluster;
 import org.jlab.rec.dc.cluster.ClusterFitter;
 import org.jlab.rec.dc.cluster.FittedCluster;
@@ -76,9 +75,14 @@ public class Refit {
             
             for(FittedHit h : clus) {
                 //local angle updated
-                h.setAlpha(Math.toDegrees(Math.atan(trkAngle) - Math.acos(1-0.02*h.getB())));
+                double theta0 = Math.toDegrees(Math.acos(1-0.02*h.getB()));
+                double alpha = Math.toDegrees(Math.atan(trkAngle));
+                // correct alpha with theta0, the angle corresponding to the isochrone lines twist due to the electric field
+                alpha-=(double)T2DCalib.polarity*theta0;
+                h.setAlpha(alpha);
                 double cosTkAng = 1./Math.sqrt(trkAngle*trkAngle + 1.);
                 h.set_X(h.get_XWire() + h.get_LeftRightAmb() * (h.get_Doca() / cosTkAng) );
+                
             }
             //refit after updating alpha
             cf.SetFitArray(clus, "TSC");

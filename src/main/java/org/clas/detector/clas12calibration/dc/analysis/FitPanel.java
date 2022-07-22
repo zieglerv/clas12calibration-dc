@@ -165,7 +165,7 @@ public class FitPanel {
                     // bb is true for parameter "tmax" on superlayers 3 and 4 only
                     boolean bb = i==3 && (j==2 || j==3);
                     // cc is true for parameter "delBf" on superlayers 1, 2, 5, and 6 only
-                    boolean cc = i==5 && (j==0 || j==1 || j==4 || j==5);
+                    boolean cc = i==5 ;//&& (j==0 || j==1 || j==4 || j==5);
                     if(aa || bb || cc) {
                         fixFit[i][j].setSelected(true);
                     } else {
