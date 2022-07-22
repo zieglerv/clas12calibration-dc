@@ -38,7 +38,7 @@ public class Utilities {
         return Math.toDegrees(ralpha);
     }  
 
-    double getDeltaTimeBeta(double x, double beta, double distbeta, double v_0) {
+    public double getDeltaTimeBeta(double x, double beta, double distbeta, double v_0) {
       
         double dtbscl = 0.5*(x/Math.sqrt(x*x+T2DCalib.DBF)+1);
         dtbscl =0.1;
