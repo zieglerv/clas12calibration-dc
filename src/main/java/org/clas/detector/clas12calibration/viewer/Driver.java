@@ -22,6 +22,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.plaf.metal.MetalButtonUI;
+import org.jlab.rec.dc.Constants;
 
 /**
  *
@@ -29,6 +30,17 @@ import javax.swing.plaf.metal.MetalButtonUI;
  */
 public class Driver {
     
+    public static int        selectedSector = 0;
+    public static boolean    wireDistortion = false;
+    public static boolean    useStartTime   = true;
+    public static boolean    useBetaCut     = false;
+    public static boolean    useDoublets    = false;
+    public static int        t2d            = 0;
+    public static int        nSuperLayer    = 5;
+    public static String     geoVariation   = "default";
+    public static String     bankType       = "TimeBasedTrkg";
+    public static String     outBankPrefix  = null;
+    public static double[][] shifts         = new double[Constants.NREG][6];
       
     public static void main(String[] args) throws FileNotFoundException {
         File file

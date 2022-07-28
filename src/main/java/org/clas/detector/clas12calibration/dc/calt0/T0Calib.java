@@ -45,6 +45,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import org.clas.detector.clas12calibration.viewer.Driver;
 import org.jlab.groot.data.DataLine;
 /**
  *
@@ -354,7 +355,17 @@ public class T0Calib extends AnalysisMonitor{
         }
         
         if(count==1) {
-            Constants.getInstance().initialize("DCCAL");
+            //Constants.getInstance().initialize("DCCAL");
+            Constants.getInstance().initialize("DCCAL",
+                       Driver.geoVariation, 
+                       Driver.wireDistortion, 
+                       Driver.useStartTime, 
+                       Driver.useBetaCut, 
+                       Driver.t2d,
+                       Driver.useDoublets,
+                       Driver.nSuperLayer, 
+                       Driver.selectedSector,
+                       Driver.shifts);
             TableLoader.FillT0Tables(newRun, "default");
             ReadTT.Load(newRun, "default"); 
             runNumber = newRun; 

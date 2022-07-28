@@ -20,6 +20,7 @@ import org.clas.detector.clas12calibration.dc.analysis.Coordinate;
 import org.clas.detector.clas12calibration.dc.analysis.FitPanel;
 import org.clas.detector.clas12calibration.dc.t2d.TimeToDistanceEstimator;
 import org.clas.detector.clas12calibration.viewer.AnalysisMonitor;
+import org.clas.detector.clas12calibration.viewer.Driver;
 import org.clas.detector.clas12calibration.viewer.T2DViewer;
 import static org.clas.detector.clas12calibration.viewer.T2DViewer.ccdb;
 import org.freehep.math.minuit.FCNBase;
@@ -64,7 +65,7 @@ public class T2DCalib extends AnalysisMonitor{
     private Utilities util = new Utilities();
     private int numberprocessedevents;
     private static double betaAve = 1;
-    public static double DBF =0.055; //factor in distbeta function (util class)
+    public static double DBF =0.025; //factor in distbeta function (util class)
     
     public T2DCalib(String name, ConstantsManager ccdb) throws FileNotFoundException {
         super(name, ccdb);
@@ -769,7 +770,17 @@ public class T2DCalib extends AnalysisMonitor{
         
         //if(count>20000) return;
         if(count==1) {
-            Constants.getInstance().initialize("DCCAL");
+            //Constants.getInstance().initialize("DCCAL");
+            Constants.getInstance().initialize("DCCAL",
+                                   Driver.geoVariation, 
+                                   Driver.wireDistortion, 
+                                   Driver.useStartTime, 
+                                   Driver.useBetaCut, 
+                                   Driver.t2d,
+                                   Driver.useDoublets,
+                                   Driver.nSuperLayer, 
+                                   Driver.selectedSector,
+                                   Driver.shifts);
             String newVar = String.valueOf(T2DViewer.calVariation.getSelectedItem());
             System.out.println("* VARIATION *"+newVar);
             ccdb.setVariation(newVar);

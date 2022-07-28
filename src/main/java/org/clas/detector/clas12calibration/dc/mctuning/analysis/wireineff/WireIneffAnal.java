@@ -19,6 +19,7 @@ import org.clas.detector.clas12calibration.dc.mctuning.analysis.Coordinate;
 import org.clas.detector.clas12calibration.dc.mctuning.viewer.AnalysisMonitor;
 import org.clas.detector.clas12calibration.dc.mctuning.viewer.WireIneffAnalViewer;
 import org.clas.detector.clas12calibration.dc.t2d.TableLoader;
+import org.clas.detector.clas12calibration.viewer.Driver;
 import org.freehep.math.minuit.FCNBase;
 import org.freehep.math.minuit.FunctionMinimum;
 import org.freehep.math.minuit.MnMigrad;
@@ -368,7 +369,17 @@ public class WireIneffAnal extends AnalysisMonitor{
         }
        
         if(count==1) {
-            Constants.getInstance().initialize("DCCAL");
+            //Constants.getInstance().initialize("DCCAL");
+            Constants.getInstance().initialize("DCCAL",
+                       Driver.geoVariation, 
+                       Driver.wireDistortion, 
+                       Driver.useStartTime, 
+                       Driver.useBetaCut, 
+                       Driver.t2d,
+                       Driver.useDoublets,
+                       Driver.nSuperLayer, 
+                       Driver.selectedSector,
+                       Driver.shifts);
             TableLoader.FillT0Tables(newRun, "default");
             TableLoader.Fill(ccdb.getConstants(newRun, Constants.TIME2DIST));  
             runNumber = newRun;

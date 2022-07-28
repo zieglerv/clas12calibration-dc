@@ -19,6 +19,7 @@ import org.clas.detector.clas12calibration.dc.analysis.Coordinate;
 import org.clas.detector.clas12calibration.dc.calt2d.SegmentProperty;
 import org.clas.detector.clas12calibration.dc.calt2d.Utilities;
 import org.clas.detector.clas12calibration.viewer.AnalysisMonitor;
+import org.clas.detector.clas12calibration.viewer.Driver;
 import org.clas.detector.clas12calibration.viewer.T0Viewer;
 import org.jlab.detector.calib.utils.CalibrationConstants;
 import org.jlab.groot.data.H1F;
@@ -237,7 +238,17 @@ public class T00Calib extends AnalysisMonitor{
         }
         
         if(count==1) {
-            Constants.getInstance().initialize("DCCAL");
+            //Constants.getInstance().initialize("DCCAL");
+            Constants.getInstance().initialize("DCCAL",
+                       Driver.geoVariation, 
+                       Driver.wireDistortion, 
+                       Driver.useStartTime, 
+                       Driver.useBetaCut, 
+                       Driver.t2d,
+                       Driver.useDoublets,
+                       Driver.nSuperLayer, 
+                       Driver.selectedSector,
+                       Driver.shifts);
             TableLoader.FillT0Tables(newRun, "default");
 
             TableLoader.Fill(T0Viewer.ccdb.getConstants(newRun, "/calibration/dc/time_to_distance/time2dist"));  
