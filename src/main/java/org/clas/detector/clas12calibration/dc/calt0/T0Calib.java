@@ -356,16 +356,7 @@ public class T0Calib extends AnalysisMonitor{
         
         if(count==1) {
             //Constants.getInstance().initialize("DCCAL");
-            Constants.getInstance().initialize("DCCAL",
-                       Driver.geoVariation, 
-                       Driver.wireDistortion, 
-                       Driver.useStartTime, 
-                       Driver.useBetaCut, 
-                       Driver.t2d,
-                       Driver.useDoublets,
-                       Driver.nSuperLayer, 
-                       Driver.selectedSector,
-                       Driver.shifts);
+            Driver.init();
             TableLoader.FillT0Tables(newRun, "default");
             ReadTT.Load(newRun, "default"); 
             runNumber = newRun; 

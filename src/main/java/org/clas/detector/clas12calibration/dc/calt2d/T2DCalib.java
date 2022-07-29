@@ -771,16 +771,7 @@ public class T2DCalib extends AnalysisMonitor{
         //if(count>20000) return;
         if(count==1) {
             //Constants.getInstance().initialize("DCCAL");
-            Constants.getInstance().initialize("DCCAL",
-                                   Driver.geoVariation, 
-                                   Driver.wireDistortion, 
-                                   Driver.useStartTime, 
-                                   Driver.useBetaCut, 
-                                   Driver.t2d,
-                                   Driver.useDoublets,
-                                   Driver.nSuperLayer, 
-                                   Driver.selectedSector,
-                                   Driver.shifts);
+            Driver.init();
             String newVar = String.valueOf(T2DViewer.calVariation.getSelectedItem());
             System.out.println("* VARIATION *"+newVar);
             ccdb.setVariation(newVar);
