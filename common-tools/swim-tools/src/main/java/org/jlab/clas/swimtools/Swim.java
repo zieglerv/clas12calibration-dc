@@ -44,8 +44,9 @@ public class Swim {
     final double SWIMZMINMOM = 0.75; // GeV/c
     final double MINTRKMOM = 0.05; // GeV/c
     double accuracy = 20e-6; // 20 microns
-    double stepSize = 5.00 * 1.e-4; // 500 microns
-
+    public double stepSize = 5.00 * 1.e-4; // 500 microns
+    public double distanceBetweenSaves= 100*stepSize;
+    
     private ProbeCollection PC;
     
     /**
@@ -1071,4 +1072,100 @@ public class Swim {
 
     }
 
+    /**
+     * 
+     * @param Z
+     * @return state  x,y,z,px,py,pz, pathlength, iBdl at the surface 
+     */
+    public double[] SwimToZ(double Z, int dir) {
+        
+        double[] value = new double[8];
+        //if(this.SwimUnPhys)
+        //    return null;
+        
+        ZSwimStopper stopper = new ZSwimStopper(Z, dir);
+        
+        SwimTrajectory st = PC.CF.swim(_charge, _x0, _y0, _z0, _pTot, _theta, _phi, stopper, _maxPathLength, stepSize,
+                        distanceBetweenSaves);
+        if(st==null)
+                return null;
+        st.computeBDL(PC.CP);
+        // st.computeBDL(compositeField);
+        this.setSwimTraj(st);
+        double[] lastY = st.lastElement();
+
+        value[0] = lastY[0] * 100; // convert back to cm
+        value[1] = lastY[1] * 100; // convert back to cm
+        value[2] = lastY[2] * 100; // convert back to cm
+        value[3] = lastY[3] * _pTot; // normalized values
+        value[4] = lastY[4] * _pTot;
+        value[5] = lastY[5] * _pTot;
+        value[6] = lastY[6] * 100;
+        value[7] = lastY[7] * 10; // Conversion from kG.m to T.cm
+
+        return value;
+
+    }
+
+    private SwimTrajectory swimTraj; 
+    
+    private class ZSwimStopper implements IStopper {
+
+        private double _finalPathLength = Double.NaN;
+
+        private double _Z;
+        private int _dir;
+        
+        private ZSwimStopper(double Z, int dir) {
+            // The reconstruction units are cm. Swim units are m. Hence scale by
+            // 100
+            _Z = Z;
+           _dir = dir;
+        }
+
+        @Override
+        public boolean stopIntegration(double t, double[] y) {
+            
+            double z = y[2] * 100.;
+            if(_dir>0) {
+                return (z > _Z);
+            } else {
+                return (z<_Z);
+            }
+        }
+
+        /**
+         * Get the final path length in meters
+         *
+         * @return the final path length in meters
+         */
+        @Override
+        public double getFinalT() {
+                return _finalPathLength;
+        }
+
+        /**
+         * Set the final path length in meters
+         *
+         * @param finalPathLength
+         *            the final path length in meters
+         */
+        @Override
+        public void setFinalT(double finalPathLength) {
+                _finalPathLength = finalPathLength;
+        }
+    }
+    /**
+     * @return the swimTraj
+     */
+    public SwimTrajectory getSwimTraj() {
+        return swimTraj;
+    }
+
+    /**
+     * @param swimTraj the swimTraj to set
+     */
+    public void setSwimTraj(SwimTrajectory swimTraj) {
+        this.swimTraj = swimTraj;
+    }
 }

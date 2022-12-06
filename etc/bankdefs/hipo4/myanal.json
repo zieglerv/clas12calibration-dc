@@ -1,0 +1,43 @@
+[
+    {
+        "name": "ANAL::Event",
+        "group": 900,
+        "item": 10,
+        "info": "Event Header Bank",
+        "entries": [
+                {"name":"run",      "type":"I", "info":"run"},
+                {"name":"event",    "type":"I", "info":"event"},
+                {"name":"torus",    "type":"B", "info":"torus"},
+                {"name":"solenoid", "type":"B", "info":"solenoid"}
+            ]
+    },
+    {
+        "name": "ANAL::Particle",
+        "group": 900,
+        "item" : 11,
+        "info": "Reconstructed Particle Information",
+        "entries": [
+            {"name":"event",    "type":"I", "info":"event"},
+            {"name":"idx",      "type":"S", "info":"particle idx"},
+            {"name":"pid",      "type":"I", "info":"particle id in LUND conventions"},
+            {"name":"e",        "type":"F", "info":"particle mass constrained energy"},
+            {"name":"px",       "type":"F", "info":"x component of the momentum (GeV)"},
+            {"name":"py",       "type":"F", "info":"y component of the momentum (GeV)"},
+            {"name":"pz",       "type":"F", "info":"z component of the momentum (GeV)"},
+            {"name":"ecm",      "type":"F", "info":"CM-frame particle mass constrained energy"},
+            {"name":"pxcm",     "type":"F", "info":"CM-frame x component of the momentum (GeV)"},
+            {"name":"pycm",     "type":"F", "info":"CM-frame y component of the momentum (GeV)"},
+            {"name":"pzcm",     "type":"F", "info":"CM-frame z component of the momentum (GeV)"},
+            {"name":"vx",       "type":"F", "info":"x component of the vertex (cm)"},
+            {"name":"vy",       "type":"F", "info":"y component of the vertex (cm)"},
+            {"name":"vz",       "type":"F", "info":"z component of the vertex (cm)"},
+            {"name":"r",        "type":"F", "info":"distance between helices for 2-particle decay (cm)"},
+            {"name":"charge",   "type":"B", "info":"particle charge"},
+            {"name":"mass",     "type":"F", "info":"particle mass (MeV)"},
+            {"name":"ndau",     "type":"B", "info":"number of daughters"},
+            {"name":"dau1idx",  "type":"S", "info":"daughter 1 idx"},
+            {"name":"dau2idx",  "type":"S", "info":"daughter 2 idx"},
+            {"name":"dau3idx",  "type":"S", "info":"daughter 3 idx"}
+        ]
+    }
+]

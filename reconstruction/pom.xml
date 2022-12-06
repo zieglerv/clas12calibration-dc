@@ -33,6 +33,6 @@
     <module>raster</module>
     <module>vtx</module>
     <module>urwell</module>
-
+    <module>myanal</module>
   </modules>
 </project>
